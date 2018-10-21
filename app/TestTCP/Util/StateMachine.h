@@ -19,12 +19,18 @@ namespace state_machine
     /*
      * Interface for each state node.
      */
-    class StateNode {
+    class StateInterface {
+    public:
+        virtual Signal GetTransitSignal(Signal recv);
+        virtual ~StateInterface();
+    private:
+        virtual bool isValid(Signal recv); // recv: Signal that received. Application also.
+    };
+
+    class StateNode: StateInterface {
     public:
         Label state_label;
-        StateNode nextNode;
-        virtual Signal GetTransit(Signal recv);
-    private:
-        virtual bool isValid(Signal recv);
+        StateNode nextState;
+        Signal transit_signal; // Signal that StateNode should send.
     };
 }
