@@ -158,3 +158,6 @@ You may modify it freely to customize this project with your courses.
 Not only the source contribution, we also receive material contribution.
 If you have better presentation slides or other teaching material, you can contribute with them.
 Please let your students not to upload their solutions online.
+=======
+# KENS
+For kens part2, part3
