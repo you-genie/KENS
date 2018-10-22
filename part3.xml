@@ -1,0 +1,781 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="12" failures="12" disabled="0" errors="0" timestamp="2018-10-22T10:18:51" time="1.996" name="AllTests">
+  <testsuite name="TestEnv_Any" tests="12" failures="12" disabled="0" errors="0" time="1.996">
+    <testcase name="TestTransfer_Connect_Send_Symmetric" status="run" time="0.005" classname="TestEnv_Any">
+      <failure message="testtransfer.cpp:189&#x0A;Expected: (ret) &gt;= (0), actual: -1 vs 0" type=""><![CDATA[testtransfer.cpp:189
+Expected: (ret) >= (0), actual: -1 vs 0]]></failure>
+      <failure message="testtransfer.cpp:194&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:194
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:195&#x0A;      Expected: addr.sin_addr.s_addr&#x0A;      Which is: 67174410&#x0A;To be equal to: temp_addr.sin_addr.s_addr&#x0A;      Which is: 32767" type=""><![CDATA[testtransfer.cpp:195
+      Expected: addr.sin_addr.s_addr
+      Which is: 67174410
+To be equal to: temp_addr.sin_addr.s_addr
+      Which is: 32767]]></failure>
+      <failure message="testtransfer.cpp:196&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\x9C&apos; (156)" type=""><![CDATA[testtransfer.cpp:196
+      Expected: addr.sin_family
+      Which is: '\x2' (2)
+To be equal to: temp_addr.sin_family
+      Which is: '\x9C' (156)]]></failure>
+      <failure message="testtransfer.cpp:197&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 26513" type=""><![CDATA[testtransfer.cpp:197
+      Expected: addr.sin_port
+      Which is: 3879
+To be equal to: temp_addr.sin_port
+      Which is: 26513]]></failure>
+      <failure message="testtransfer.cpp:203&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:203
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:273&#x0A;      Expected: expect_size&#x0A;      Which is: 131072&#x0A;To be equal to: total_size&#x0A;      Which is: 0" type=""><![CDATA[testtransfer.cpp:273
+      Expected: expect_size
+      Which is: 131072
+To be equal to: total_size
+      Which is: 0]]></failure>
+      <failure message="testtransfer.cpp:68&#x0A;Expected: (client_fd) &gt;= (0), actual: -1 vs 0" type=""><![CDATA[testtransfer.cpp:68
+Expected: (client_fd) >= (0), actual: -1 vs 0]]></failure>
+      <failure message="testtransfer.cpp:71&#x0A;      Expected: client_addr.sin_family&#x0A;      Which is: &apos;\0&apos;&#x0A;To be equal to: 2" type=""><![CDATA[testtransfer.cpp:71
+      Expected: client_addr.sin_family
+      Which is: '\0'
+To be equal to: 2]]></failure>
+      <failure message="testtransfer.cpp:76&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:76
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:79&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\x8E&apos; (142)" type=""><![CDATA[testtransfer.cpp:79
+      Expected: addr.sin_family
+      Which is: '\x2' (2)
+To be equal to: temp_addr.sin_family
+      Which is: '\x8E' (142)]]></failure>
+      <failure message="testtransfer.cpp:80&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 60525" type=""><![CDATA[testtransfer.cpp:80
+      Expected: addr.sin_port
+      Which is: 3879
+To be equal to: temp_addr.sin_port
+      Which is: 60525]]></failure>
+      <failure message="testtransfer.cpp:86&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:86
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:156&#x0A;      Expected: expect_size&#x0A;      Which is: 131072&#x0A;To be equal to: total_size&#x0A;      Which is: 0" type=""><![CDATA[testtransfer.cpp:156
+      Expected: expect_size
+      Which is: 131072
+To be equal to: total_size
+      Which is: 0]]></failure>
+    </testcase>
+    <testcase name="TestTransfer_Connect_Send_EOF" status="run" time="0.005" classname="TestEnv_Any">
+      <failure message="testtransfer.cpp:189&#x0A;Expected: (ret) &gt;= (0), actual: -1 vs 0" type=""><![CDATA[testtransfer.cpp:189
+Expected: (ret) >= (0), actual: -1 vs 0]]></failure>
+      <failure message="testtransfer.cpp:194&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:194
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:195&#x0A;      Expected: addr.sin_addr.s_addr&#x0A;      Which is: 67174410&#x0A;To be equal to: temp_addr.sin_addr.s_addr&#x0A;      Which is: 32767" type=""><![CDATA[testtransfer.cpp:195
+      Expected: addr.sin_addr.s_addr
+      Which is: 67174410
+To be equal to: temp_addr.sin_addr.s_addr
+      Which is: 32767]]></failure>
+      <failure message="testtransfer.cpp:196&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\x9C&apos; (156)" type=""><![CDATA[testtransfer.cpp:196
+      Expected: addr.sin_family
+      Which is: '\x2' (2)
+To be equal to: temp_addr.sin_family
+      Which is: '\x9C' (156)]]></failure>
+      <failure message="testtransfer.cpp:197&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 26513" type=""><![CDATA[testtransfer.cpp:197
+      Expected: addr.sin_port
+      Which is: 3879
+To be equal to: temp_addr.sin_port
+      Which is: 26513]]></failure>
+      <failure message="testtransfer.cpp:203&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:203
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:273&#x0A;      Expected: expect_size&#x0A;      Which is: 131072&#x0A;To be equal to: total_size&#x0A;      Which is: 0" type=""><![CDATA[testtransfer.cpp:273
+      Expected: expect_size
+      Which is: 131072
+To be equal to: total_size
+      Which is: 0]]></failure>
+      <failure message="testtransfer.cpp:68&#x0A;Expected: (client_fd) &gt;= (0), actual: -1 vs 0" type=""><![CDATA[testtransfer.cpp:68
+Expected: (client_fd) >= (0), actual: -1 vs 0]]></failure>
+      <failure message="testtransfer.cpp:71&#x0A;      Expected: client_addr.sin_family&#x0A;      Which is: &apos;\0&apos;&#x0A;To be equal to: 2" type=""><![CDATA[testtransfer.cpp:71
+      Expected: client_addr.sin_family
+      Which is: '\0'
+To be equal to: 2]]></failure>
+      <failure message="testtransfer.cpp:76&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:76
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:79&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;P&apos; (80, 0x50)" type=""><![CDATA[testtransfer.cpp:79
+      Expected: addr.sin_family
+      Which is: '\x2' (2)
+To be equal to: temp_addr.sin_family
+      Which is: 'P' (80, 0x50)]]></failure>
+      <failure message="testtransfer.cpp:80&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 170" type=""><![CDATA[testtransfer.cpp:80
+      Expected: addr.sin_port
+      Which is: 3879
+To be equal to: temp_addr.sin_port
+      Which is: 170]]></failure>
+      <failure message="testtransfer.cpp:86&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:86
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:156&#x0A;      Expected: expect_size&#x0A;      Which is: 131072&#x0A;To be equal to: total_size&#x0A;      Which is: 0" type=""><![CDATA[testtransfer.cpp:156
+      Expected: expect_size
+      Which is: 131072
+To be equal to: total_size
+      Which is: 0]]></failure>
+    </testcase>
+    <testcase name="TestTransfer_Connect_Recv_Symmetric" status="run" time="0.005" classname="TestEnv_Any">
+      <failure message="testtransfer.cpp:189&#x0A;Expected: (ret) &gt;= (0), actual: -1 vs 0" type=""><![CDATA[testtransfer.cpp:189
+Expected: (ret) >= (0), actual: -1 vs 0]]></failure>
+      <failure message="testtransfer.cpp:194&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:194
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:195&#x0A;      Expected: addr.sin_addr.s_addr&#x0A;      Which is: 67174410&#x0A;To be equal to: temp_addr.sin_addr.s_addr&#x0A;      Which is: 32767" type=""><![CDATA[testtransfer.cpp:195
+      Expected: addr.sin_addr.s_addr
+      Which is: 67174410
+To be equal to: temp_addr.sin_addr.s_addr
+      Which is: 32767]]></failure>
+      <failure message="testtransfer.cpp:196&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\x9C&apos; (156)" type=""><![CDATA[testtransfer.cpp:196
+      Expected: addr.sin_family
+      Which is: '\x2' (2)
+To be equal to: temp_addr.sin_family
+      Which is: '\x9C' (156)]]></failure>
+      <failure message="testtransfer.cpp:197&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 26513" type=""><![CDATA[testtransfer.cpp:197
+      Expected: addr.sin_port
+      Which is: 3879
+To be equal to: temp_addr.sin_port
+      Which is: 26513]]></failure>
+      <failure message="testtransfer.cpp:203&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:203
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:273&#x0A;      Expected: expect_size&#x0A;      Which is: 131072&#x0A;To be equal to: total_size&#x0A;      Which is: 0" type=""><![CDATA[testtransfer.cpp:273
+      Expected: expect_size
+      Which is: 131072
+To be equal to: total_size
+      Which is: 0]]></failure>
+      <failure message="testtransfer.cpp:68&#x0A;Expected: (client_fd) &gt;= (0), actual: -1 vs 0" type=""><![CDATA[testtransfer.cpp:68
+Expected: (client_fd) >= (0), actual: -1 vs 0]]></failure>
+      <failure message="testtransfer.cpp:71&#x0A;      Expected: client_addr.sin_family&#x0A;      Which is: &apos;\0&apos;&#x0A;To be equal to: 2" type=""><![CDATA[testtransfer.cpp:71
+      Expected: client_addr.sin_family
+      Which is: '\0'
+To be equal to: 2]]></failure>
+      <failure message="testtransfer.cpp:76&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:76
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:79&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;P&apos; (80, 0x50)" type=""><![CDATA[testtransfer.cpp:79
+      Expected: addr.sin_family
+      Which is: '\x2' (2)
+To be equal to: temp_addr.sin_family
+      Which is: 'P' (80, 0x50)]]></failure>
+      <failure message="testtransfer.cpp:80&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 170" type=""><![CDATA[testtransfer.cpp:80
+      Expected: addr.sin_port
+      Which is: 3879
+To be equal to: temp_addr.sin_port
+      Which is: 170]]></failure>
+      <failure message="testtransfer.cpp:86&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:86
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:156&#x0A;      Expected: expect_size&#x0A;      Which is: 131072&#x0A;To be equal to: total_size&#x0A;      Which is: 0" type=""><![CDATA[testtransfer.cpp:156
+      Expected: expect_size
+      Which is: 131072
+To be equal to: total_size
+      Which is: 0]]></failure>
+    </testcase>
+    <testcase name="TestTransfer_Connect_Recv_EOF" status="run" time="0.003" classname="TestEnv_Any">
+      <failure message="testtransfer.cpp:189&#x0A;Expected: (ret) &gt;= (0), actual: -1 vs 0" type=""><![CDATA[testtransfer.cpp:189
+Expected: (ret) >= (0), actual: -1 vs 0]]></failure>
+      <failure message="testtransfer.cpp:194&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:194
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:195&#x0A;      Expected: addr.sin_addr.s_addr&#x0A;      Which is: 67174410&#x0A;To be equal to: temp_addr.sin_addr.s_addr&#x0A;      Which is: 32767" type=""><![CDATA[testtransfer.cpp:195
+      Expected: addr.sin_addr.s_addr
+      Which is: 67174410
+To be equal to: temp_addr.sin_addr.s_addr
+      Which is: 32767]]></failure>
+      <failure message="testtransfer.cpp:196&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\x9C&apos; (156)" type=""><![CDATA[testtransfer.cpp:196
+      Expected: addr.sin_family
+      Which is: '\x2' (2)
+To be equal to: temp_addr.sin_family
+      Which is: '\x9C' (156)]]></failure>
+      <failure message="testtransfer.cpp:197&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 26513" type=""><![CDATA[testtransfer.cpp:197
+      Expected: addr.sin_port
+      Which is: 3879
+To be equal to: temp_addr.sin_port
+      Which is: 26513]]></failure>
+      <failure message="testtransfer.cpp:203&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:203
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:273&#x0A;      Expected: expect_size&#x0A;      Which is: 131072&#x0A;To be equal to: total_size&#x0A;      Which is: 0" type=""><![CDATA[testtransfer.cpp:273
+      Expected: expect_size
+      Which is: 131072
+To be equal to: total_size
+      Which is: 0]]></failure>
+      <failure message="testtransfer.cpp:68&#x0A;Expected: (client_fd) &gt;= (0), actual: -1 vs 0" type=""><![CDATA[testtransfer.cpp:68
+Expected: (client_fd) >= (0), actual: -1 vs 0]]></failure>
+      <failure message="testtransfer.cpp:71&#x0A;      Expected: client_addr.sin_family&#x0A;      Which is: &apos;\0&apos;&#x0A;To be equal to: 2" type=""><![CDATA[testtransfer.cpp:71
+      Expected: client_addr.sin_family
+      Which is: '\0'
+To be equal to: 2]]></failure>
+      <failure message="testtransfer.cpp:76&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:76
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:79&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;P&apos; (80, 0x50)" type=""><![CDATA[testtransfer.cpp:79
+      Expected: addr.sin_family
+      Which is: '\x2' (2)
+To be equal to: temp_addr.sin_family
+      Which is: 'P' (80, 0x50)]]></failure>
+      <failure message="testtransfer.cpp:80&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 170" type=""><![CDATA[testtransfer.cpp:80
+      Expected: addr.sin_port
+      Which is: 3879
+To be equal to: temp_addr.sin_port
+      Which is: 170]]></failure>
+      <failure message="testtransfer.cpp:86&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:86
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:156&#x0A;      Expected: expect_size&#x0A;      Which is: 131072&#x0A;To be equal to: total_size&#x0A;      Which is: 0" type=""><![CDATA[testtransfer.cpp:156
+      Expected: expect_size
+      Which is: 131072
+To be equal to: total_size
+      Which is: 0]]></failure>
+    </testcase>
+    <testcase name="TestTransfer_Connect_Recv_SmallBuffer1" status="run" time="0.007" classname="TestEnv_Any">
+      <failure message="testtransfer.cpp:189&#x0A;Expected: (ret) &gt;= (0), actual: -1 vs 0" type=""><![CDATA[testtransfer.cpp:189
+Expected: (ret) >= (0), actual: -1 vs 0]]></failure>
+      <failure message="testtransfer.cpp:194&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:194
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:195&#x0A;      Expected: addr.sin_addr.s_addr&#x0A;      Which is: 67174410&#x0A;To be equal to: temp_addr.sin_addr.s_addr&#x0A;      Which is: 32767" type=""><![CDATA[testtransfer.cpp:195
+      Expected: addr.sin_addr.s_addr
+      Which is: 67174410
+To be equal to: temp_addr.sin_addr.s_addr
+      Which is: 32767]]></failure>
+      <failure message="testtransfer.cpp:196&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\x9C&apos; (156)" type=""><![CDATA[testtransfer.cpp:196
+      Expected: addr.sin_family
+      Which is: '\x2' (2)
+To be equal to: temp_addr.sin_family
+      Which is: '\x9C' (156)]]></failure>
+      <failure message="testtransfer.cpp:197&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 26513" type=""><![CDATA[testtransfer.cpp:197
+      Expected: addr.sin_port
+      Which is: 3879
+To be equal to: temp_addr.sin_port
+      Which is: 26513]]></failure>
+      <failure message="testtransfer.cpp:203&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:203
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:273&#x0A;      Expected: expect_size&#x0A;      Which is: 131072&#x0A;To be equal to: total_size&#x0A;      Which is: 0" type=""><![CDATA[testtransfer.cpp:273
+      Expected: expect_size
+      Which is: 131072
+To be equal to: total_size
+      Which is: 0]]></failure>
+      <failure message="testtransfer.cpp:68&#x0A;Expected: (client_fd) &gt;= (0), actual: -1 vs 0" type=""><![CDATA[testtransfer.cpp:68
+Expected: (client_fd) >= (0), actual: -1 vs 0]]></failure>
+      <failure message="testtransfer.cpp:71&#x0A;      Expected: client_addr.sin_family&#x0A;      Which is: &apos;\0&apos;&#x0A;To be equal to: 2" type=""><![CDATA[testtransfer.cpp:71
+      Expected: client_addr.sin_family
+      Which is: '\0'
+To be equal to: 2]]></failure>
+      <failure message="testtransfer.cpp:76&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:76
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:79&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\0&apos;" type=""><![CDATA[testtransfer.cpp:79
+      Expected: addr.sin_family
+      Which is: '\x2' (2)
+To be equal to: temp_addr.sin_family
+      Which is: '\0']]></failure>
+      <failure message="testtransfer.cpp:80&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 0" type=""><![CDATA[testtransfer.cpp:80
+      Expected: addr.sin_port
+      Which is: 3879
+To be equal to: temp_addr.sin_port
+      Which is: 0]]></failure>
+      <failure message="testtransfer.cpp:86&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:86
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:156&#x0A;      Expected: expect_size&#x0A;      Which is: 131072&#x0A;To be equal to: total_size&#x0A;      Which is: 0" type=""><![CDATA[testtransfer.cpp:156
+      Expected: expect_size
+      Which is: 131072
+To be equal to: total_size
+      Which is: 0]]></failure>
+    </testcase>
+    <testcase name="TestTransfer_Connect_Recv_SmallBuffer2" status="run" time="0.006" classname="TestEnv_Any">
+      <failure message="testtransfer.cpp:189&#x0A;Expected: (ret) &gt;= (0), actual: -1 vs 0" type=""><![CDATA[testtransfer.cpp:189
+Expected: (ret) >= (0), actual: -1 vs 0]]></failure>
+      <failure message="testtransfer.cpp:194&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:194
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:195&#x0A;      Expected: addr.sin_addr.s_addr&#x0A;      Which is: 67174410&#x0A;To be equal to: temp_addr.sin_addr.s_addr&#x0A;      Which is: 32767" type=""><![CDATA[testtransfer.cpp:195
+      Expected: addr.sin_addr.s_addr
+      Which is: 67174410
+To be equal to: temp_addr.sin_addr.s_addr
+      Which is: 32767]]></failure>
+      <failure message="testtransfer.cpp:196&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\x9C&apos; (156)" type=""><![CDATA[testtransfer.cpp:196
+      Expected: addr.sin_family
+      Which is: '\x2' (2)
+To be equal to: temp_addr.sin_family
+      Which is: '\x9C' (156)]]></failure>
+      <failure message="testtransfer.cpp:197&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 26513" type=""><![CDATA[testtransfer.cpp:197
+      Expected: addr.sin_port
+      Which is: 3879
+To be equal to: temp_addr.sin_port
+      Which is: 26513]]></failure>
+      <failure message="testtransfer.cpp:203&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:203
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:273&#x0A;      Expected: expect_size&#x0A;      Which is: 64819&#x0A;To be equal to: total_size&#x0A;      Which is: 0" type=""><![CDATA[testtransfer.cpp:273
+      Expected: expect_size
+      Which is: 64819
+To be equal to: total_size
+      Which is: 0]]></failure>
+      <failure message="testtransfer.cpp:68&#x0A;Expected: (client_fd) &gt;= (0), actual: -1 vs 0" type=""><![CDATA[testtransfer.cpp:68
+Expected: (client_fd) >= (0), actual: -1 vs 0]]></failure>
+      <failure message="testtransfer.cpp:71&#x0A;      Expected: client_addr.sin_family&#x0A;      Which is: &apos;\0&apos;&#x0A;To be equal to: 2" type=""><![CDATA[testtransfer.cpp:71
+      Expected: client_addr.sin_family
+      Which is: '\0'
+To be equal to: 2]]></failure>
+      <failure message="testtransfer.cpp:76&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:76
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:79&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;P&apos; (80, 0x50)" type=""><![CDATA[testtransfer.cpp:79
+      Expected: addr.sin_family
+      Which is: '\x2' (2)
+To be equal to: temp_addr.sin_family
+      Which is: 'P' (80, 0x50)]]></failure>
+      <failure message="testtransfer.cpp:80&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 170" type=""><![CDATA[testtransfer.cpp:80
+      Expected: addr.sin_port
+      Which is: 3879
+To be equal to: temp_addr.sin_port
+      Which is: 170]]></failure>
+      <failure message="testtransfer.cpp:86&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:86
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:156&#x0A;      Expected: expect_size&#x0A;      Which is: 64819&#x0A;To be equal to: total_size&#x0A;      Which is: 0" type=""><![CDATA[testtransfer.cpp:156
+      Expected: expect_size
+      Which is: 64819
+To be equal to: total_size
+      Which is: 0]]></failure>
+    </testcase>
+    <testcase name="TestTransfer_Accept_Send_Symmetric" status="run" time="0.353" classname="TestEnv_Any">
+      <failure message="testtransfer.cpp:59&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:59
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:68&#x0A;Expected: (client_fd) &gt;= (0), actual: -1 vs 0" type=""><![CDATA[testtransfer.cpp:68
+Expected: (client_fd) >= (0), actual: -1 vs 0]]></failure>
+      <failure message="testtransfer.cpp:71&#x0A;      Expected: client_addr.sin_family&#x0A;      Which is: &apos;\0&apos;&#x0A;To be equal to: 2" type=""><![CDATA[testtransfer.cpp:71
+      Expected: client_addr.sin_family
+      Which is: '\0'
+To be equal to: 2]]></failure>
+      <failure message="testtransfer.cpp:76&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:76
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:79&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;P&apos; (80, 0x50)" type=""><![CDATA[testtransfer.cpp:79
+      Expected: addr.sin_family
+      Which is: '\x2' (2)
+To be equal to: temp_addr.sin_family
+      Which is: 'P' (80, 0x50)]]></failure>
+      <failure message="testtransfer.cpp:80&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 170" type=""><![CDATA[testtransfer.cpp:80
+      Expected: addr.sin_port
+      Which is: 3879
+To be equal to: temp_addr.sin_port
+      Which is: 170]]></failure>
+      <failure message="testtransfer.cpp:86&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:86
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:156&#x0A;      Expected: expect_size&#x0A;      Which is: 131072&#x0A;To be equal to: total_size&#x0A;      Which is: 0" type=""><![CDATA[testtransfer.cpp:156
+      Expected: expect_size
+      Which is: 131072
+To be equal to: total_size
+      Which is: 0]]></failure>
+      <failure message="testtransfer.cpp:189&#x0A;Expected: (ret) &gt;= (0), actual: -1 vs 0" type=""><![CDATA[testtransfer.cpp:189
+Expected: (ret) >= (0), actual: -1 vs 0]]></failure>
+      <failure message="testtransfer.cpp:194&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:194
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:195&#x0A;      Expected: addr.sin_addr.s_addr&#x0A;      Which is: 117483712&#x0A;To be equal to: temp_addr.sin_addr.s_addr&#x0A;      Which is: 32767" type=""><![CDATA[testtransfer.cpp:195
+      Expected: addr.sin_addr.s_addr
+      Which is: 117483712
+To be equal to: temp_addr.sin_addr.s_addr
+      Which is: 32767]]></failure>
+      <failure message="testtransfer.cpp:196&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\x9C&apos; (156)" type=""><![CDATA[testtransfer.cpp:196
+      Expected: addr.sin_family
+      Which is: '\x2' (2)
+To be equal to: temp_addr.sin_family
+      Which is: '\x9C' (156)]]></failure>
+      <failure message="testtransfer.cpp:197&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 26513" type=""><![CDATA[testtransfer.cpp:197
+      Expected: addr.sin_port
+      Which is: 3879
+To be equal to: temp_addr.sin_port
+      Which is: 26513]]></failure>
+      <failure message="testtransfer.cpp:203&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:203
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:273&#x0A;      Expected: expect_size&#x0A;      Which is: 131072&#x0A;To be equal to: total_size&#x0A;      Which is: 0" type=""><![CDATA[testtransfer.cpp:273
+      Expected: expect_size
+      Which is: 131072
+To be equal to: total_size
+      Which is: 0]]></failure>
+    </testcase>
+    <testcase name="TestTransfer_Accept_Send_EOF" status="run" time="0.29" classname="TestEnv_Any">
+      <failure message="testtransfer.cpp:53&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:53
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:59&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:59
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:68&#x0A;Expected: (client_fd) &gt;= (0), actual: -1 vs 0" type=""><![CDATA[testtransfer.cpp:68
+Expected: (client_fd) >= (0), actual: -1 vs 0]]></failure>
+      <failure message="testtransfer.cpp:71&#x0A;      Expected: client_addr.sin_family&#x0A;      Which is: &apos;\0&apos;&#x0A;To be equal to: 2" type=""><![CDATA[testtransfer.cpp:71
+      Expected: client_addr.sin_family
+      Which is: '\0'
+To be equal to: 2]]></failure>
+      <failure message="testtransfer.cpp:76&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:76
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:79&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\x80&apos; (128)" type=""><![CDATA[testtransfer.cpp:79
+      Expected: addr.sin_family
+      Which is: '\x2' (2)
+To be equal to: temp_addr.sin_family
+      Which is: '\x80' (128)]]></failure>
+      <failure message="testtransfer.cpp:80&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 178" type=""><![CDATA[testtransfer.cpp:80
+      Expected: addr.sin_port
+      Which is: 3879
+To be equal to: temp_addr.sin_port
+      Which is: 178]]></failure>
+      <failure message="testtransfer.cpp:86&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:86
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:156&#x0A;      Expected: expect_size&#x0A;      Which is: 131072&#x0A;To be equal to: total_size&#x0A;      Which is: 0" type=""><![CDATA[testtransfer.cpp:156
+      Expected: expect_size
+      Which is: 131072
+To be equal to: total_size
+      Which is: 0]]></failure>
+      <failure message="testtransfer.cpp:189&#x0A;Expected: (ret) &gt;= (0), actual: -1 vs 0" type=""><![CDATA[testtransfer.cpp:189
+Expected: (ret) >= (0), actual: -1 vs 0]]></failure>
+      <failure message="testtransfer.cpp:194&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:194
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:195&#x0A;      Expected: addr.sin_addr.s_addr&#x0A;      Which is: 117483712&#x0A;To be equal to: temp_addr.sin_addr.s_addr&#x0A;      Which is: 32767" type=""><![CDATA[testtransfer.cpp:195
+      Expected: addr.sin_addr.s_addr
+      Which is: 117483712
+To be equal to: temp_addr.sin_addr.s_addr
+      Which is: 32767]]></failure>
+      <failure message="testtransfer.cpp:196&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\x9C&apos; (156)" type=""><![CDATA[testtransfer.cpp:196
+      Expected: addr.sin_family
+      Which is: '\x2' (2)
+To be equal to: temp_addr.sin_family
+      Which is: '\x9C' (156)]]></failure>
+      <failure message="testtransfer.cpp:197&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 26513" type=""><![CDATA[testtransfer.cpp:197
+      Expected: addr.sin_port
+      Which is: 3879
+To be equal to: temp_addr.sin_port
+      Which is: 26513]]></failure>
+      <failure message="testtransfer.cpp:203&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:203
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:273&#x0A;      Expected: expect_size&#x0A;      Which is: 131072&#x0A;To be equal to: total_size&#x0A;      Which is: 0" type=""><![CDATA[testtransfer.cpp:273
+      Expected: expect_size
+      Which is: 131072
+To be equal to: total_size
+      Which is: 0]]></failure>
+    </testcase>
+    <testcase name="TestTransfer_Accept_Recv_Symmetric" status="run" time="0.316" classname="TestEnv_Any">
+      <failure message="testtransfer.cpp:53&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:53
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:59&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:59
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:68&#x0A;Expected: (client_fd) &gt;= (0), actual: -1 vs 0" type=""><![CDATA[testtransfer.cpp:68
+Expected: (client_fd) >= (0), actual: -1 vs 0]]></failure>
+      <failure message="testtransfer.cpp:71&#x0A;      Expected: client_addr.sin_family&#x0A;      Which is: &apos;\0&apos;&#x0A;To be equal to: 2" type=""><![CDATA[testtransfer.cpp:71
+      Expected: client_addr.sin_family
+      Which is: '\0'
+To be equal to: 2]]></failure>
+      <failure message="testtransfer.cpp:76&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:76
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:79&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;P&apos; (80, 0x50)" type=""><![CDATA[testtransfer.cpp:79
+      Expected: addr.sin_family
+      Which is: '\x2' (2)
+To be equal to: temp_addr.sin_family
+      Which is: 'P' (80, 0x50)]]></failure>
+      <failure message="testtransfer.cpp:80&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 170" type=""><![CDATA[testtransfer.cpp:80
+      Expected: addr.sin_port
+      Which is: 3879
+To be equal to: temp_addr.sin_port
+      Which is: 170]]></failure>
+      <failure message="testtransfer.cpp:86&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:86
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:156&#x0A;      Expected: expect_size&#x0A;      Which is: 131072&#x0A;To be equal to: total_size&#x0A;      Which is: 0" type=""><![CDATA[testtransfer.cpp:156
+      Expected: expect_size
+      Which is: 131072
+To be equal to: total_size
+      Which is: 0]]></failure>
+      <failure message="testtransfer.cpp:189&#x0A;Expected: (ret) &gt;= (0), actual: -1 vs 0" type=""><![CDATA[testtransfer.cpp:189
+Expected: (ret) >= (0), actual: -1 vs 0]]></failure>
+      <failure message="testtransfer.cpp:194&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:194
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:195&#x0A;      Expected: addr.sin_addr.s_addr&#x0A;      Which is: 117483712&#x0A;To be equal to: temp_addr.sin_addr.s_addr&#x0A;      Which is: 32767" type=""><![CDATA[testtransfer.cpp:195
+      Expected: addr.sin_addr.s_addr
+      Which is: 117483712
+To be equal to: temp_addr.sin_addr.s_addr
+      Which is: 32767]]></failure>
+      <failure message="testtransfer.cpp:196&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\x9C&apos; (156)" type=""><![CDATA[testtransfer.cpp:196
+      Expected: addr.sin_family
+      Which is: '\x2' (2)
+To be equal to: temp_addr.sin_family
+      Which is: '\x9C' (156)]]></failure>
+      <failure message="testtransfer.cpp:197&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 26513" type=""><![CDATA[testtransfer.cpp:197
+      Expected: addr.sin_port
+      Which is: 3879
+To be equal to: temp_addr.sin_port
+      Which is: 26513]]></failure>
+      <failure message="testtransfer.cpp:203&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:203
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:273&#x0A;      Expected: expect_size&#x0A;      Which is: 131072&#x0A;To be equal to: total_size&#x0A;      Which is: 0" type=""><![CDATA[testtransfer.cpp:273
+      Expected: expect_size
+      Which is: 131072
+To be equal to: total_size
+      Which is: 0]]></failure>
+    </testcase>
+    <testcase name="TestTransfer_Accept_Recv_EOF" status="run" time="0.32" classname="TestEnv_Any">
+      <failure message="testtransfer.cpp:53&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:53
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:59&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:59
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:68&#x0A;Expected: (client_fd) &gt;= (0), actual: -1 vs 0" type=""><![CDATA[testtransfer.cpp:68
+Expected: (client_fd) >= (0), actual: -1 vs 0]]></failure>
+      <failure message="testtransfer.cpp:71&#x0A;      Expected: client_addr.sin_family&#x0A;      Which is: &apos;\0&apos;&#x0A;To be equal to: 2" type=""><![CDATA[testtransfer.cpp:71
+      Expected: client_addr.sin_family
+      Which is: '\0'
+To be equal to: 2]]></failure>
+      <failure message="testtransfer.cpp:76&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:76
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:79&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;P&apos; (80, 0x50)" type=""><![CDATA[testtransfer.cpp:79
+      Expected: addr.sin_family
+      Which is: '\x2' (2)
+To be equal to: temp_addr.sin_family
+      Which is: 'P' (80, 0x50)]]></failure>
+      <failure message="testtransfer.cpp:80&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 170" type=""><![CDATA[testtransfer.cpp:80
+      Expected: addr.sin_port
+      Which is: 3879
+To be equal to: temp_addr.sin_port
+      Which is: 170]]></failure>
+      <failure message="testtransfer.cpp:86&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:86
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:156&#x0A;      Expected: expect_size&#x0A;      Which is: 131072&#x0A;To be equal to: total_size&#x0A;      Which is: 0" type=""><![CDATA[testtransfer.cpp:156
+      Expected: expect_size
+      Which is: 131072
+To be equal to: total_size
+      Which is: 0]]></failure>
+      <failure message="testtransfer.cpp:189&#x0A;Expected: (ret) &gt;= (0), actual: -1 vs 0" type=""><![CDATA[testtransfer.cpp:189
+Expected: (ret) >= (0), actual: -1 vs 0]]></failure>
+      <failure message="testtransfer.cpp:194&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:194
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:195&#x0A;      Expected: addr.sin_addr.s_addr&#x0A;      Which is: 117483712&#x0A;To be equal to: temp_addr.sin_addr.s_addr&#x0A;      Which is: 32767" type=""><![CDATA[testtransfer.cpp:195
+      Expected: addr.sin_addr.s_addr
+      Which is: 117483712
+To be equal to: temp_addr.sin_addr.s_addr
+      Which is: 32767]]></failure>
+      <failure message="testtransfer.cpp:196&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\x9C&apos; (156)" type=""><![CDATA[testtransfer.cpp:196
+      Expected: addr.sin_family
+      Which is: '\x2' (2)
+To be equal to: temp_addr.sin_family
+      Which is: '\x9C' (156)]]></failure>
+      <failure message="testtransfer.cpp:197&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 26513" type=""><![CDATA[testtransfer.cpp:197
+      Expected: addr.sin_port
+      Which is: 3879
+To be equal to: temp_addr.sin_port
+      Which is: 26513]]></failure>
+      <failure message="testtransfer.cpp:203&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:203
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:273&#x0A;      Expected: expect_size&#x0A;      Which is: 131072&#x0A;To be equal to: total_size&#x0A;      Which is: 0" type=""><![CDATA[testtransfer.cpp:273
+      Expected: expect_size
+      Which is: 131072
+To be equal to: total_size
+      Which is: 0]]></failure>
+    </testcase>
+    <testcase name="TestTransfer_Accept_Recv_SmallBuffer1" status="run" time="0.303" classname="TestEnv_Any">
+      <failure message="testtransfer.cpp:53&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:53
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:59&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:59
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:68&#x0A;Expected: (client_fd) &gt;= (0), actual: -1 vs 0" type=""><![CDATA[testtransfer.cpp:68
+Expected: (client_fd) >= (0), actual: -1 vs 0]]></failure>
+      <failure message="testtransfer.cpp:71&#x0A;      Expected: client_addr.sin_family&#x0A;      Which is: &apos;\0&apos;&#x0A;To be equal to: 2" type=""><![CDATA[testtransfer.cpp:71
+      Expected: client_addr.sin_family
+      Which is: '\0'
+To be equal to: 2]]></failure>
+      <failure message="testtransfer.cpp:76&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:76
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:79&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;P&apos; (80, 0x50)" type=""><![CDATA[testtransfer.cpp:79
+      Expected: addr.sin_family
+      Which is: '\x2' (2)
+To be equal to: temp_addr.sin_family
+      Which is: 'P' (80, 0x50)]]></failure>
+      <failure message="testtransfer.cpp:80&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 170" type=""><![CDATA[testtransfer.cpp:80
+      Expected: addr.sin_port
+      Which is: 3879
+To be equal to: temp_addr.sin_port
+      Which is: 170]]></failure>
+      <failure message="testtransfer.cpp:86&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:86
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:156&#x0A;      Expected: expect_size&#x0A;      Which is: 131072&#x0A;To be equal to: total_size&#x0A;      Which is: 0" type=""><![CDATA[testtransfer.cpp:156
+      Expected: expect_size
+      Which is: 131072
+To be equal to: total_size
+      Which is: 0]]></failure>
+      <failure message="testtransfer.cpp:189&#x0A;Expected: (ret) &gt;= (0), actual: -1 vs 0" type=""><![CDATA[testtransfer.cpp:189
+Expected: (ret) >= (0), actual: -1 vs 0]]></failure>
+      <failure message="testtransfer.cpp:194&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:194
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:195&#x0A;      Expected: addr.sin_addr.s_addr&#x0A;      Which is: 117483712&#x0A;To be equal to: temp_addr.sin_addr.s_addr&#x0A;      Which is: 32767" type=""><![CDATA[testtransfer.cpp:195
+      Expected: addr.sin_addr.s_addr
+      Which is: 117483712
+To be equal to: temp_addr.sin_addr.s_addr
+      Which is: 32767]]></failure>
+      <failure message="testtransfer.cpp:196&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\x9C&apos; (156)" type=""><![CDATA[testtransfer.cpp:196
+      Expected: addr.sin_family
+      Which is: '\x2' (2)
+To be equal to: temp_addr.sin_family
+      Which is: '\x9C' (156)]]></failure>
+      <failure message="testtransfer.cpp:197&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 26513" type=""><![CDATA[testtransfer.cpp:197
+      Expected: addr.sin_port
+      Which is: 3879
+To be equal to: temp_addr.sin_port
+      Which is: 26513]]></failure>
+      <failure message="testtransfer.cpp:203&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:203
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:273&#x0A;      Expected: expect_size&#x0A;      Which is: 131072&#x0A;To be equal to: total_size&#x0A;      Which is: 0" type=""><![CDATA[testtransfer.cpp:273
+      Expected: expect_size
+      Which is: 131072
+To be equal to: total_size
+      Which is: 0]]></failure>
+    </testcase>
+    <testcase name="TestTransfer_Accept_Recv_SmallBuffer2" status="run" time="0.383" classname="TestEnv_Any">
+      <failure message="testtransfer.cpp:53&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:53
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:59&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:59
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:68&#x0A;Expected: (client_fd) &gt;= (0), actual: -1 vs 0" type=""><![CDATA[testtransfer.cpp:68
+Expected: (client_fd) >= (0), actual: -1 vs 0]]></failure>
+      <failure message="testtransfer.cpp:71&#x0A;      Expected: client_addr.sin_family&#x0A;      Which is: &apos;\0&apos;&#x0A;To be equal to: 2" type=""><![CDATA[testtransfer.cpp:71
+      Expected: client_addr.sin_family
+      Which is: '\0'
+To be equal to: 2]]></failure>
+      <failure message="testtransfer.cpp:76&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:76
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:79&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;P&apos; (80, 0x50)" type=""><![CDATA[testtransfer.cpp:79
+      Expected: addr.sin_family
+      Which is: '\x2' (2)
+To be equal to: temp_addr.sin_family
+      Which is: 'P' (80, 0x50)]]></failure>
+      <failure message="testtransfer.cpp:80&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 170" type=""><![CDATA[testtransfer.cpp:80
+      Expected: addr.sin_port
+      Which is: 3879
+To be equal to: temp_addr.sin_port
+      Which is: 170]]></failure>
+      <failure message="testtransfer.cpp:86&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:86
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:156&#x0A;      Expected: expect_size&#x0A;      Which is: 64819&#x0A;To be equal to: total_size&#x0A;      Which is: 0" type=""><![CDATA[testtransfer.cpp:156
+      Expected: expect_size
+      Which is: 64819
+To be equal to: total_size
+      Which is: 0]]></failure>
+      <failure message="testtransfer.cpp:189&#x0A;Expected: (ret) &gt;= (0), actual: -1 vs 0" type=""><![CDATA[testtransfer.cpp:189
+Expected: (ret) >= (0), actual: -1 vs 0]]></failure>
+      <failure message="testtransfer.cpp:194&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:194
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:195&#x0A;      Expected: addr.sin_addr.s_addr&#x0A;      Which is: 117483712&#x0A;To be equal to: temp_addr.sin_addr.s_addr&#x0A;      Which is: 32767" type=""><![CDATA[testtransfer.cpp:195
+      Expected: addr.sin_addr.s_addr
+      Which is: 117483712
+To be equal to: temp_addr.sin_addr.s_addr
+      Which is: 32767]]></failure>
+      <failure message="testtransfer.cpp:196&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\x9C&apos; (156)" type=""><![CDATA[testtransfer.cpp:196
+      Expected: addr.sin_family
+      Which is: '\x2' (2)
+To be equal to: temp_addr.sin_family
+      Which is: '\x9C' (156)]]></failure>
+      <failure message="testtransfer.cpp:197&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 26513" type=""><![CDATA[testtransfer.cpp:197
+      Expected: addr.sin_port
+      Which is: 3879
+To be equal to: temp_addr.sin_port
+      Which is: 26513]]></failure>
+      <failure message="testtransfer.cpp:203&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testtransfer.cpp:203
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+      <failure message="testtransfer.cpp:273&#x0A;      Expected: expect_size&#x0A;      Which is: 64819&#x0A;To be equal to: total_size&#x0A;      Which is: 0" type=""><![CDATA[testtransfer.cpp:273
+      Expected: expect_size
+      Which is: 64819
+To be equal to: total_size
+      Which is: 0]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>
