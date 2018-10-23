@@ -289,7 +289,7 @@ namespace E {
 //        this->freePacket(packet_start);
     }
 
-    void TCPAssignment::syscall_listen(UUID syscallUUID, int pid, int server_fd, int max_backlog){
+    void TCPAssignment::syscall_listen(UUID syscallUUID, int pid, int server_fd, int max_backlog) {
         /* TODO: Error Detection
          * Is this socket bound before?
          */
@@ -303,10 +303,16 @@ namespace E {
         /* TODO
          * Set server_fd to 'listen' the connection request.
          */
+        StateMachine *target_state_machine_ptr = (StateMachine *) server_socket.state_machine;
+        target_state_machine_ptr->transit(Signal::NONE);
 
         /* TODO
          * Set the max_backlog of the server_fd
          */
+        server_socket.max_backlog = max_backlog;
+        server_socket.current_packet_num = 0;
+
+
     }
 
     int TCPAssignment::syscall_accept(UUID syscallUUID, int pid, int listen_fd,

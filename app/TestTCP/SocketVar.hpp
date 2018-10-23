@@ -26,10 +26,11 @@ struct socket {
     uint32_t SEQ_num;
     int max_backlog;
     int clientaddr_defined = 0;
+    int current_packet_num;
+    sockaddr **backlog_table;
 };
 
 struct file {
     int fd;
     struct socket socket;
-
 };
