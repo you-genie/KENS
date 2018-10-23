@@ -1,3 +1,4 @@
+/*
 //
 // Created by 정유진 on 2018. 10. 21..
 //
@@ -239,4 +240,4 @@ namespace state_machine {
 
         Signal getSendSignal(Signal recv); // TODO: give Signal::ERR if is not valid.
     };
-}
+}*/
