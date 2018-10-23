@@ -85,7 +85,86 @@ namespace E {
         static HostModule *allocate(Host *host) { return new TCPAssignment(host); }
     };
 
+    enum class MachineType {
+        SERVER, CLIENT
+    };
+
+    enum class Label {
+        CLOSED, LISTEN, SYN_RCVD,
+        SYN_SENT, ESTABLISHED, CLOSE_WAIT,
+        LAST_ACK, FIN_WAIT_1, CLOSING,
+        FIN_WAIT_2, TIME_WAIT, NONE
+    };
+
+    enum class Signal {
+        SYN, ACK, FIN, SYN_ACK, FIN_ACK, OPEN, CLOSE, DATA, ERR, NONE
+    }; // err contains timeout
+
+    class StateNode {
+    public:
+        StateNode();
+
+        StateNode(Label label, char *str_label);
+
+        char *ToString() { return str_label; };
+
+        Label GetLabel() { return label; };
+    private:
+        Label label;
+        char str_label[20];
+    };
+
+    class StateLink {
+    public:
+        StateLink(StateNode *state_node, StateNode *next_node, Signal recv, Signal send);
+
+        Signal GetRecv() { return recv; };
+
+        Signal GetSend() { return send; };
+
+        StateNode *GetNextNode() { return next_node; };
+
+        // TODO: generate str_link on this function
+        char *ToString() { return str_link; };
+    private:
+        StateNode *state_node = new StateNode();
+        StateNode *next_node;
+        char str_link[80];
+        Signal recv;
+        Signal send;
+    };
+
+    struct LabelMap {
+        Label label;
+        StateLink *link_map[3];
+    };
+
+    class StateMachine {
+    public:
+        StateMachine(MachineType machine_type);
+
+        int GetMachineType() { return (int) machine_type; };
+
+        StateNode *GetCurrentState() { return current_state_ptr; };
+
+        Signal GetSendSignal(Signal recv) { return getSendSignal(recv); };
+
+        int transit(Signal recv); // TODO: return -1 if not valid signal.
+        void log(); // TODO: log all the actions, receiving link and stateNode value.
+    private:
+        StateNode *current_state_ptr;
+        StateLink **state_link_table;
+        MachineType machine_type;
+
+        StateNode *getNextNode(Signal recv);
+
+        Signal getSendSignal(Signal recv); // TODO: give Signal::ERR if is not valid.
+    };
+
 }
 
+namespace state_machine {
+
+}
 
 #endif /* E_TCPASSIGNMENT_HPP_ */
