@@ -142,9 +142,9 @@ namespace E {
     class StateMachine {
     public:
         StateMachine(MachineType machine_type);
-
+      
         ~StateMachine();
-
+      
         int GetMachineType() { return (int) machine_type; };
 
         StateNode *GetCurrentState() { return current_state_ptr; };

@@ -552,7 +552,7 @@ namespace E {
         free(this->current_state_ptr);
         free(this->state_link_table);
     }
-
+  
     Signal StateMachine::getSendSignal(Signal recv) {
         StateNode *currentNode = GetCurrentState();
         Label currentLabel = currentNode->GetLabel();
