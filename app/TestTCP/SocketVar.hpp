@@ -17,7 +17,7 @@
 //};
 
 struct socket {
-    int state; // later be defined in TCPassignment
+    void *state_machine; // later be defined in TCPassignment
     int domain;
     int type;
     int protocol;
@@ -25,6 +25,7 @@ struct socket {
     socklen_t sock_len;
     uint32_t SEQ_num;
     int max_backlog;
+    int clientaddr_defined = 0;
 };
 
 struct file {
