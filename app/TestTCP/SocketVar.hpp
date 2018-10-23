@@ -25,11 +25,13 @@ struct socket {
     socklen_t sock_len;
     uint32_t SEQ_num;
     int max_backlog;
+    int current_backlog;
     int clientaddr_defined = 0;
+    uint8_t uuid[16]; // 128-bit
+    sockaddr **backlog_table;
 };
 
 struct file {
     int fd;
     struct socket socket;
-
 };

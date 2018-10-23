@@ -307,6 +307,17 @@ namespace E {
         /* TODO
          * Set the max_backlog of the server_fd
          */
+        server_socket.max_backlog = max_backlog;
+        server_socket.current_backlog = 0;
+        *(server_socket.uuid) = syscallUUID;
+
+        sockaddr *new_backlog_table[max_backlog];
+        for (int i = 0; i < max_backlog; i++) {
+            new_backlog_table[i] = nullptr;
+        }
+
+        server_socket.backlog_table = new_backlog_table;
+        returnSystemCall(syscallUUID, 0);
     }
 
     int TCPAssignment::syscall_accept(UUID syscallUUID, int pid, int listen_fd,
