@@ -21,6 +21,8 @@ struct socket {
     int protocol;
     struct sockaddr* addr_ptr = NULL; // NULL
     socklen_t sock_len;
+    uint32_t SEQ_num;
+    int max_backlog;
 };
 
 struct file {
