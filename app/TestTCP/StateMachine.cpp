@@ -15,13 +15,14 @@ using state_machine::StateNode;
 using state_machine::state_label_table;
 using namespace state_machine;
 
-StateNode::StateNode(state_machine::Label label, char *str_label) {
-    this->label = label;
+StateNode::StateNode(state_machine::Label label, char *str_label): label(label) {
     strcpy(this->str_label, str_label);
 }
 
-StateLink::StateLink(state_machine::StateNode *state_node, state_machine::StateNode *next_node,
-                     state_machine::Signal recv, state_machine::Signal send) {
+StateNode::StateNode(): label(Label::NONE){}
+
+StateLink::StateLink(StateNode *state_node, StateNode *next_node,
+        Signal recv, Signal send) {
     this->state_node = state_node;
     this->next_node = next_node;
     this->recv = recv;
@@ -166,6 +167,7 @@ StateMachine::StateMachine(state_machine::MachineType machine_type) {
         this->state_link_table = cli_closed_table;
     } else {
         // SERVER state machine
+        printf("ABD\n");
         this->state_link_table = serv_closed_table;
     }
 }
@@ -226,49 +228,64 @@ int StateMachine::transit(state_machine::Signal recv) {
 }
 
 
-int main() {
-    StateMachine *stateMachine = new StateMachine(MachineType::CLIENT);
-
-    char key[80];
-    while (1) {
-        printf("\nPress key, current state is: ");
-        stateMachine->log();
-        printf("\n");
-        scanf("%s", key);
-
-        Signal signal = Signal::NONE;
-        if (strncmp(key,"q",80) == 0) {
-            return -1;
-        }
-        else if (strncmp(key, "ack", 80) == 0) {
-            signal = Signal::ACK;
-        }
-        else if (strncmp(key, "open", 80) == 0) {
-            signal = Signal::OPEN;
-        }
-        else if (strncmp(key, "close", 80) == 0) {
-            signal = Signal::CLOSE;
-        }
-        else if (strncmp(key, "syn_ack", 80) == 0) {
-            signal = Signal::SYN_ACK;
-        }
-        else if (strncmp(key, "fin", 80) == 0) {
-            signal = Signal::FIN;
-        }
-        else if (strncmp(key, "fin_ack", 80) == 0) {
-            signal = Signal::SYN_ACK;
-        }
-        else if (strncmp(key, "data", 80) == 0) {
-            signal = Signal::DATA;
-        }
-        else if (strncmp(key, "err", 80) == 0) {
-            signal = Signal::ERR;
-        }
-
-        if (stateMachine->transit(signal) == -1) {
-            printf("ERROOooOOOR: \n");
-        } else {
-        }
-    }
-    return 1;
-}
+//int main() {
+//    StateMachine *stateMachine = new StateMachine(MachineType::SERVER);
+//
+//    char key[80];
+//    while (1) {
+//        printf("\nPress key, current state is: ");
+//        stateMachine->log();
+//        printf("\n");
+//        scanf("%s", key);
+//
+//        Signal signal = Signal::NONE;
+//        if (strncmp(key,"q",80) == 0) {
+//            return -1;
+//        }
+//        else if (strncmp(key, "ack", 80) == 0) {
+//            signal = Signal::ACK;
+//        }
+//        else if (strncmp(key, "syn", 80) == 0) {
+//            signal = Signal::SYN;
+//        }
+//        else if (strncmp(key, "open", 80) == 0) {
+//            signal = Signal::OPEN;
+//        }
+//        else if (strncmp(key, "close", 80) == 0) {
+//            signal = Signal::CLOSE;
+//        }
+//        else if (strncmp(key, "syn_ack", 80) == 0) {
+//            signal = Signal::SYN_ACK;
+//        }
+//        else if (strncmp(key, "fin", 80) == 0) {
+//            signal = Signal::FIN;
+//        }
+//        else if (strncmp(key, "fin_ack", 80) == 0) {
+//            signal = Signal::SYN_ACK;
+//        }
+//        else if (strncmp(key, "data", 80) == 0) {
+//            signal = Signal::DATA;
+//        }
+//        else if (strncmp(key, "err", 80) == 0) {
+//            signal = Signal::ERR;
+//        }
+//        else if (strncmp(key, "none", 80) == 0) {
+//            signal = Signal::NONE;
+//        }
+//        else {
+//            printf("ERROR!!!!!");
+//            return -1;
+//        }
+//
+//        Signal send_signal = stateMachine->GetSendSignal(signal);
+//        char *signal_str = state_machine::PrintSignal(send_signal);
+//
+//        printf("Send: %s\n", signal_str);
+//
+//        if (stateMachine->transit(signal) == -1) {
+//            printf("ERROOooOOOR: \n");
+//        } else {
+//        }
+//    }
+//    return 1;
+//}

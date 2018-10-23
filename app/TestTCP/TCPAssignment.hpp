@@ -50,6 +50,19 @@ namespace E {
                 UUID syscallUUId,
                 int pid, int fd, struct sockaddr *sockaddr_ptr, socklen_t socklen_ptr);
 
+        void syscall_connect(UUID syscallUUID, int pid, int client_fd,
+                             struct sockaddr* server_addr, socklen_t server_addr_length);
+
+        void syscall_listen(UUID syscallUUID, int pid, int server_fd, int max_backlog);
+
+        int syscall_accept(UUID syscallUUID, int pid, int listen_fd,
+                           struct sockaddr* client_addr, socklen_t* client_addr_len);
+
+        void createPacketHeader(Packet* packet_send, uint8_t src_ip[4], uint8_t dest_ip[4],
+                                uint8_t* src_port, uint8_t* dest_port, uint8_t* SEQ_num, uint8_t* ACK_num, uint8_t* all_flags);
+
+        unsigned short checksum(unsigned short* ptr_packet, int size_packet);
+
         virtual void initialize();
 
         virtual void finalize();

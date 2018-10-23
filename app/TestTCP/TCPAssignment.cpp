@@ -32,7 +32,6 @@ namespace E {
 
     void TCPAssignment::initialize() {
         typedef struct socket socket;
-
     }
 
     void TCPAssignment::finalize() {
@@ -83,13 +82,10 @@ namespace E {
             returnSystemCall(syscallUUID, -1);
         }
         memcpy(param2_ptr, socket_ret.addr_ptr, sizeof(struct sockaddr));
-
         /* Copy socket address length */
         memcpy(param3_ptr, &socket_ret.sock_len, sizeof(socklen_t));
 
-
         returnSystemCall(syscallUUID, 0);
-        //need to change this
     }
 
     void TCPAssignment::syscall_bind(UUID syscallUUID, int pid, int fd, struct sockaddr *sockaddr_ptr,
@@ -101,8 +97,8 @@ namespace E {
         returnSystemCall(syscallUUID, ret);
     }
 
-    void TCPAssignment:: syscall_connect(UUID syscallUUID, int pid, int client_fd,
-                                         struct sockaddr* server_addr, socklen_t server_addr_length){
+    void TCPAssignment::syscall_connect(UUID syscallUUID, int pid, int client_fd,
+                                        struct sockaddr* server_addr, socklen_t server_addr_length){
         /* Set client addr and port number(= implicit bound),
          * if addr and port have not been set before.
          */
@@ -110,20 +106,27 @@ namespace E {
         socket_b.get_socket_by_fd(client_fd, &client_socket);
 
         if (client_socket.addr_ptr == NULL) { // Client socket addr is not set.
-            uint8_t* ip_addr_dest;
+            uint8_t* ip_addr_dest; //TODO: NOT USED YET
             uint8_t* ip_addr_src;
             ip_addr_dest = (uint8_t *) malloc( 4 * sizeof(uint8_t) );
             ip_addr_src = (uint8_t *) malloc( 4 * sizeof(uint8_t) );
-            *(ip_addr_dest) = (struct sockaddr_in*) server_addr->sin_addr;
+            *(ip_addr_dest) = ((struct sockaddr_in*) server_addr)->sin_addr.s_addr;
 
             int interface_index;
-            interface_index = getHost()->getRoutingTable(ip_addr);
+            interface_index = getHost()->getRoutingTable(ip_addr_dest);
             getHost()->getIPAddr(ip_addr_src, interface_index);
 
             /* Set addr_ptr of the client socket */
-            (struct sockaddr_in *)(client_socket.addr_ptr)->sin_family = AF_INET;
-            (struct sockaddr_in *)(client_socket.addr_ptr)->sin_port = (uint16_t) 3000;
-            (struct sockaddr_in *)(client_socket.addr_ptr)->sin_addr = (struct in_addr)(*(ip_addr_src));
+//            (struct sockaddr_in *)(client_socket.addr_ptr)->sin_family = AF_INET;
+//            (struct sockaddr_in *)(client_socket.addr_ptr)->sin_port = (uint16_t) 3000;
+//            (struct sockaddr_in *)(client_socket.addr_ptr)->sin_addr = (struct in_addr)(*(ip_addr_src));
+
+            sockaddr_in *temp_addr_ptr = (sockaddr_in *) malloc (sizeof(sockaddr_in *));
+            temp_addr_ptr->sin_family = AF_INET;
+            temp_addr_ptr->sin_port = (uint16_t) 3000;
+            temp_addr_ptr->sin_addr.s_addr = (u_long) ip_addr_src;
+            client_socket.addr_ptr = (struct sockaddr *)temp_addr_ptr;
+
         }
 
         /* Send SYN bit to the server.
@@ -131,15 +134,20 @@ namespace E {
         Packet* packet_start;
         packet_start = this->allocatePacket(54);
 
-        uint8_t src_ip[4] = (struct sockaddr_in *)(client_socket.addr_ptr)->sin_addr;
-        uint8_t dest_ip[4] = ((struct sockaddr_in *)server_addr)->sin_addr;
-        uint8_t scr_port[2] = (struct sockaddr_in *)(client_socket.addr_ptr)->sin_port;
-        uint8_t dest_port[2] = ((struct sockaddr_in *)server_addr)->sin_port;;
+        uint8_t src_ip[4];
+        uint8_t dest_ip[4];
+        uint8_t src_port[2];
+        uint8_t dest_port[2];
+
+        *(src_ip) = (uint8_t) ((struct sockaddr_in *)client_socket.addr_ptr)->sin_addr.s_addr; // 네 번 값 받기.
+        *(dest_ip) = (uint8_t) ((struct sockaddr_in *)server_addr)->sin_addr.s_addr;
+        *(src_port) = (uint8_t) ((struct sockaddr_in *)client_socket.addr_ptr)->sin_port;
+        *(dest_port) = (uint8_t) ((struct sockaddr_in *)server_addr)->sin_port;;
 
         uint8_t SEQ_num_send[4];
-        (* SEQ_num_send) = client_socket.SEQ_num;
+        *(SEQ_num_send) = client_socket.SEQ_num;
         uint8_t ACK_num_send[4];
-        (* ACK_num_send) = (uint32_t) 0;
+        *(ACK_num_send) = (uint32_t) 0;
 
         uint8_t all_flags_send[1];
         all_flags_send[1] = 0x02;
@@ -147,10 +155,6 @@ namespace E {
         createPacketHeader(packet_start, src_ip, dest_ip, src_port, dest_port, SEQ_num_send
                 , ACK_num_send, all_flags_send);
         this->sendPacket("IPv4", packet_start);
-
-        /* TODO : How to call packetArrived */
-        packetArrived
-
         this->freePacket(packet_start);
     }
 
@@ -194,6 +198,7 @@ namespace E {
         /* TODO
          * Return final connection file descriptor
          */
+        return 1;
     }
 
     void TCPAssignment::systemCallback(UUID syscallUUID, int pid, const SystemCallParameter &param) {
@@ -234,8 +239,8 @@ namespace E {
                 break;
             case GETPEERNAME:
                 //this->syscall_getpeername(syscallUUID, pid, param.param1_int,
-                //		static_cast<struct sockaddr *>(param.param2_ptr),
-                //		static_cast<socklen_t*>(param.param3_ptr));
+                //      static_cast<struct sockaddr *>(param.param2_ptr),
+                //      static_cast<socklen_t*>(param.param3_ptr));
                 break;
             default:
                 assert(0);
@@ -246,7 +251,7 @@ namespace E {
         /* Extract the IP address and port number of source and destination from the recv pkt */
         uint8_t src_ip[4];
         uint8_t dest_ip[4];
-        uint8_t scr_port[2];
+        uint8_t src_port[2];
         uint8_t dest_port[2];
 
         packet->readData(14+12, src_ip, 4);
@@ -260,11 +265,11 @@ namespace E {
         uint8_t all_flags_recv[1];
         uint8_t all_flags_send[1];
         uint8_t ACK_send_bit, SYN_send_bit;
-        int ACK_recv, SEQ_recv;
-        int ACK_send, SEQ_send;
+        int ACK_recv, SYN_recv;
+        int ACK_send, SYN_send;
 
         packet->readData(14+20+13, all_flags_recv, 1);
-        all_flags_send[0] = all_flags_recv; /* copy recv packet flags */
+        all_flags_send[0] = *all_flags_recv; /* copy recv packet flags */
 
         ACK_recv = ( all_flags_recv[0] & 0x10 == 0 )? 0:1;
         SYN_recv = ( all_flags_recv[0] & 0x02 == 0 )? 0:1;
@@ -309,62 +314,60 @@ namespace E {
     }
 
     void TCPAssignment::createPacketHeader(Packet* packet_send, uint8_t src_ip[4], uint8_t dest_ip[4],
-                                           uint8_t* src_port, uint8_t* dest_port, uint8_t SEQ_num, uint8_t ACK_num, uint8_t* all_flags){
+                                           uint8_t* src_port, uint8_t* dest_port, uint8_t* SEQ_num, uint8_t* ACK_num, uint8_t* all_flags){
         /* Set Packet */
         /* Src/Dest Ip addr and port number */
-        uint16_t checksum;
+        uint16_t checksum_;
         packet_send->writeData(14+12, src_ip, 4);
         packet_send->writeData(14+16, dest_ip, 4);
         packet_send->writeData(14+20+0, src_port, 2);
-        pakcet_send->writeData(14+20+2, dest_port, 2);
+        packet_send->writeData(14+20+2, dest_port, 2);
 
         /* ACK num and SEQ num */
-        packet_send->writeData(14+20+4, SEQ_num_send, 4);
-        pakcet_send->writeData(14+20+8, ACK_num_send, 4);
+        packet_send->writeData(14+20+4, SEQ_num, 4);
+        packet_send->writeData(14+20+8, ACK_num, 4);
 
-        packet_send->writeData(14+20+13, all_flags_send, 1);
-        packet_send->writeData(14+20+16, (uint16_t) 0);
+        packet_send->writeData(14+20+13, all_flags, 1);
+        packet_send->writeData(14+20+16, 0, 2);
 
         /* Calculating Checksum */
-        checksum = checksum((unsigned short*) packet_send, 54);
-        packet_send->writeData(14+20+16, checksum);
+        checksum_ = checksum((unsigned short*) packet_send, 54);
+        packet_send->writeData(14+20+16, &checksum_, 2);
     }
 
     void TCPAssignment::timerCallback(void *payload) {
 
     }
 
+    /* The reference for the checksum:  http://locklessinc.com/articles/tcp_checksum/
+     * @ Name: checksum
+     * @ Function: Allow us to calculate TCP checksum */
+    unsigned short TCPAssignment::checksum(unsigned short* ptr_packet, int size_packet)
+    {
+        register long c_sum;
+        unsigned short oddbyte;
+        register short c_sum_final;
 
-}
-/* The reference for the checksum:  http://locklessinc.com/articles/tcp_checksum/
- * @ Name: checksum
- * @ Function: Allow us to calculate TCP checksum */
-unsigned short checksum(unsigned short* ptr_packet, int size_packet)
-{
-    register long c_sum;
-    unsigned short oddbyte;
-    register short c_sum_final;
+        c_sum = 0;
 
-    c_sum = 0;
+        /* In calculating checksum, we should deal with the odd number byte.
+         * While loop calculate the pre-checksum w.o. considering odd number byte.*/
+        while( size_packet > 1) {
+            c_sum += *ptr_packet ++;
+            size_packet -= 2;
+        }
 
-    /* In calculating checksum, we should deal with the odd number byte.
-     * While loop calculate the pre-checksum w.o. considering odd number byte.*/
-    while( size_packet > 1) {
-        c_sum += *ptr_packet ++;
-        size_packet -= 2;
+        /* Following if statement allows to cope with the 'odd case'.  */
+        if( size_packet == 1 ) {
+            oddbyte = 0;
+            *((u_char*) &oddbyte) = *(u_char*)ptr_packet ;
+            c_sum += oddbyte;
+        }
+
+        c_sum = (c_sum >> 16) + (c_sum & 0xffff);
+        c_sum = c_sum + ( c_sum >> 16 );
+        c_sum_final = (short) ~c_sum;
+
+        return (c_sum_final);
     }
-
-    /* Following if statement allows to cope with the 'odd case'.  */
-    if( size_packet == 1 ) {
-        oddbyte = 0;
-        *((u_char*) &oddbyte) = *(u_char*)ptr_packet ;
-        c_sum += oddbyte;
-    }
-
-    c_sum = (c_sum >> 16) + (c_sum & 0xffff);
-    c_sum = c_sum + ( c_sum >> 16 );
-    c_sum_final = (short) ~c_sum;
-
-    return (c_sum_final);
 }
-

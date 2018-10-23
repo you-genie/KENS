@@ -8,6 +8,7 @@
 #endif //KENSV3_SOCKET_H
 
 #include <stdlib.h>
+
 //#include <sys/socket.h>
 //
 //struct sockaddr {
@@ -16,6 +17,7 @@
 //};
 
 struct socket {
+    int state; // later be defined in TCPassignment
     int domain;
     int type;
     int protocol;

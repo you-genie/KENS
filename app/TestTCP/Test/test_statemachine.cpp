@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 
-#include "../Util/StateMachine.cpp"
+#include "../StateMachine.cpp"
 
 TEST(statemachine, generation) {
 EXPECT_EQ(1, header());
