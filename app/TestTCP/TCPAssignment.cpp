@@ -19,6 +19,9 @@
 
 namespace E {
 
+    /**
+     * STATIC VARIABLES
+     */
     StateNode *node_closed = new StateNode(Label::CLOSED, "Closed");
     StateNode *node_syn_sent = new StateNode(Label::SYN_SENT, "Syn Sent");
     StateNode *node_established = new StateNode(Label::ESTABLISHED, "Established");
@@ -136,6 +139,9 @@ namespace E {
             Label::CLOSED, Label::LISTEN, Label::SYN_RCVD,
             Label::ESTABLISHED, Label::CLOSE_WAIT, Label::LAST_ACK
     };
+    /**
+     * STATIC VARIABLES END
+     */
 
     TCPAssignment::TCPAssignment(Host *host) : HostModule("TCP", host),
                                                NetworkModule(this->getHostModuleName(), host->getNetworkSystem()),
@@ -223,9 +229,14 @@ namespace E {
          */
         struct socket client_socket;
         socket_b.get_socket_by_fd(client_fd, &client_socket);
+        printf(":: Client fd: %d ::\n", client_fd);
 
-        if (client_socket.addr_ptr == NULL) { // Client socket addr is not set.
-            uint8_t* ip_addr_dest; //TODO: NOT USED YET
+        StateMachine *state_machine_ptr = new StateMachine(MachineType::CLIENT);
+
+        if ( client_socket.clientaddr_defined == 0 ) { // Client socket addr is not set.
+            printf(":: first client addr access ::\n");
+            client_socket.addr_ptr = (struct sockaddr*) malloc(sizeof(struct sockaddr));
+            uint8_t* ip_addr_dest;
             uint8_t* ip_addr_src;
             ip_addr_dest = (uint8_t *) malloc( 4 * sizeof(uint8_t) );
             ip_addr_src = (uint8_t *) malloc( 4 * sizeof(uint8_t) );
@@ -235,19 +246,15 @@ namespace E {
             interface_index = getHost()->getRoutingTable(ip_addr_dest);
             getHost()->getIPAddr(ip_addr_src, interface_index);
 
-            /* Set addr_ptr of the client socket */
-//            (struct sockaddr_in *)(client_socket.addr_ptr)->sin_family = AF_INET;
-//            (struct sockaddr_in *)(client_socket.addr_ptr)->sin_port = (uint16_t) 3000;
-//            (struct sockaddr_in *)(client_socket.addr_ptr)->sin_addr = (struct in_addr)(*(ip_addr_src));
-
-            sockaddr_in *temp_addr_ptr = (sockaddr_in *) malloc (sizeof(sockaddr_in *));
+            struct sockaddr_in *temp_addr_ptr = (sockaddr_in *) malloc (sizeof(sockaddr_in *));
             temp_addr_ptr->sin_family = AF_INET;
-            temp_addr_ptr->sin_port = (uint16_t) 3000;
+            temp_addr_ptr->sin_port = htons( (uint16_t) 30000 ); /* Port in Network Byte */
             temp_addr_ptr->sin_addr.s_addr = (u_long) ip_addr_src;
             client_socket.addr_ptr = (struct sockaddr *)temp_addr_ptr;
 
+            printf(":: Client port: %d ::\n",(int)(((struct sockaddr_in*)client_socket.addr_ptr)->sin_port));
+            client_socket.clientaddr_defined = 1;
         }
-
         /* Send SYN bit to the server.
          */
         Packet* packet_start;
@@ -257,11 +264,16 @@ namespace E {
         uint8_t dest_ip[4];
         uint8_t src_port[2];
         uint8_t dest_port[2];
+        /* Set addr_ptr of the client socket */
+        /*
+        (struct sockaddr_in *)(client_socket.addr_ptr)->sin_family = AF_INET;
+        (struct sockaddr_in *)(client_socket.addr_ptr)->sin_port = (uint16_t) 3000;
+        (struct sockaddr_in *)(client_socket.addr_ptr)->sin_addr = (struct in_addr)(*(ip_addr_src)); */
 
-        *(src_ip) = (uint8_t) ((struct sockaddr_in *)client_socket.addr_ptr)->sin_addr.s_addr; // 네 번 값 받기.
-        *(dest_ip) = (uint8_t) ((struct sockaddr_in *)server_addr)->sin_addr.s_addr;
-        *(src_port) = (uint8_t) ((struct sockaddr_in *)client_socket.addr_ptr)->sin_port;
-        *(dest_port) = (uint8_t) ((struct sockaddr_in *)server_addr)->sin_port;;
+        *(src_ip) = ((struct sockaddr_in *)client_socket.addr_ptr)->sin_addr.s_addr; // 네 번 값 받기.
+        *(dest_ip) = ((struct sockaddr_in *)server_addr)->sin_addr.s_addr;
+        *(src_port) = ((struct sockaddr_in *)client_socket.addr_ptr)->sin_port;
+        *(dest_port) = ((struct sockaddr_in *)server_addr)->sin_port;;
 
         uint8_t SEQ_num_send[4];
         *(SEQ_num_send) = client_socket.SEQ_num;
@@ -269,18 +281,24 @@ namespace E {
         *(ACK_num_send) = (uint32_t) 0;
 
         uint8_t all_flags_send[1];
-        all_flags_send[1] = 0x02;
+        all_flags_send[0] = 0x02;
 
         createPacketHeader(packet_start, src_ip, dest_ip, src_port, dest_port, SEQ_num_send
                 , ACK_num_send, all_flags_send);
         this->sendPacket("IPv4", packet_start);
-        this->freePacket(packet_start);
+//        this->freePacket(packet_start);
     }
 
     void TCPAssignment::syscall_listen(UUID syscallUUID, int pid, int server_fd, int max_backlog){
         /* TODO: Error Detection
          * Is this socket bound before?
          */
+        struct socket server_socket;
+        socket_b.get_socket_by_fd(server_fd, &server_socket);
+
+        StateMachine *state_machine_ptr = new StateMachine(MachineType::SERVER); // ONLY SERVER CAN CALL THIS FUNC.
+        server_socket.state_machine = state_machine_ptr;
+
 
         /* TODO
          * Set server_fd to 'listen' the connection request.
@@ -368,75 +386,75 @@ namespace E {
 
     void TCPAssignment::packetArrived(std::string fromModule, Packet *packet) {
         /* Extract the IP address and port number of source and destination from the recv pkt */
-        uint8_t src_ip[4];
-        uint8_t dest_ip[4];
-        uint8_t src_port[2];
-        uint8_t dest_port[2];
-
-        packet->readData(14+12, src_ip, 4);
-        packet->readData(14+16, dest_ip, 4);
-        packet->readData(14+20+0, src_port, 2);
-        packet->readData(14+20+2, dest_port, 2);
-
-        /* Read ACK and SYN bit from pkt
-         * 1) all_flags_recv, all_flags_send: all 6 bit flag in the packet.
-         * 2) ACK_send_bit, SYN_send_bit: bit version of ACK_send and SYN_send */
-        uint8_t all_flags_recv[1];
-        uint8_t all_flags_send[1];
-        uint8_t ACK_send_bit, SYN_send_bit;
-        int ACK_recv, SYN_recv;
-        int ACK_send, SYN_send;
-
-        packet->readData(14+20+13, all_flags_recv, 1);
-        all_flags_send[0] = *all_flags_recv; /* copy recv packet flags */
-
-        ACK_recv = ( all_flags_recv[0] & 0x10 == 0 )? 0:1;
-        SYN_recv = ( all_flags_recv[0] & 0x02 == 0 )? 0:1;
-
-        /* Read ACK num and SEQ num from pkt. */
-        uint8_t ACK_num_recv[4];
-        uint8_t SEQ_num_recv[4];
-        uint8_t ACK_num_send[4];
-        uint8_t SEQ_num_send[4];
-
-        packet->readData(14+20+4, SEQ_num_recv, 4);
-        packet->readData(14+20+8, ACK_num_recv, 4);
-
-
-        /* TODO
-         * 1. Communicate with dest_port with SYN or ACK bit. (state machine communication)
-         * 2. Recv ACK, SYN, ACKnum and SEQnum from state machine. */
-
-        /* Create packet */
-        Packet *packet_send;
-        packet_send = this->allocatePacket( packet->getSize() );
-        packet_send = this->clonePacket(packet);
-
-        /* Set Packet */
-        /* ACK bit and SYN bit */
-        all_flags_send[1] = all_flags_send[1] & 0xED; /* reset ACK bit and SYN bit */
-        SYN_send_bit = (SYN_send) ? 0x02 : 0x00; /* Decide whether SYN bit is on */
-        ACK_send_bit = (ACK_send) ? 0x10 : 0x00; /* Decide whether ACK bit is on */
-        all_flags_send[1] = ( all_flags_send[1] | SYN_send_bit ) | ACK_send_bit;
-
-        createPacketHeader(packet_send, dest_ip, src_ip, dest_port, src_port,
-                           SEQ_num_send, ACK_num_send, all_flags_send);
-
-        /* Sending packet */
-        /* TODO:
-         *  1) copy the packet
-         *  2) If the packet does not arrived properly, re-send the packet
-         */
-        this->sendPacket("IPv4", packet_send);
-
-        this->freePacket(packet);
+//        uint8_t src_ip[4];
+//        uint8_t dest_ip[4];
+//        uint8_t src_port[2];
+//        uint8_t dest_port[2];
+//
+//        packet->readData(14+12, src_ip, 4);
+//        packet->readData(14+16, dest_ip, 4);
+//        packet->readData(14+20+0, src_port, 2);
+//        packet->readData(14+20+2, dest_port, 2);
+//
+//        /* Read ACK and SYN bit from pkt
+//         * 1) all_flags_recv, all_flags_send: all 6 bit flag in the packet.
+//         * 2) ACK_send_bit, SYN_send_bit: bit version of ACK_send and SYN_send */
+//        uint8_t all_flags_recv[1];
+//        uint8_t all_flags_send[1];
+//        uint8_t ACK_send_bit, SYN_send_bit;
+//        int ACK_recv, SYN_recv;
+//        int ACK_send, SYN_send;
+//
+//        packet->readData(14+20+13, all_flags_recv, 1);
+//        all_flags_send[0] = *all_flags_recv; /* copy recv packet flags */
+//
+//        ACK_recv = ( all_flags_recv[0] & 0x10 == 0 )? 0:1;
+//        SYN_recv = ( all_flags_recv[0] & 0x02 == 0 )? 0:1;
+//
+//        /* Read ACK num and SEQ num from pkt. */
+//        uint8_t ACK_num_recv[4];
+//        uint8_t SEQ_num_recv[4];
+//        uint8_t ACK_num_send[4];
+//        uint8_t SEQ_num_send[4];
+//
+//        packet->readData(14+20+4, SEQ_num_recv, 4);
+//        packet->readData(14+20+8, ACK_num_recv, 4);
+//
+//
+//        /* TODO
+//         * 1. Communicate with dest_port with SYN or ACK bit. (state machine communication)
+//         * 2. Recv ACK, SYN, ACKnum and SEQnum from state machine. */
+//
+//        /* Create packet */
+//        Packet *packet_send;
+//        packet_send = this->allocatePacket( packet->getSize() );
+//        packet_send = this->clonePacket(packet);
+//
+//        /* Set Packet */
+//        /* ACK bit and SYN bit */
+//        all_flags_send[1] = all_flags_send[1] & 0xED; /* reset ACK bit and SYN bit */
+//        SYN_send_bit = (SYN_send) ? 0x02 : 0x00; /* Decide whether SYN bit is on */
+//        ACK_send_bit = (ACK_send) ? 0x10 : 0x00; /* Decide whether ACK bit is on */
+//        all_flags_send[1] = ( all_flags_send[1] | SYN_send_bit ) | ACK_send_bit;
+//
+//        createPacketHeader(packet_send, dest_ip, src_ip, dest_port, src_port,
+//                           SEQ_num_send, ACK_num_send, all_flags_send);
+//
+//        /* Sending packet */
+//        /* TODO:
+//         *  1) copy the packet
+//         *  2) If the packet does not arrived properly, re-send the packet
+//         */
+//        this->sendPacket("IPv4", packet_send);
+//
+//        this->freePacket(packet);
     }
 
-    void TCPAssignment::createPacketHeader(Packet* packet_send, uint8_t src_ip[4], uint8_t dest_ip[4],
+    void TCPAssignment::createPacketHeader(Packet* packet_send, uint8_t* src_ip, uint8_t* dest_ip,
                                            uint8_t* src_port, uint8_t* dest_port, uint8_t* SEQ_num, uint8_t* ACK_num, uint8_t* all_flags){
         /* Set Packet */
         /* Src/Dest Ip addr and port number */
-        uint16_t checksum_;
+        uint16_t checksum_ = (uint16_t) 0;
         packet_send->writeData(14+12, src_ip, 4);
         packet_send->writeData(14+16, dest_ip, 4);
         packet_send->writeData(14+20+0, src_port, 2);
@@ -447,11 +465,11 @@ namespace E {
         packet_send->writeData(14+20+8, ACK_num, 4);
 
         packet_send->writeData(14+20+13, all_flags, 1);
-        packet_send->writeData(14+20+16, 0, 2);
+        packet_send->writeData(14+20+16, &(checksum_), 2);
 
         /* Calculating Checksum */
         checksum_ = checksum((unsigned short*) packet_send, 54);
-        packet_send->writeData(14+20+16, &checksum_, 2);
+        packet_send->writeData(14+20+16, &(checksum_), 2);
     }
 
     void TCPAssignment::timerCallback(void *payload) {
@@ -526,11 +544,15 @@ namespace E {
             this->state_link_table = E::cli_closed_table;
         } else {
             // SERVER state machine
-            printf("ABD\n");
             this->state_link_table = E::serv_closed_table;
         }
     }
 
+    StateMachine::~StateMachine() {
+        free(this->current_state_ptr);
+        free(this->state_link_table);
+    }
+  
     Signal StateMachine::getSendSignal(Signal recv) {
         StateNode *currentNode = GetCurrentState();
         Label currentLabel = currentNode->GetLabel();
