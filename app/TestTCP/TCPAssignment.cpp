@@ -15,7 +15,6 @@
 #include "TCPAssignment.hpp"
 #include "Bucket.hpp"
 #include <string.h>
-#include "StateMachine.h"
 
 namespace E {
 
@@ -601,4 +600,46 @@ namespace E {
         }
         return -1;
     };
+
+    int StateMachine::transit(Signal recv) {
+        int index;
+        StateNode *next_node = getNextNode(recv);
+        if (next_node == nullptr) {
+            return -1;
+        }
+
+        current_state_ptr = next_node;
+
+        Label newLabel = current_state_ptr->GetLabel();
+
+        if (this->machine_type == MachineType::CLIENT) {
+            index = getIndexFromLabel(cli_label_table, newLabel, 7);
+            this->state_link_table = cli_link_table[index];
+        } else {
+            index = getIndexFromLabel(serv_label_table, newLabel, 6);
+            this->state_link_table = serv_link_table[index];
+        }
+
+        return 1;
+    }
+
+    StateNode* StateMachine::getNextNode(Signal recv) {
+        StateNode *currentNode = GetCurrentState();
+
+        Label currentLabel = currentNode->GetLabel();
+
+        for (int i = 0; i < 3; i++) {
+            StateLink *state_link_ptr = this->state_link_table[i];
+            if (state_link_ptr->GetRecv() == recv) {
+                printf("%s: \n", state_link_ptr->ToString());
+                return state_link_ptr->GetNextNode();
+            }
+        }
+        return nullptr; // node_err
+    }
+
+    void StateMachine::log() {
+        char *current_state = this->current_state_ptr->ToString();
+        printf("%s\n", current_state);
+    }
 }
