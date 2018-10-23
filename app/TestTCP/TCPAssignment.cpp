@@ -15,6 +15,7 @@
 #include "TCPAssignment.hpp"
 #include "Bucket.hpp"
 #include <string.h>
+#include "StateMachine.h"
 
 namespace E {
 
@@ -600,7 +601,7 @@ namespace E {
         }
         return -1;
     };
-
+  
     int StateMachine::transit(Signal recv) {
         int index;
         StateNode *next_node = getNextNode(recv);
