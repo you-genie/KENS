@@ -34,5 +34,7 @@ public:
 
     file get_file_by_fd(int s_fd);
 
+    DynamicArray GetFiles() {return files_;};
+
 //    void
 };

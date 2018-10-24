@@ -58,6 +58,9 @@ namespace E {
         void syscall_accept(UUID syscallUUID, int pid, int listen_fd,
                             struct sockaddr* client_addr, socklen_t* client_addr_len);
 
+        void syscall_getpeername(UUID syscallUUID, int pid, int listen_fd,
+                struct sockaddr* client_addr, socklen_t *client_addr_len);
+
         void createPacketHeader(Packet* packet_send, uint32_t* src_ip, uint32_t* dest_ip,
                                 uint16_t* src_port, uint16_t* dest_port, uint32_t* SEQ_num, uint32_t* ACK_num, uint8_t* all_flags);
 
@@ -142,6 +145,8 @@ namespace E {
     class StateMachine {
     public:
         StateMachine(MachineType machine_type);
+
+        StateMachine(MachineType machine_type, Label label);
 
         ~StateMachine();
 

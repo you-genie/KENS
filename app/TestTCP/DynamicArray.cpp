@@ -60,6 +60,7 @@ int DynamicArray::getFdWithPort(unsigned short port) {
             return f.fd;
         }
     }
+    printf("ASDFASDFASDf\n");
     return -1; // no socket with that port
 }
 file DynamicArray::getFileWithPort(unsigned short port, int* no_such_file) {
