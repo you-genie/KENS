@@ -50,3 +50,11 @@ void socket_bucket::get_socket_by_fd(int s_fd, struct socket *socket_ptr) {
     struct socket * ret_socket_ptr = (struct socket *)&(file.socket);
     memcpy(socket_ptr, ret_socket_ptr, sizeof(struct socket));
 }
+
+int socket_bucket::get_socket_by_port(unsigned short port_num, struct socket *socket_ptr){
+    file file = files_.getFileWithPort(port_num);
+    printf("========== get socket by port 3 ==========\n");
+    socket_ptr = (struct socket *)&(file.socket);
+    printf("========== get socket by port 4 ==========\n");
+    return file.fd;
+}
