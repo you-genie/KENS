@@ -55,11 +55,11 @@ namespace E {
 
         void syscall_listen(UUID syscallUUID, int pid, int server_fd, int max_backlog);
 
-        int syscall_accept(UUID syscallUUID, int pid, int listen_fd,
-                           struct sockaddr* client_addr, socklen_t* client_addr_len);
+        void syscall_accept(UUID syscallUUID, int pid, int listen_fd,
+                            struct sockaddr* client_addr, socklen_t* client_addr_len);
 
-        void createPacketHeader(Packet* packet_send, uint8_t src_ip[4], uint8_t dest_ip[4],
-                                uint8_t* src_port, uint8_t* dest_port, uint8_t* SEQ_num, uint8_t* ACK_num, uint8_t* all_flags);
+        void createPacketHeader(Packet* packet_send, uint32_t* src_ip, uint32_t* dest_ip,
+                                uint16_t* src_port, uint16_t* dest_port, uint32_t* SEQ_num, uint32_t* ACK_num, uint8_t* all_flags);
 
         unsigned short checksum(unsigned short* ptr_packet, int size_packet);
 

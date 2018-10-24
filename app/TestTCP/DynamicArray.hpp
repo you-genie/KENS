@@ -36,6 +36,7 @@ public:
 
     int bindSocketWithFd(int fd, struct sockaddr *s_addr, socklen_t sock_len_new);
 
+    file getFileWithPort(unsigned short port, int* no_such_file);
 
     void popBack();
 
@@ -44,7 +45,6 @@ public:
     void print();
 
     void deleteWithIndex(int index);
-
 
     int deleteWithFd(int fd);
 
