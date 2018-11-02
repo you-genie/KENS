@@ -20,6 +20,111 @@
 #include <E/E_TimerModule.hpp>
 
 namespace E {
+    enum class MachineType {
+        SERVER, CLIENT
+    };
+
+    enum class Label {
+        CLOSED, LISTEN, SYN_RCVD,
+        SYN_SENT, ESTABLISHED, CLOSE_WAIT,
+        LAST_ACK, FIN_WAIT_1, CLOSING,
+        FIN_WAIT_2, TIME_WAIT, NONE
+    };
+
+    enum class Signal {
+        SYN, ACK, FIN, SYN_ACK, FIN_ACK, OPEN, CLOSE, DATA, ERR, NONE
+    }; // err contains timeout
+
+    struct Connection {
+        uint32_t seq_num;
+        uint32_t ack_num;
+        sockaddr *cli_addr_ptr;
+    };
+
+    struct ConnectionBucket {
+        std::vector<Connection *> connections;
+    };
+
+    struct pseudoHeader {
+        uint32_t src_ip;
+        uint32_t dest_ip;
+        uint8_t reserved;
+        uint8_t protocol;
+        uint16_t TCP_segment_length;
+    };
+
+    struct Socket {
+        int fd;
+        int max_backlog;
+        ConnectionBucket *backlog;
+
+        Label state_label;
+        MachineType socket_type;
+
+        int domain;
+        int type;
+        int protocol;
+
+        struct sockaddr *addr_ptr;
+        socklen_t sock_len;
+
+        uint32_t seq_num;
+        uint32_t ack_num;
+
+        UUID syscallUUID;
+    };
+
+
+    struct SocketBucket {
+        std::vector<Socket *> sockets;
+    };
+
+    struct TCPHeader {
+        uint16_t src_port;
+        uint16_t dest_port;
+
+        uint32_t seq_num;
+        uint32_t ack_num;
+
+        uint8_t head_length;
+        uint8_t offset_res_flags;
+        uint16_t window;
+        uint16_t checksum;
+        uint16_t urgent_ptr;
+    };
+
+    class Debug {
+    public:
+        void Log(Label label) {
+            ToString(label, this->debug_str);
+            printf("Label: %s\n", debug_str);
+        };
+
+        void Log(Signal signal) {
+            ToString(signal, this->debug_str);
+            printf("Label: %s\n", debug_str);
+        };
+
+        void Log(Connection connection) {
+            ToString(connection, this->debug_str);
+            printf("Label: %s\n", debug_str);
+        };
+
+        void Log(MachineType machine_type) {
+            ToString(machine_type, this->debug_str);
+            printf("Label: %s\n", debug_str);
+        };
+    private:
+        char debug_str[50];
+
+        void ToString(Label label, char *ret_string);
+
+        void ToString(Signal signal, char *ret_string);
+
+        void ToString(Connection connection, char *ret_string);
+
+        void ToString(MachineType machineType, char *ret_string);
+    }
 
     class TCPAssignment
             : public HostModule,
@@ -27,12 +132,17 @@ namespace E {
               public SystemCallInterface,
               private NetworkLog,
               private TimerModule {
-    private:
 
     private:
         virtual void timerCallback(void *payload) final;
 
+        void CreatePacketHeader(Packet *packet, TCPHeader *packet_header, uint32_t *src_ip, uint32_t *dest_ip, int length);
+
     public:
+        SocketBucket socket_bucket;
+
+        char debug_str[50];
+
         TCPAssignment(Host *host);
 
         void syscall_socket(
@@ -55,11 +165,11 @@ namespace E {
 
         void syscall_listen(UUID syscallUUID, int pid, int server_fd, int max_backlog);
 
-        int syscall_accept(UUID syscallUUID, int pid, int listen_fd,
-                           struct sockaddr* client_addr, socklen_t* client_addr_len);
+        void syscall_accept(UUID syscallUUID, int pid, int listen_fd,
+                            struct sockaddr* client_addr, socklen_t* client_addr_len);
 
-        void createPacketHeader(Packet* packet_send, uint8_t src_ip[4], uint8_t dest_ip[4],
-                                uint8_t* src_port, uint8_t* dest_port, uint8_t* SEQ_num, uint8_t* ACK_num, uint8_t* all_flags);
+        void syscall_getpeername(UUID syscallUUID, int pid, int listen_fd,
+                                 struct sockaddr* client_addr, socklen_t *client_addr_len);
 
         unsigned short checksum(unsigned short* ptr_packet, int size_packet);
 
@@ -85,83 +195,26 @@ namespace E {
         static HostModule *allocate(Host *host) { return new TCPAssignment(host); }
     };
 
-    enum class MachineType {
-        SERVER, CLIENT
-    };
-
-    enum class Label {
-        CLOSED, LISTEN, SYN_RCVD,
-        SYN_SENT, ESTABLISHED, CLOSE_WAIT,
-        LAST_ACK, FIN_WAIT_1, CLOSING,
-        FIN_WAIT_2, TIME_WAIT, NONE
-    };
-
-    enum class Signal {
-        SYN, ACK, FIN, SYN_ACK, FIN_ACK, OPEN, CLOSE, DATA, ERR, NONE
-    }; // err contains timeout
-
-    class StateNode {
-    public:
-        StateNode();
-
-        StateNode(Label label, char *str_label);
-
-        char *ToString() { return str_label; };
-
-        Label GetLabel() { return label; };
-    private:
-        Label label;
-        char str_label[20];
-    };
-
-    class StateLink {
-    public:
-        StateLink(StateNode *state_node, StateNode *next_node, Signal recv, Signal send);
-
-        Signal GetRecv() { return recv; };
-
-        Signal GetSend() { return send; };
-
-        StateNode *GetNextNode() { return next_node; };
-
-        // TODO: generate str_link on this function
-        char *ToString() { return str_link; };
-    private:
-        StateNode *state_node = new StateNode();
-        StateNode *next_node;
-        char str_link[80];
-        Signal recv;
-        Signal send;
-    };
-
-    struct LabelMap {
-        Label label;
-        StateLink *link_map[3];
-    };
-
     class StateMachine {
     public:
-        StateMachine(MachineType machine_type);
+        StateMachine() : current_node(Label::CLOSED), machine_type(MachineType::CLIENT) {};
 
-        ~StateMachine();
+        StateMachine(Label label, MachineType machineType) : current_node(label), machine_type(machineType) {};
 
-        int GetMachineType() { return (int) machine_type; };
+        Label GetCurrentState() { return current_node; };
 
-        StateNode *GetCurrentState() { return current_state_ptr; };
+        MachineType GetSocketType() { return machine_type; };
 
-        Signal GetSendSignal(Signal recv) { return getSendSignal(recv); };
+        int Transit(Signal recv);
 
-        int transit(Signal recv); // TODO: return -1 if not valid signal.
-        void log(); // TODO: log all the actions, receiving link and stateNode value.
+        Signal GetSendSignalAndSetNextNode(Signal recv);
+
     private:
-        StateNode *current_state_ptr;
-        StateLink **state_link_table;
+        Label current_node;
+        Label next_node;
         MachineType machine_type;
-
-        StateNode *getNextNode(Signal recv);
-
-        Signal getSendSignal(Signal recv); // TODO: give Signal::ERR if is not valid.
     };
+
 
 }
 

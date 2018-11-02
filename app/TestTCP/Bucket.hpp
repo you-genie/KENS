@@ -30,5 +30,11 @@ public:
 
     int bind_socket_by_fd(int s_fd, struct sockaddr *s_addr_ptr, socklen_t sock_len);
 
+    file get_file_by_port(unsigned short port_num, int* error_detection);
+
+    file get_file_by_fd(int s_fd);
+
+    DynamicArray GetFiles() {return files_;};
+
 //    void
 };

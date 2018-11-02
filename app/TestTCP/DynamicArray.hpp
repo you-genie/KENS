@@ -32,10 +32,15 @@ public:
 
     ~DynamicArray();
 
+    int GetMUsed(){ return m_used; };
+
     int overlapSocket(int fd, unsigned short port);
 
     int bindSocketWithFd(int fd, struct sockaddr *s_addr, socklen_t sock_len_new);
 
+    file getFileWithPort(unsigned short port, int* no_such_file);
+
+    file *GetFiles() { return m_array; };
 
     void popBack();
 
@@ -44,7 +49,6 @@ public:
     void print();
 
     void deleteWithIndex(int index);
-
 
     int deleteWithFd(int fd);
 
