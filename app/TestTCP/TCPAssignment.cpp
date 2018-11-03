@@ -140,8 +140,10 @@ namespace E {
 
     void TCPAssignment::initialize() {
         std::vector<Socket *> new_sockets = std::vector<Socket *>();
+        std::vector<Socket *> new_cli_sockets = std::vector<Socket *>();
         new_sockets.reserve(1024);
         socket_bucket.sockets = new_sockets;
+        cli_bucket.sockets = new_cli_sockets;
     }
 
     void TCPAssignment::finalize() {
@@ -182,6 +184,18 @@ namespace E {
         return -1; // error occured
     }
 
+    int RemoveConnectionWithPort(uint16_t port, ConnectionBucket *connection_bucket_ptr) {
+        for (int i = 0; i < connection_bucket_ptr->connections.size(); i++) {
+            Connection *connection_ptr = connection_bucket_ptr->connections[i];
+            if (((sockaddr_in *)connection_ptr->cli_addr_ptr)->sin_port == port) {
+                connection_bucket_ptr->connections.erase(connection_bucket_ptr->connections.begin() + i);
+
+                return 1;
+            }
+        }
+        return -1;
+    }
+
     int FindSocketWithFd(int fd, Socket *socket_ptr_ret, SocketBucket socket_bucket) {
         for (int i = 0; i < socket_bucket.sockets.size(); i++) {
             Socket *socket_ptr = socket_bucket.sockets[i];
@@ -192,6 +206,20 @@ namespace E {
             }
         }
         return -1; // Error occured.
+    }
+
+    int FindConnectionWithPort(
+            uint16_t port, Connection *connection_ptr_ret, ConnectionBucket *connection_bucket_ptr) {
+        for (int i = 0; i < connection_bucket_ptr->connections.size(); i++) {
+            Connection *connection_ptr = connection_bucket_ptr->connections[i];
+            if (((sockaddr_in *)connection_ptr->cli_addr_ptr)->sin_port == port) {
+                memcpy(connection_ptr_ret, connection_ptr, sizeof(Connection));
+
+                return 1;
+            }
+        }
+//        printf("== Bind Return Point 2 ==\n");
+        return -1;
     }
 
     int FindSocketWithPort(uint16_t port, Socket *socket_ptr_ret, SocketBucket socket_bucket) {
@@ -208,12 +236,16 @@ namespace E {
     }
 
     void TCPAssignment::syscall_close(UUID syscallUUID, int pid, int fd) {
-        removeFileDescriptor(pid, fd);
 
         int ret = RemoveSocketWithFd(fd, &socket_bucket);
         if (ret == -1) {
-            returnSystemCall(syscallUUID, ret);
+            if (RemoveSocketWithFd(fd, &cli_bucket) == -1) {
+                returnSystemCall(syscallUUID, -1);
+            }
+            removeFileDescriptor(pid, fd);
+            returnSystemCall(syscallUUID, fd);
         } else {
+            removeFileDescriptor(pid, fd);
             returnSystemCall(syscallUUID, fd);
         }
     }
@@ -227,7 +259,11 @@ namespace E {
         Socket *socket_ret = new Socket;
 
         if (E::FindSocketWithFd(param1, socket_ret, this->socket_bucket) != 0) {
+            memcpy(param2_ptr, socket_ret->addr_ptr, sizeof(struct sockaddr));
+            memcpy(param3_ptr, &(socket_ret->sock_len), sizeof(socklen_t));
 
+            returnSystemCall(syscallUUID, 0);
+        } else if (E::FindSocketWithFd(param1, socket_ret, this->cli_bucket) != 0) {
             memcpy(param2_ptr, socket_ret->addr_ptr, sizeof(struct sockaddr));
             memcpy(param3_ptr, &(socket_ret->sock_len), sizeof(socklen_t));
 
@@ -350,6 +386,7 @@ namespace E {
         // TODO: change each states of socket.
         cli_socket->socket_type = MachineType::CLIENT;
         cli_socket->syscallUUID = syscallUUID;
+
         RemoveSocketWithFd(client_fd, &socket_bucket);
         socket_bucket.sockets.push_back(cli_socket);
     }
@@ -377,10 +414,11 @@ namespace E {
         socket_ptr->state_label = Label::LISTEN;
         socket_ptr->socket_type = MachineType::SERVER;
         socket_ptr->syscallUUID = syscallUUID;
+
         RemoveSocketWithFd(server_fd, &socket_bucket);
         socket_bucket.sockets.push_back(socket_ptr);
 
-        returnSystemCall(syscallUUID, 1);
+        returnSystemCall(syscallUUID, 0);
     }
 
     void TCPAssignment::CreatePacketHeader(
@@ -420,15 +458,75 @@ namespace E {
         free(TCP_segment);
     }
 
+
+    void TCPAssignment::CreatePacketHeaderWithFlag(
+            uint8_t *flags,
+            Socket *socket_ptr,
+            Packet *packet,
+            E::TCPHeader *packet_header,
+            uint32_t *src_ip,
+            uint32_t *dest_ip,
+            int length) {
+        TCPHeader *new_header = new TCPHeader;
+        /* Setting head len and flags */
+        new_header->head_length = packet_header->head_length;
+        new_header->offset_res_flags = *flags;
+
+        new_header->dest_port = htons(ntohs(packet_header->src_port));
+        new_header->src_port = htons(ntohs(packet_header->dest_port));
+        new_header->ack_num = htonl(ntohl(packet_header->seq_num) + (uint32_t) 1);
+        new_header->seq_num = htonl(socket_ptr->seq_num);
+        new_header->window = packet_header->window;
+        new_header->urgent_ptr = (uint16_t) 0;
+
+        CreatePacketHeader(packet, new_header, src_ip, dest_ip, length);
+    }
     void TCPAssignment::syscall_accept(UUID syscallUUID, int pid, int listen_fd,
                                        struct sockaddr *client_addr, socklen_t *client_addr_len) {
+        debug->Log("ACCEPT!");
+        Socket *server_socket_ptr = new Socket;
+        if (FindSocketWithFd(listen_fd, server_socket_ptr, socket_bucket) == -1) {
+            debug->LogDivider();
+            returnSystemCall(syscallUUID, -1);
+        }
 
+        if (server_socket_ptr->backlog->connections.size() > server_socket_ptr->backlog->not_established) {
+            for (int i = 0; i < server_socket_ptr->backlog->connections.size(); i++) {
+                Connection *connection_ptr = server_socket_ptr->backlog->connections[i];
+                if (connection_ptr->established == 1) {
+                    Socket *cli_socket_ptr = new Socket;
+
+                    int fd = 0;
+                    fd = createFileDescriptor(pid);
+
+                    debug->Log("seq", (int)connection_ptr->seq_num);
+
+                    struct sockaddr *temp_addr_ptr = (struct sockaddr *)connection_ptr->cli_addr_ptr;
+                    cli_socket_ptr->addr_ptr = (struct sockaddr *)connection_ptr->cli_addr_ptr;
+
+                    memcpy(client_addr, cli_socket_ptr->addr_ptr, 16);
+
+                    cli_socket_ptr->fd = fd;
+
+                    cli_socket_ptr->sock_len = 16; // 임의의 숫자. 귀찮.
+                    *client_addr_len = 16;
+
+                    cli_bucket.sockets.push_back(cli_socket_ptr);
+
+                    server_socket_ptr->backlog->connections.erase(server_socket_ptr->backlog->connections.begin() + i);
+                    returnSystemCall(syscallUUID, fd);
+                    return;
+                }
+            }
+        }
+        returnSystemCall(syscallUUID, -1);
 
     }
 
     void TCPAssignment::syscall_getpeername(UUID syscallUUID, int pid, int listen_fd,
                                             struct sockaddr* client_addr, socklen_t *client_addr_len) {
         // Give peer's name
+        returnSystemCall(syscallUUID, -1);
 
     }
 
@@ -454,9 +552,9 @@ namespace E {
                 this->syscall_listen(syscallUUID, pid, param.param1_int, param.param2_int);
                 break;
             case ACCEPT:
-                //                this->syscall_accept(syscallUUID, pid, param.param1_int,
-                //                                     static_cast<struct sockaddr *>(param.param2_ptr),
-                //                                     static_cast<socklen_t *>(param.param3_ptr));
+                this->syscall_accept(syscallUUID, pid, param.param1_int,
+                                     static_cast<struct sockaddr *>(param.param2_ptr),
+                                     static_cast<socklen_t *>(param.param3_ptr));
                 break;
             case BIND:
                 this->syscall_bind(syscallUUID, pid, param.param1_int,
@@ -505,17 +603,106 @@ namespace E {
         bool fin = packet_header->offset_res_flags & 0x01;
         Signal recv;
 
+//        debug->Log("flag?", packet_header->offset_res_flags);
+
         if (syn) {
             if (ack) {
                 recv = Signal::SYN_ACK;
+
+                if (dest_socket_ptr->state_label == Label::SYN_SENT) {
+                    dest_socket_ptr->state_label = Label::ESTABLISHED;
+
+                    uint8_t flags = 0x12;
+
+                    // Create new Packet.
+                    Packet *new_packet = this->clonePacket(packet);
+                    CreatePacketHeaderWithFlag(&flags, dest_socket_ptr, new_packet, packet_header, dest_ip, src_ip, 20);
+
+                    this->sendPacket("IPv4", new_packet);
+
+                    RemoveSocketWithFd(dest_socket_ptr->fd, &socket_bucket);
+                    socket_bucket.sockets.push_back(dest_socket_ptr);
+
+                    this->freePacket(packet);
+                    returnSystemCall(dest_socket_ptr->syscallUUID, 0);
+                    return;
+                }
             } else {
                 recv = Signal::SYN;
+
+                if (dest_socket_ptr->state_label == Label::LISTEN) {
+//                    /**
+                    if (dest_socket_ptr->backlog->not_established < dest_socket_ptr->max_backlog) {
+                        debug->Log("not Established", dest_socket_ptr->backlog->not_established);
+                        debug->Log("max backlog", dest_socket_ptr->max_backlog);
+                        // ignore other arrived packets.
+                        Connection *new_connection_ptr = new Connection;
+
+                        // Set new client address pointer;
+                        sockaddr_in *new_cli_addr_ptr = new sockaddr_in;
+                        new_cli_addr_ptr->sin_addr.s_addr = *src_ip;
+                        new_cli_addr_ptr->sin_family = AF_INET;
+                        new_cli_addr_ptr->sin_port = packet_header->src_port;
+
+                        // set client address pointer to new connection pointer
+                        new_connection_ptr->cli_addr_ptr = new_cli_addr_ptr;
+                        printf("%d: %d\n", new_connection_ptr->cli_addr_ptr->sin_addr.s_addr,
+                               new_connection_ptr->cli_addr_ptr->sin_port);
+
+                        // set destination socket (a.k.a. server socket) new connection & raise unestablished one.
+                        dest_socket_ptr->backlog->connections.push_back(new_connection_ptr);
+                        dest_socket_ptr->backlog->not_established = dest_socket_ptr->backlog->not_established + 1;
+                    } else {
+//                        debug->Log("over!!!!", dest_socket_ptr->max_backlog);
+                    }
+//                     **/
+
+                    uint8_t flags = 0x12;
+
+                    Packet *new_packet = this->clonePacket(packet);
+                    CreatePacketHeaderWithFlag(&flags, dest_socket_ptr, new_packet, packet_header, dest_ip, src_ip, 20);
+
+                    this->sendPacket("IPv4", new_packet);
+                    dest_socket_ptr->state_label = Label::SYN_RCVD;
+//                    RemoveSocketWithFd(dest_socket_ptr->fd, &socket_bucket);
+//                    socket_bucket.sockets.push_back(dest_socket_ptr);
+                    this->freePacket(packet);
+                    return;
+                } else {
+//                    debug->Log(dest_socket_ptr->state_label);
+                }
             }
         } else if (ack) {
             if (fin) {
                 recv = Signal::FIN_ACK;
             } else {
                 recv = Signal::ACK; //change
+
+                if (dest_socket_ptr->state_label == Label::SYN_RCVD || dest_socket_ptr->state_label == Label::LISTEN) {
+                    dest_socket_ptr->state_label = Label::ESTABLISHED;
+
+                    // Do connection related job.
+//                    /**
+                    Connection *new_connection_ptr = new Connection;
+                    FindConnectionWithPort(packet_header->src_port, new_connection_ptr, dest_socket_ptr->backlog);
+                    new_connection_ptr->seq_num = ntohl(packet_header->ack_num);
+//                    debug->Log("seq", (int)new_connection_ptr->seq_num);
+                    new_connection_ptr->ack_num = ntohl(packet_header->seq_num) + (uint32_t) 1;
+                    new_connection_ptr->established = 1;
+
+                    RemoveConnectionWithPort(packet_header->src_port, dest_socket_ptr->backlog);
+                    dest_socket_ptr->backlog->connections.push_back(new_connection_ptr);
+                    dest_socket_ptr->backlog->not_established = dest_socket_ptr->backlog->not_established - 1;
+//                     **/
+
+                    this->freePacket(packet);
+                    returnSystemCall(dest_socket_ptr->syscallUUID, 1);
+                    RemoveSocketWithFd(dest_socket_ptr->fd, &socket_bucket);
+                    socket_bucket.sockets.push_back(dest_socket_ptr);
+                    return;
+                } else {
+//                    debug->Log(dest_socket_ptr->state_label);
+                }
             }
         } else if (fin) {
             recv = Signal::FIN;
@@ -523,60 +710,59 @@ namespace E {
             recv = Signal::NONE;
         }
 
-        Debug::Log(recv, debug_str);
 //        printf("recv: %s\n", debug_str);
 
+/**
+        // TODO: if SYN, check whether it's valid with max.
 
-//        // TODO: if SYN, check whether it's valid with max.
-//
-//        // TODO: if SYN, do SYN related action
-//        StateMachine *state_machine = new StateMachine(dest_socket_ptr->state_label, dest_socket_ptr->socket_type);
-//        ToString(dest_socket_ptr->state_label, debug_str);
-////        printf("%s, %d\n", debug_str, dest_socket_ptr->socket_type);
-//
-//        Signal send = state_machine->GetSendSignalAndSetNextNode(recv);
-//        ToString(send, debug_str);
-////        printf("action: %s\n", debug_str);
-//
-//        if (send == Signal::ERR) {
-//            return;
-//        } else if (send == Signal::SYN_ACK) {
-//            Packet *new_packet = this->clonePacket(packet);
-//            TCPHeader *new_header = new TCPHeader;
-//            /* Setting head len and flags */
-//            new_header->head_length = packet_header->head_length;
-//            new_header->offset_res_flags = 0x12;
-//
-//            new_header->dest_port = htons(ntohs(packet_header->src_port));
-//            new_header->src_port = htons(ntohs(packet_header->dest_port));
-//            new_header->ack_num = htonl(ntohl(packet_header->seq_num) + (uint32_t)1);
-//            new_header->seq_num = htonl(dest_socket_ptr->seq_num);
-//            new_header->window = packet_header->window;
-//            new_header->urgent_ptr = (uint16_t) 0;
-//
-//            CreatePacketHeader(new_packet, new_header, dest_ip, src_ip, 20);
-//            this->sendPacket("IPv4", new_packet);
-////            printf("Sending Signal\n");
-//            free(new_header);
-//        } else {
-//            // TODO: other actions
-//        }
-//
-//        dest_socket_ptr->state_label = (Label) state_machine->Transit(recv);
-//        if (dest_socket_ptr->state_label == Label::ESTABLISHED) {
-//            returnSystemCall(dest_socket_ptr->syscallUUID, 1);
-//        }
-//        char* state_str = (char*)malloc(4);
-//        ToString(dest_socket_ptr->state_label, state_str);
-////        printf("Label: %s\n", state_str);
-//        free(state_str);
-//
-//
-//        this->freePacket(packet);
-//        free(state_machine);
-//        free(dest_ip);
-//        free(src_ip);
-//        free(packet_header);
+        // TODO: if SYN, do SYN related action
+        StateMachine *state_machine = new StateMachine(dest_socket_ptr->state_label, dest_socket_ptr->socket_type);
+        ToString(dest_socket_ptr->state_label, debug_str);
+//        printf("%s, %d\n", debug_str, dest_socket_ptr->socket_type);
+
+        Signal send = state_machine->GetSendSignalAndSetNextNode(recv);
+        ToString(send, debug_str);
+//        printf("action: %s\n", debug_str);
+
+        if (send == Signal::ERR) {
+            return;
+        } else if (send == Signal::SYN_ACK) {
+            Packet *new_packet = this->clonePacket(packet);
+            TCPHeader *new_header = new TCPHeader;
+            new_header->head_length = packet_header->head_length;
+            new_header->offset_res_flags = 0x12;
+
+            new_header->dest_port = htons(ntohs(packet_header->src_port));
+            new_header->src_port = htons(ntohs(packet_header->dest_port));
+            new_header->ack_num = htonl(ntohl(packet_header->seq_num) + (uint32_t)1);
+            new_header->seq_num = htonl(dest_socket_ptr->seq_num);
+            new_header->window = packet_header->window;
+            new_header->urgent_ptr = (uint16_t) 0;
+
+            CreatePacketHeader(new_packet, new_header, dest_ip, src_ip, 20);
+            this->sendPacket("IPv4", new_packet);
+//            printf("Sending Signal\n");
+            free(new_header);
+        } else {
+            // TODO: other actions
+        }
+
+        dest_socket_ptr->state_label = (Label) state_machine->Transit(recv);
+        if (dest_socket_ptr->state_label == Label::ESTABLISHED) {
+            returnSystemCall(dest_socket_ptr->syscallUUID, 1);
+        }
+        char* state_str = (char*)malloc(4);
+        ToString(dest_socket_ptr->state_label, state_str);
+//        printf("Label: %s\n", state_str);
+        free(state_str);
+
+
+        this->freePacket(packet);
+        free(state_machine);
+        free(dest_ip);
+        free(src_ip);
+        free(packet_header);
+**/
         // TODO: if SYN ACK, do SYN ACK related action
     }
 
