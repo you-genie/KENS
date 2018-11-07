@@ -113,19 +113,35 @@ namespace E {
         Debug(){};
 
         void Log(char *string) {
+            printf("%s\n", string);
+        };
+
+        void BigLog(char *string) {
             printf("========== %s ==========\n", string);
+        }
+
+        void StarLog(char *string) {
+            printf("** %s **\n", string);
+        }
+
+        void StarLog(char *string, int num) {
+            printf("** %s: %d **\n", string, num);
+        }
+
+        void StarLog(char *string, uint8_t num) {
+            printf("** %s: %d **\n", string, num);
         };
 
         void Log(char *string, char *string2) {
-            printf("========== %s %s ==========\n", string, string2);
+            printf("%s: %s\n", string, string2);
         };
 
         void Log(char *string, int num) {
-            printf("========== %s: %d ==========\n", string, num);
+            printf("%s: %d\n", string, num);
         };
 
         void Log(char *string, uint8_t num) {
-            printf("========== %s: %d ==========\n", string, num);
+            printf("%s: %d\n", string, num);
         };
 
         void LogDivider() {

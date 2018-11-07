@@ -272,7 +272,7 @@ namespace E {
     }
 
     void TCPAssignment::syscall_close(UUID syscallUUID, int pid, int fd) {
-        printf("==== Close call ====\n");
+        debug->BigLog("syscall_close");
         Socket *socket_temp = new Socket;
 
         if (FindSocketWithFd(fd, socket_temp, socket_bucket) == -1) {
@@ -288,6 +288,7 @@ namespace E {
         removeFileDescriptor(pid, fd);
 
         delete socket_temp;
+        delete packet_header;
         return;
         /* TODO Get peer address */
         // if it's server socket
@@ -415,7 +416,7 @@ namespace E {
         /* Set client addr and port number(= implicit bound),
          * if addr and port have not been set before.
          */
-        printf("==== connect call ====\n");
+        debug->BigLog("syscall connect");
         Socket *cli_socket = new Socket;
 
         if (FindSocketWithFd(client_fd, cli_socket, socket_bucket) == -1) {
@@ -577,7 +578,7 @@ namespace E {
     }
     void TCPAssignment::syscall_accept(UUID syscallUUID, int pid, int listen_fd,
                                        struct sockaddr *client_addr, socklen_t *client_addr_len) {
-        debug->Log("syscall_accept");
+        debug->BigLog("syscall accept");
         Socket *server_socket_ptr = new Socket;
         if (FindSocketWithFd(listen_fd, server_socket_ptr, socket_bucket) == -1) {
             debug->Log("No Socket");
@@ -685,7 +686,7 @@ namespace E {
         /* Extract the IP address and port number of source and destination from the recv pkt */
         /* Extract the IP address and port number of source and destination from the recv pkt */
         debug->LogDivider();
-        debug->Log("Packet arrived");
+        debug->BigLog("Packet arrived");
         uint32_t *src_ip = new uint32_t;
         uint32_t *dest_ip = new uint32_t;
 
