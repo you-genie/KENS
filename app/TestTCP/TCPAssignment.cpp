@@ -455,6 +455,9 @@ namespace E {
         packet_header->seq_num = cli_socket->seq_num;
         packet_header->ack_num = cli_socket->ack_num;
         packet_header->ack_num = (uint16_t) 0;
+        packet_header->checksum = (uint16_t) 0;
+        packet_header->urgent_ptr = (uint16_t) 0;
+        packet_header->window = (uint16_t) 0;
 
         Packet *packet = this->allocatePacket(54);
 
