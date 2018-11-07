@@ -1,71 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites tests="15" failures="15" disabled="0" errors="0" timestamp="2018-11-02T08:49:49" time="6.506" name="AllTests">
-  <testsuite name="TestEnv_Reliable" tests="2" failures="2" disabled="0" errors="0" time="0.279">
-    <testcase name="TestAccept_Backlog1" status="run" time="0.131" classname="TestEnv_Reliable">
-      <failure message="testhandshake.cpp:54&#x0A;      Expected: ret&#x0A;      Which is: 1&#x0A;To be equal to: 0" type=""><![CDATA[testhandshake.cpp:54
-      Expected: ret
-      Which is: 1
-To be equal to: 0]]></failure>
-      <failure message="testhandshake.cpp:90&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_accept&#x0A;      Which is: 3" type=""><![CDATA[testhandshake.cpp:90
+<testsuites tests="15" failures="15" disabled="0" errors="0" timestamp="2018-11-05T22:23:52" time="16.608" name="AllTests">
+  <testsuite name="TestEnv_Reliable" tests="2" failures="2" disabled="0" errors="0" time="0.218">
+    <testcase name="TestAccept_Backlog1" status="run" time="0.104" classname="TestEnv_Reliable">
+      <failure message="testhandshake.cpp:97&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_accept&#x0A;      Which is: 3" type=""><![CDATA[testhandshake.cpp:97
       Expected: (int)client_sockets.size()
       Which is: 0
 To be equal to: expected_accept
       Which is: 3]]></failure>
-      <failure message="testhandshake.cpp:168&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_connect&#x0A;      Which is: 1" type=""><![CDATA[testhandshake.cpp:168
+      <failure message="testhandshake.cpp:178&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_connect&#x0A;      Which is: 1" type=""><![CDATA[testhandshake.cpp:178
       Expected: (int)client_sockets.size()
       Which is: 0
 To be equal to: expected_connect
       Which is: 1]]></failure>
-      <failure message="testhandshake.cpp:168&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_connect&#x0A;      Which is: 1" type=""><![CDATA[testhandshake.cpp:168
+      <failure message="testhandshake.cpp:178&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_connect&#x0A;      Which is: 1" type=""><![CDATA[testhandshake.cpp:178
       Expected: (int)client_sockets.size()
       Which is: 0
 To be equal to: expected_connect
       Which is: 1]]></failure>
-      <failure message="testhandshake.cpp:168&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_connect&#x0A;      Which is: 1" type=""><![CDATA[testhandshake.cpp:168
+      <failure message="testhandshake.cpp:178&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_connect&#x0A;      Which is: 1" type=""><![CDATA[testhandshake.cpp:178
       Expected: (int)client_sockets.size()
       Which is: 0
 To be equal to: expected_connect
       Which is: 1]]></failure>
     </testcase>
-    <testcase name="TestAccept_Backlog2" status="run" time="0.148" classname="TestEnv_Reliable">
-      <failure message="testhandshake.cpp:54&#x0A;      Expected: ret&#x0A;      Which is: 1&#x0A;To be equal to: 0" type=""><![CDATA[testhandshake.cpp:54
-      Expected: ret
-      Which is: 1
-To be equal to: 0]]></failure>
-      <failure message="testhandshake.cpp:90&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_accept&#x0A;      Which is: 6" type=""><![CDATA[testhandshake.cpp:90
+    <testcase name="TestAccept_Backlog2" status="run" time="0.114" classname="TestEnv_Reliable">
+      <failure message="testhandshake.cpp:97&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_accept&#x0A;      Which is: 6" type=""><![CDATA[testhandshake.cpp:97
       Expected: (int)client_sockets.size()
       Which is: 0
 To be equal to: expected_accept
       Which is: 6]]></failure>
-      <failure message="testhandshake.cpp:168&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_connect&#x0A;      Which is: 1" type=""><![CDATA[testhandshake.cpp:168
+      <failure message="testhandshake.cpp:178&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_connect&#x0A;      Which is: 1" type=""><![CDATA[testhandshake.cpp:178
       Expected: (int)client_sockets.size()
       Which is: 0
 To be equal to: expected_connect
       Which is: 1]]></failure>
-      <failure message="testhandshake.cpp:168&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_connect&#x0A;      Which is: 1" type=""><![CDATA[testhandshake.cpp:168
+      <failure message="testhandshake.cpp:178&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_connect&#x0A;      Which is: 1" type=""><![CDATA[testhandshake.cpp:178
       Expected: (int)client_sockets.size()
       Which is: 0
 To be equal to: expected_connect
       Which is: 1]]></failure>
-      <failure message="testhandshake.cpp:168&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_connect&#x0A;      Which is: 1" type=""><![CDATA[testhandshake.cpp:168
+      <failure message="testhandshake.cpp:178&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_connect&#x0A;      Which is: 1" type=""><![CDATA[testhandshake.cpp:178
       Expected: (int)client_sockets.size()
       Which is: 0
 To be equal to: expected_connect
       Which is: 1]]></failure>
-      <failure message="testhandshake.cpp:168&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_connect&#x0A;      Which is: 1" type=""><![CDATA[testhandshake.cpp:168
+      <failure message="testhandshake.cpp:178&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_connect&#x0A;      Which is: 1" type=""><![CDATA[testhandshake.cpp:178
       Expected: (int)client_sockets.size()
       Which is: 0
 To be equal to: expected_connect
       Which is: 1]]></failure>
-      <failure message="testhandshake.cpp:168&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_connect&#x0A;      Which is: 1" type=""><![CDATA[testhandshake.cpp:168
+      <failure message="testhandshake.cpp:178&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_connect&#x0A;      Which is: 1" type=""><![CDATA[testhandshake.cpp:178
+      Expected: (int)client_sockets.size()
+      Which is: 0
+To be equal to: expected_connect
+      Which is: 1]]></failure>
+      <failure message="testhandshake.cpp:178&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_connect&#x0A;      Which is: 1" type=""><![CDATA[testhandshake.cpp:178
       Expected: (int)client_sockets.size()
       Which is: 0
 To be equal to: expected_connect
       Which is: 1]]></failure>
     </testcase>
   </testsuite>
-  <testsuite name="TestEnv_Any" tests="13" failures="13" disabled="0" errors="0" time="6.227">
-    <testcase name="TestClose_Connect_CloseFirst" status="run" time="0.003" classname="TestEnv_Any">
+  <testsuite name="TestEnv_Any" tests="13" failures="13" disabled="0" errors="0" time="16.39">
+    <testcase name="TestClose_Connect_CloseFirst" status="run" time="0.002" classname="TestEnv_Any">
       <failure message="testclose.cpp:122&#x0A;Expected: (ret) &gt;= (0), actual: -1 vs 0" type=""><![CDATA[testclose.cpp:122
 Expected: (ret) >= (0), actual: -1 vs 0]]></failure>
       <failure message="testclose.cpp:127&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testclose.cpp:127
@@ -77,16 +74,16 @@ To be equal to: 0]]></failure>
       Which is: 67174410
 To be equal to: temp_addr.sin_addr.s_addr
       Which is: 32767]]></failure>
-      <failure message="testclose.cpp:129&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\f&apos; (12, 0xC)" type=""><![CDATA[testclose.cpp:129
+      <failure message="testclose.cpp:129&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\xCB&apos; (203)" type=""><![CDATA[testclose.cpp:129
       Expected: addr.sin_family
       Which is: '\x2' (2)
 To be equal to: temp_addr.sin_family
-      Which is: '\f' (12, 0xC)]]></failure>
-      <failure message="testclose.cpp:130&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 20841" type=""><![CDATA[testclose.cpp:130
+      Which is: '\xCB' (203)]]></failure>
+      <failure message="testclose.cpp:130&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 21909" type=""><![CDATA[testclose.cpp:130
       Expected: addr.sin_port
       Which is: 3879
 To be equal to: temp_addr.sin_port
-      Which is: 20841]]></failure>
+      Which is: 21909]]></failure>
       <failure message="testclose.cpp:136&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testclose.cpp:136
       Expected: ret
       Which is: -1
@@ -101,16 +98,16 @@ To be equal to: 2]]></failure>
       Expected: ret
       Which is: -1
 To be equal to: 0]]></failure>
-      <failure message="testclose.cpp:75&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\xC0&apos; (192)" type=""><![CDATA[testclose.cpp:75
+      <failure message="testclose.cpp:75&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\xD0&apos; (208)" type=""><![CDATA[testclose.cpp:75
       Expected: addr.sin_family
       Which is: '\x2' (2)
 To be equal to: temp_addr.sin_family
-      Which is: '\xC0' (192)]]></failure>
-      <failure message="testclose.cpp:76&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 3065" type=""><![CDATA[testclose.cpp:76
+      Which is: '\xD0' (208)]]></failure>
+      <failure message="testclose.cpp:76&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 2524" type=""><![CDATA[testclose.cpp:76
       Expected: addr.sin_port
       Which is: 3879
 To be equal to: temp_addr.sin_port
-      Which is: 3065]]></failure>
+      Which is: 2524]]></failure>
       <failure message="testclose.cpp:83&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testclose.cpp:83
       Expected: ret
       Which is: -1
@@ -128,16 +125,16 @@ To be equal to: 0]]></failure>
       Which is: 67174410
 To be equal to: temp_addr.sin_addr.s_addr
       Which is: 32767]]></failure>
-      <failure message="testclose.cpp:129&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\f&apos; (12, 0xC)" type=""><![CDATA[testclose.cpp:129
+      <failure message="testclose.cpp:129&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\xCB&apos; (203)" type=""><![CDATA[testclose.cpp:129
       Expected: addr.sin_family
       Which is: '\x2' (2)
 To be equal to: temp_addr.sin_family
-      Which is: '\f' (12, 0xC)]]></failure>
-      <failure message="testclose.cpp:130&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 20841" type=""><![CDATA[testclose.cpp:130
+      Which is: '\xCB' (203)]]></failure>
+      <failure message="testclose.cpp:130&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 21909" type=""><![CDATA[testclose.cpp:130
       Expected: addr.sin_port
       Which is: 3879
 To be equal to: temp_addr.sin_port
-      Which is: 20841]]></failure>
+      Which is: 21909]]></failure>
       <failure message="testclose.cpp:136&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testclose.cpp:136
       Expected: ret
       Which is: -1
@@ -152,22 +149,22 @@ To be equal to: 2]]></failure>
       Expected: ret
       Which is: -1
 To be equal to: 0]]></failure>
-      <failure message="testclose.cpp:75&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\xC0&apos; (192)" type=""><![CDATA[testclose.cpp:75
+      <failure message="testclose.cpp:75&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\xD0&apos; (208)" type=""><![CDATA[testclose.cpp:75
       Expected: addr.sin_family
       Which is: '\x2' (2)
 To be equal to: temp_addr.sin_family
-      Which is: '\xC0' (192)]]></failure>
-      <failure message="testclose.cpp:76&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 3065" type=""><![CDATA[testclose.cpp:76
+      Which is: '\xD0' (208)]]></failure>
+      <failure message="testclose.cpp:76&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 2524" type=""><![CDATA[testclose.cpp:76
       Expected: addr.sin_port
       Which is: 3879
 To be equal to: temp_addr.sin_port
-      Which is: 3065]]></failure>
+      Which is: 2524]]></failure>
       <failure message="testclose.cpp:83&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testclose.cpp:83
       Expected: ret
       Which is: -1
 To be equal to: 0]]></failure>
     </testcase>
-    <testcase name="TestClose_Connect_CloseSimultaneous" status="run" time="0.008" classname="TestEnv_Any">
+    <testcase name="TestClose_Connect_CloseSimultaneous" status="run" time="0.003" classname="TestEnv_Any">
       <failure message="testclose.cpp:122&#x0A;Expected: (ret) &gt;= (0), actual: -1 vs 0" type=""><![CDATA[testclose.cpp:122
 Expected: (ret) >= (0), actual: -1 vs 0]]></failure>
       <failure message="testclose.cpp:127&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testclose.cpp:127
@@ -179,16 +176,16 @@ To be equal to: 0]]></failure>
       Which is: 67174410
 To be equal to: temp_addr.sin_addr.s_addr
       Which is: 32767]]></failure>
-      <failure message="testclose.cpp:129&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\f&apos; (12, 0xC)" type=""><![CDATA[testclose.cpp:129
+      <failure message="testclose.cpp:129&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\xCB&apos; (203)" type=""><![CDATA[testclose.cpp:129
       Expected: addr.sin_family
       Which is: '\x2' (2)
 To be equal to: temp_addr.sin_family
-      Which is: '\f' (12, 0xC)]]></failure>
-      <failure message="testclose.cpp:130&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 20841" type=""><![CDATA[testclose.cpp:130
+      Which is: '\xCB' (203)]]></failure>
+      <failure message="testclose.cpp:130&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 21909" type=""><![CDATA[testclose.cpp:130
       Expected: addr.sin_port
       Which is: 3879
 To be equal to: temp_addr.sin_port
-      Which is: 20841]]></failure>
+      Which is: 21909]]></failure>
       <failure message="testclose.cpp:136&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testclose.cpp:136
       Expected: ret
       Which is: -1
@@ -203,26 +200,22 @@ To be equal to: 2]]></failure>
       Expected: ret
       Which is: -1
 To be equal to: 0]]></failure>
-      <failure message="testclose.cpp:75&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\xC0&apos; (192)" type=""><![CDATA[testclose.cpp:75
+      <failure message="testclose.cpp:75&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\xD0&apos; (208)" type=""><![CDATA[testclose.cpp:75
       Expected: addr.sin_family
       Which is: '\x2' (2)
 To be equal to: temp_addr.sin_family
-      Which is: '\xC0' (192)]]></failure>
-      <failure message="testclose.cpp:76&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 3065" type=""><![CDATA[testclose.cpp:76
+      Which is: '\xD0' (208)]]></failure>
+      <failure message="testclose.cpp:76&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 2524" type=""><![CDATA[testclose.cpp:76
       Expected: addr.sin_port
       Which is: 3879
 To be equal to: temp_addr.sin_port
-      Which is: 3065]]></failure>
+      Which is: 2524]]></failure>
       <failure message="testclose.cpp:83&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testclose.cpp:83
       Expected: ret
       Which is: -1
 To be equal to: 0]]></failure>
     </testcase>
-    <testcase name="TestClose_Accept_CloseLater" status="run" time="0.008" classname="TestEnv_Any">
-      <failure message="testclose.cpp:55&#x0A;      Expected: ret&#x0A;      Which is: 1&#x0A;To be equal to: 0" type=""><![CDATA[testclose.cpp:55
-      Expected: ret
-      Which is: 1
-To be equal to: 0]]></failure>
+    <testcase name="TestClose_Accept_CloseLater" status="run" time="0.004" classname="TestEnv_Any">
       <failure message="testclose.cpp:64&#x0A;Expected: (client_fd) &gt;= (0), actual: -1 vs 0" type=""><![CDATA[testclose.cpp:64
 Expected: (client_fd) >= (0), actual: -1 vs 0]]></failure>
       <failure message="testclose.cpp:67&#x0A;      Expected: client_addr.sin_family&#x0A;      Which is: &apos;\0&apos;&#x0A;To be equal to: 2" type=""><![CDATA[testclose.cpp:67
@@ -233,26 +226,22 @@ To be equal to: 2]]></failure>
       Expected: ret
       Which is: -1
 To be equal to: 0]]></failure>
-      <failure message="testclose.cpp:75&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\xC0&apos; (192)" type=""><![CDATA[testclose.cpp:75
+      <failure message="testclose.cpp:75&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\0&apos;" type=""><![CDATA[testclose.cpp:75
       Expected: addr.sin_family
       Which is: '\x2' (2)
 To be equal to: temp_addr.sin_family
-      Which is: '\xC0' (192)]]></failure>
-      <failure message="testclose.cpp:76&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 3065" type=""><![CDATA[testclose.cpp:76
+      Which is: '\0']]></failure>
+      <failure message="testclose.cpp:76&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 0" type=""><![CDATA[testclose.cpp:76
       Expected: addr.sin_port
       Which is: 3879
 To be equal to: temp_addr.sin_port
-      Which is: 3065]]></failure>
+      Which is: 0]]></failure>
       <failure message="testclose.cpp:83&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testclose.cpp:83
       Expected: ret
       Which is: -1
 To be equal to: 0]]></failure>
     </testcase>
-    <testcase name="TestClose_Accept_CloseFirst" status="run" time="0.67" classname="TestEnv_Any">
-      <failure message="testclose.cpp:55&#x0A;      Expected: ret&#x0A;      Which is: 1&#x0A;To be equal to: 0" type=""><![CDATA[testclose.cpp:55
-      Expected: ret
-      Which is: 1
-To be equal to: 0]]></failure>
+    <testcase name="TestClose_Accept_CloseFirst" status="run" time="2.277" classname="TestEnv_Any">
       <failure message="testclose.cpp:64&#x0A;Expected: (client_fd) &gt;= (0), actual: -1 vs 0" type=""><![CDATA[testclose.cpp:64
 Expected: (client_fd) >= (0), actual: -1 vs 0]]></failure>
       <failure message="testclose.cpp:67&#x0A;      Expected: client_addr.sin_family&#x0A;      Which is: &apos;\0&apos;&#x0A;To be equal to: 2" type=""><![CDATA[testclose.cpp:67
@@ -263,16 +252,16 @@ To be equal to: 2]]></failure>
       Expected: ret
       Which is: -1
 To be equal to: 0]]></failure>
-      <failure message="testclose.cpp:75&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\xC0&apos; (192)" type=""><![CDATA[testclose.cpp:75
+      <failure message="testclose.cpp:75&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\xD0&apos; (208)" type=""><![CDATA[testclose.cpp:75
       Expected: addr.sin_family
       Which is: '\x2' (2)
 To be equal to: temp_addr.sin_family
-      Which is: '\xC0' (192)]]></failure>
-      <failure message="testclose.cpp:76&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 3065" type=""><![CDATA[testclose.cpp:76
+      Which is: '\xD0' (208)]]></failure>
+      <failure message="testclose.cpp:76&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 2524" type=""><![CDATA[testclose.cpp:76
       Expected: addr.sin_port
       Which is: 3879
 To be equal to: temp_addr.sin_port
-      Which is: 3065]]></failure>
+      Which is: 2524]]></failure>
       <failure message="testclose.cpp:83&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testclose.cpp:83
       Expected: ret
       Which is: -1
@@ -288,26 +277,22 @@ To be equal to: 0]]></failure>
       Which is: 117483712
 To be equal to: temp_addr.sin_addr.s_addr
       Which is: 32767]]></failure>
-      <failure message="testclose.cpp:129&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\f&apos; (12, 0xC)" type=""><![CDATA[testclose.cpp:129
+      <failure message="testclose.cpp:129&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\xCB&apos; (203)" type=""><![CDATA[testclose.cpp:129
       Expected: addr.sin_family
       Which is: '\x2' (2)
 To be equal to: temp_addr.sin_family
-      Which is: '\f' (12, 0xC)]]></failure>
-      <failure message="testclose.cpp:130&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 20841" type=""><![CDATA[testclose.cpp:130
+      Which is: '\xCB' (203)]]></failure>
+      <failure message="testclose.cpp:130&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 21909" type=""><![CDATA[testclose.cpp:130
       Expected: addr.sin_port
       Which is: 3879
 To be equal to: temp_addr.sin_port
-      Which is: 20841]]></failure>
+      Which is: 21909]]></failure>
       <failure message="testclose.cpp:136&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testclose.cpp:136
       Expected: ret
       Which is: -1
 To be equal to: 0]]></failure>
     </testcase>
-    <testcase name="TestClose_Accept_CloseSimultaneous" status="run" time="0.005" classname="TestEnv_Any">
-      <failure message="testclose.cpp:55&#x0A;      Expected: ret&#x0A;      Which is: 1&#x0A;To be equal to: 0" type=""><![CDATA[testclose.cpp:55
-      Expected: ret
-      Which is: 1
-To be equal to: 0]]></failure>
+    <testcase name="TestClose_Accept_CloseSimultaneous" status="run" time="1.864" classname="TestEnv_Any">
       <failure message="testclose.cpp:64&#x0A;Expected: (client_fd) &gt;= (0), actual: -1 vs 0" type=""><![CDATA[testclose.cpp:64
 Expected: (client_fd) >= (0), actual: -1 vs 0]]></failure>
       <failure message="testclose.cpp:67&#x0A;      Expected: client_addr.sin_family&#x0A;      Which is: &apos;\0&apos;&#x0A;To be equal to: 2" type=""><![CDATA[testclose.cpp:67
@@ -318,192 +303,223 @@ To be equal to: 2]]></failure>
       Expected: ret
       Which is: -1
 To be equal to: 0]]></failure>
-      <failure message="testclose.cpp:75&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\xC0&apos; (192)" type=""><![CDATA[testclose.cpp:75
+      <failure message="testclose.cpp:75&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\xD0&apos; (208)" type=""><![CDATA[testclose.cpp:75
       Expected: addr.sin_family
       Which is: '\x2' (2)
 To be equal to: temp_addr.sin_family
-      Which is: '\xC0' (192)]]></failure>
-      <failure message="testclose.cpp:76&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 3065" type=""><![CDATA[testclose.cpp:76
+      Which is: '\xD0' (208)]]></failure>
+      <failure message="testclose.cpp:76&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 2524" type=""><![CDATA[testclose.cpp:76
       Expected: addr.sin_port
       Which is: 3879
 To be equal to: temp_addr.sin_port
-      Which is: 3065]]></failure>
+      Which is: 2524]]></failure>
       <failure message="testclose.cpp:83&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testclose.cpp:83
       Expected: ret
       Which is: -1
 To be equal to: 0]]></failure>
-    </testcase>
-    <testcase name="TestAccept_BeforeAccept" status="run" time="0.264" classname="TestEnv_Any">
-      <failure message="testhandshake.cpp:54&#x0A;      Expected: ret&#x0A;      Which is: 1&#x0A;To be equal to: 0" type=""><![CDATA[testhandshake.cpp:54
+      <failure message="testclose.cpp:122&#x0A;Expected: (ret) &gt;= (0), actual: -1 vs 0" type=""><![CDATA[testclose.cpp:122
+Expected: (ret) >= (0), actual: -1 vs 0]]></failure>
+      <failure message="testclose.cpp:127&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testclose.cpp:127
       Expected: ret
-      Which is: 1
+      Which is: -1
 To be equal to: 0]]></failure>
-      <failure message="testhandshake.cpp:90&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_accept&#x0A;      Which is: 1" type=""><![CDATA[testhandshake.cpp:90
+      <failure message="testclose.cpp:128&#x0A;      Expected: addr.sin_addr.s_addr&#x0A;      Which is: 117483712&#x0A;To be equal to: temp_addr.sin_addr.s_addr&#x0A;      Which is: 32767" type=""><![CDATA[testclose.cpp:128
+      Expected: addr.sin_addr.s_addr
+      Which is: 117483712
+To be equal to: temp_addr.sin_addr.s_addr
+      Which is: 32767]]></failure>
+      <failure message="testclose.cpp:129&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\xCB&apos; (203)" type=""><![CDATA[testclose.cpp:129
+      Expected: addr.sin_family
+      Which is: '\x2' (2)
+To be equal to: temp_addr.sin_family
+      Which is: '\xCB' (203)]]></failure>
+      <failure message="testclose.cpp:130&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 3879&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 21909" type=""><![CDATA[testclose.cpp:130
+      Expected: addr.sin_port
+      Which is: 3879
+To be equal to: temp_addr.sin_port
+      Which is: 21909]]></failure>
+      <failure message="testclose.cpp:136&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testclose.cpp:136
+      Expected: ret
+      Which is: -1
+To be equal to: 0]]></failure>
+    </testcase>
+    <testcase name="TestAccept_BeforeAccept" status="run" time="1.85" classname="TestEnv_Any">
+      <failure message="testhandshake.cpp:97&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_accept&#x0A;      Which is: 1" type=""><![CDATA[testhandshake.cpp:97
       Expected: (int)client_sockets.size()
       Which is: 0
 To be equal to: expected_accept
       Which is: 1]]></failure>
+      <failure message="testhandshake.cpp:178&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_connect&#x0A;      Which is: 1" type=""><![CDATA[testhandshake.cpp:178
+      Expected: (int)client_sockets.size()
+      Which is: 0
+To be equal to: expected_connect
+      Which is: 1]]></failure>
     </testcase>
-    <testcase name="TestAccept_AfterAccept" status="run" time="0.378" classname="TestEnv_Any">
-      <failure message="testhandshake.cpp:54&#x0A;      Expected: ret&#x0A;      Which is: 1&#x0A;To be equal to: 0" type=""><![CDATA[testhandshake.cpp:54
-      Expected: ret
-      Which is: 1
-To be equal to: 0]]></failure>
-      <failure message="testhandshake.cpp:90&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_accept&#x0A;      Which is: 1" type=""><![CDATA[testhandshake.cpp:90
+    <testcase name="TestAccept_AfterAccept" status="run" time="1.995" classname="TestEnv_Any">
+      <failure message="testhandshake.cpp:97&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_accept&#x0A;      Which is: 1" type=""><![CDATA[testhandshake.cpp:97
       Expected: (int)client_sockets.size()
       Which is: 0
 To be equal to: expected_accept
       Which is: 1]]></failure>
+      <failure message="testhandshake.cpp:178&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_connect&#x0A;      Which is: 1" type=""><![CDATA[testhandshake.cpp:178
+      Expected: (int)client_sockets.size()
+      Which is: 0
+To be equal to: expected_connect
+      Which is: 1]]></failure>
     </testcase>
-    <testcase name="TestAccept_MultipleInterface1" status="run" time="2.353" classname="TestEnv_Any">
-      <failure message="testhandshake.cpp:54&#x0A;      Expected: ret&#x0A;      Which is: 1&#x0A;To be equal to: 0" type=""><![CDATA[testhandshake.cpp:54
-      Expected: ret
-      Which is: 1
-To be equal to: 0]]></failure>
-      <failure message="testhandshake.cpp:54&#x0A;      Expected: ret&#x0A;      Which is: 1&#x0A;To be equal to: 0" type=""><![CDATA[testhandshake.cpp:54
-      Expected: ret
-      Which is: 1
-To be equal to: 0]]></failure>
-      <failure message="testhandshake.cpp:90&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_accept&#x0A;      Which is: 5" type=""><![CDATA[testhandshake.cpp:90
+    <testcase name="TestAccept_MultipleInterface1" status="run" time="3.81" classname="TestEnv_Any">
+      <failure message="testhandshake.cpp:97&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_accept&#x0A;      Which is: 5" type=""><![CDATA[testhandshake.cpp:97
       Expected: (int)client_sockets.size()
       Which is: 0
 To be equal to: expected_accept
       Which is: 5]]></failure>
-      <failure message="testhandshake.cpp:90&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_accept&#x0A;      Which is: 3" type=""><![CDATA[testhandshake.cpp:90
+      <failure message="testhandshake.cpp:97&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_accept&#x0A;      Which is: 3" type=""><![CDATA[testhandshake.cpp:97
       Expected: (int)client_sockets.size()
       Which is: 0
 To be equal to: expected_accept
       Which is: 3]]></failure>
+      <failure message="testhandshake.cpp:178&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_connect&#x0A;      Which is: 5" type=""><![CDATA[testhandshake.cpp:178
+      Expected: (int)client_sockets.size()
+      Which is: 0
+To be equal to: expected_connect
+      Which is: 5]]></failure>
+      <failure message="testhandshake.cpp:178&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_connect&#x0A;      Which is: 3" type=""><![CDATA[testhandshake.cpp:178
+      Expected: (int)client_sockets.size()
+      Which is: 0
+To be equal to: expected_connect
+      Which is: 3]]></failure>
     </testcase>
-    <testcase name="TestAccept_MultipleInterface2" status="run" time="1.87" classname="TestEnv_Any">
-      <failure message="testhandshake.cpp:54&#x0A;      Expected: ret&#x0A;      Which is: 1&#x0A;To be equal to: 0" type=""><![CDATA[testhandshake.cpp:54
-      Expected: ret
-      Which is: 1
-To be equal to: 0]]></failure>
-      <failure message="testhandshake.cpp:54&#x0A;      Expected: ret&#x0A;      Which is: 1&#x0A;To be equal to: 0" type=""><![CDATA[testhandshake.cpp:54
-      Expected: ret
-      Which is: 1
-To be equal to: 0]]></failure>
-      <failure message="testhandshake.cpp:90&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_accept&#x0A;      Which is: 2" type=""><![CDATA[testhandshake.cpp:90
+    <testcase name="TestAccept_MultipleInterface2" status="run" time="3.962" classname="TestEnv_Any">
+      <failure message="testhandshake.cpp:97&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_accept&#x0A;      Which is: 2" type=""><![CDATA[testhandshake.cpp:97
       Expected: (int)client_sockets.size()
       Which is: 0
 To be equal to: expected_accept
       Which is: 2]]></failure>
-      <failure message="testhandshake.cpp:90&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_accept&#x0A;      Which is: 4" type=""><![CDATA[testhandshake.cpp:90
+      <failure message="testhandshake.cpp:97&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_accept&#x0A;      Which is: 4" type=""><![CDATA[testhandshake.cpp:97
       Expected: (int)client_sockets.size()
       Which is: 0
 To be equal to: expected_accept
       Which is: 4]]></failure>
+      <failure message="testhandshake.cpp:178&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_connect&#x0A;      Which is: 2" type=""><![CDATA[testhandshake.cpp:178
+      Expected: (int)client_sockets.size()
+      Which is: 0
+To be equal to: expected_connect
+      Which is: 2]]></failure>
+      <failure message="testhandshake.cpp:178&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_connect&#x0A;      Which is: 4" type=""><![CDATA[testhandshake.cpp:178
+      Expected: (int)client_sockets.size()
+      Which is: 0
+To be equal to: expected_connect
+      Which is: 4]]></failure>
     </testcase>
     <testcase name="TestConnect_BeforeAccept" status="run" time="0.002" classname="TestEnv_Any">
-      <failure message="testhandshake.cpp:168&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_connect&#x0A;      Which is: 1" type=""><![CDATA[testhandshake.cpp:168
+      <failure message="testhandshake.cpp:178&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_connect&#x0A;      Which is: 1" type=""><![CDATA[testhandshake.cpp:178
       Expected: (int)client_sockets.size()
       Which is: 0
 To be equal to: expected_connect
       Which is: 1]]></failure>
-      <failure message="testhandshake.cpp:90&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_accept&#x0A;      Which is: 1" type=""><![CDATA[testhandshake.cpp:90
+      <failure message="testhandshake.cpp:97&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_accept&#x0A;      Which is: 1" type=""><![CDATA[testhandshake.cpp:97
       Expected: (int)client_sockets.size()
       Which is: 0
 To be equal to: expected_accept
       Which is: 1]]></failure>
     </testcase>
-    <testcase name="TestConnect_AfterAccept" status="run" time="0.003" classname="TestEnv_Any">
-      <failure message="testhandshake.cpp:168&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_connect&#x0A;      Which is: 1" type=""><![CDATA[testhandshake.cpp:168
+    <testcase name="TestConnect_AfterAccept" status="run" time="0.001" classname="TestEnv_Any">
+      <failure message="testhandshake.cpp:178&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_connect&#x0A;      Which is: 1" type=""><![CDATA[testhandshake.cpp:178
       Expected: (int)client_sockets.size()
       Which is: 0
 To be equal to: expected_connect
       Which is: 1]]></failure>
-      <failure message="testhandshake.cpp:90&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_accept&#x0A;      Which is: 1" type=""><![CDATA[testhandshake.cpp:90
+      <failure message="testhandshake.cpp:97&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_accept&#x0A;      Which is: 1" type=""><![CDATA[testhandshake.cpp:97
       Expected: (int)client_sockets.size()
       Which is: 0
 To be equal to: expected_accept
       Which is: 1]]></failure>
     </testcase>
-    <testcase name="TestConnect_SimultaneousConnect" status="run" time="0.657" classname="TestEnv_Any">
-      <failure message="testhandshake.cpp:629&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testhandshake.cpp:629
+    <testcase name="TestConnect_SimultaneousConnect" status="run" time="0.616" classname="TestEnv_Any">
+      <failure message="testhandshake.cpp:641&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testhandshake.cpp:641
       Expected: ret
       Which is: -1
 To be equal to: 0]]></failure>
-      <failure message="testhandshake.cpp:634&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testhandshake.cpp:634
+      <failure message="testhandshake.cpp:646&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testhandshake.cpp:646
       Expected: ret
       Which is: -1
 To be equal to: 0]]></failure>
-      <failure message="testhandshake.cpp:635&#x0A;      Expected: addr.sin_addr.s_addr&#x0A;      Which is: 67174410&#x0A;To be equal to: temp_addr.sin_addr.s_addr&#x0A;      Which is: 28672" type=""><![CDATA[testhandshake.cpp:635
+      <failure message="testhandshake.cpp:647&#x0A;      Expected: addr.sin_addr.s_addr&#x0A;      Which is: 67174410&#x0A;To be equal to: temp_addr.sin_addr.s_addr&#x0A;      Which is: 28672" type=""><![CDATA[testhandshake.cpp:647
       Expected: addr.sin_addr.s_addr
       Which is: 67174410
 To be equal to: temp_addr.sin_addr.s_addr
       Which is: 28672]]></failure>
-      <failure message="testhandshake.cpp:636&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\xC0&apos; (192)" type=""><![CDATA[testhandshake.cpp:636
+      <failure message="testhandshake.cpp:648&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\xD0&apos; (208)" type=""><![CDATA[testhandshake.cpp:648
       Expected: addr.sin_family
       Which is: '\x2' (2)
 To be equal to: temp_addr.sin_family
-      Which is: '\xC0' (192)]]></failure>
-      <failure message="testhandshake.cpp:637&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 14640&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 3065" type=""><![CDATA[testhandshake.cpp:637
+      Which is: '\xD0' (208)]]></failure>
+      <failure message="testhandshake.cpp:649&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 14640&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 2524" type=""><![CDATA[testhandshake.cpp:649
       Expected: addr.sin_port
       Which is: 14640
 To be equal to: temp_addr.sin_port
-      Which is: 3065]]></failure>
-      <failure message="testhandshake.cpp:640&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testhandshake.cpp:640
+      Which is: 2524]]></failure>
+      <failure message="testhandshake.cpp:652&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testhandshake.cpp:652
       Expected: ret
       Which is: -1
 To be equal to: 0]]></failure>
-      <failure message="testhandshake.cpp:642&#x0A;      Expected: bind_addr.sin_addr.s_addr&#x0A;      Which is: 117483712&#x0A;To be equal to: temp_addr.sin_addr.s_addr&#x0A;      Which is: 28672" type=""><![CDATA[testhandshake.cpp:642
+      <failure message="testhandshake.cpp:654&#x0A;      Expected: bind_addr.sin_addr.s_addr&#x0A;      Which is: 117483712&#x0A;To be equal to: temp_addr.sin_addr.s_addr&#x0A;      Which is: 28672" type=""><![CDATA[testhandshake.cpp:654
       Expected: bind_addr.sin_addr.s_addr
       Which is: 117483712
 To be equal to: temp_addr.sin_addr.s_addr
       Which is: 28672]]></failure>
-      <failure message="testhandshake.cpp:643&#x0A;      Expected: bind_addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\xC0&apos; (192)" type=""><![CDATA[testhandshake.cpp:643
+      <failure message="testhandshake.cpp:655&#x0A;      Expected: bind_addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\xD0&apos; (208)" type=""><![CDATA[testhandshake.cpp:655
       Expected: bind_addr.sin_family
       Which is: '\x2' (2)
 To be equal to: temp_addr.sin_family
-      Which is: '\xC0' (192)]]></failure>
-      <failure message="testhandshake.cpp:644&#x0A;      Expected: bind_addr.sin_port&#x0A;      Which is: 52822&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 3065" type=""><![CDATA[testhandshake.cpp:644
+      Which is: '\xD0' (208)]]></failure>
+      <failure message="testhandshake.cpp:656&#x0A;      Expected: bind_addr.sin_port&#x0A;      Which is: 52822&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 2524" type=""><![CDATA[testhandshake.cpp:656
       Expected: bind_addr.sin_port
       Which is: 52822
 To be equal to: temp_addr.sin_port
-      Which is: 3065]]></failure>
-      <failure message="testhandshake.cpp:629&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testhandshake.cpp:629
+      Which is: 2524]]></failure>
+      <failure message="testhandshake.cpp:641&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testhandshake.cpp:641
       Expected: ret
       Which is: -1
 To be equal to: 0]]></failure>
-      <failure message="testhandshake.cpp:634&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testhandshake.cpp:634
+      <failure message="testhandshake.cpp:646&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testhandshake.cpp:646
       Expected: ret
       Which is: -1
 To be equal to: 0]]></failure>
-      <failure message="testhandshake.cpp:635&#x0A;      Expected: addr.sin_addr.s_addr&#x0A;      Which is: 117483712&#x0A;To be equal to: temp_addr.sin_addr.s_addr&#x0A;      Which is: 28672" type=""><![CDATA[testhandshake.cpp:635
+      <failure message="testhandshake.cpp:647&#x0A;      Expected: addr.sin_addr.s_addr&#x0A;      Which is: 117483712&#x0A;To be equal to: temp_addr.sin_addr.s_addr&#x0A;      Which is: 28672" type=""><![CDATA[testhandshake.cpp:647
       Expected: addr.sin_addr.s_addr
       Which is: 117483712
 To be equal to: temp_addr.sin_addr.s_addr
       Which is: 28672]]></failure>
-      <failure message="testhandshake.cpp:636&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\xF0&apos; (240)" type=""><![CDATA[testhandshake.cpp:636
+      <failure message="testhandshake.cpp:648&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\0&apos;" type=""><![CDATA[testhandshake.cpp:648
       Expected: addr.sin_family
       Which is: '\x2' (2)
 To be equal to: temp_addr.sin_family
-      Which is: '\xF0' (240)]]></failure>
-      <failure message="testhandshake.cpp:637&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 52822&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 3073" type=""><![CDATA[testhandshake.cpp:637
+      Which is: '\0']]></failure>
+      <failure message="testhandshake.cpp:649&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 52822&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 2533" type=""><![CDATA[testhandshake.cpp:649
       Expected: addr.sin_port
       Which is: 52822
 To be equal to: temp_addr.sin_port
-      Which is: 3073]]></failure>
-      <failure message="testhandshake.cpp:640&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testhandshake.cpp:640
+      Which is: 2533]]></failure>
+      <failure message="testhandshake.cpp:652&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testhandshake.cpp:652
       Expected: ret
       Which is: -1
 To be equal to: 0]]></failure>
-      <failure message="testhandshake.cpp:642&#x0A;      Expected: bind_addr.sin_addr.s_addr&#x0A;      Which is: 67174410&#x0A;To be equal to: temp_addr.sin_addr.s_addr&#x0A;      Which is: 28672" type=""><![CDATA[testhandshake.cpp:642
+      <failure message="testhandshake.cpp:654&#x0A;      Expected: bind_addr.sin_addr.s_addr&#x0A;      Which is: 67174410&#x0A;To be equal to: temp_addr.sin_addr.s_addr&#x0A;      Which is: 28672" type=""><![CDATA[testhandshake.cpp:654
       Expected: bind_addr.sin_addr.s_addr
       Which is: 67174410
 To be equal to: temp_addr.sin_addr.s_addr
       Which is: 28672]]></failure>
-      <failure message="testhandshake.cpp:643&#x0A;      Expected: bind_addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\xF0&apos; (240)" type=""><![CDATA[testhandshake.cpp:643
+      <failure message="testhandshake.cpp:655&#x0A;      Expected: bind_addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\0&apos;" type=""><![CDATA[testhandshake.cpp:655
       Expected: bind_addr.sin_family
       Which is: '\x2' (2)
 To be equal to: temp_addr.sin_family
-      Which is: '\xF0' (240)]]></failure>
-      <failure message="testhandshake.cpp:644&#x0A;      Expected: bind_addr.sin_port&#x0A;      Which is: 14640&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 3073" type=""><![CDATA[testhandshake.cpp:644
+      Which is: '\0']]></failure>
+      <failure message="testhandshake.cpp:656&#x0A;      Expected: bind_addr.sin_port&#x0A;      Which is: 14640&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 2533" type=""><![CDATA[testhandshake.cpp:656
       Expected: bind_addr.sin_port
       Which is: 14640
 To be equal to: temp_addr.sin_port
-      Which is: 3073]]></failure>
+      Which is: 2533]]></failure>
     </testcase>
   </testsuite>
 </testsuites>

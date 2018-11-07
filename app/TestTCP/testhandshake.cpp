@@ -67,18 +67,25 @@ protected:
 			struct sockaddr_in client_addr;
 			socklen_t client_len = sizeof(client_addr);
 			memset(&client_addr, 0, client_len);
+
+			printf("here1\n");
 			int client_fd = accept(server_socket, (struct sockaddr*)&client_addr, &client_len);
+			printf("here2\n");
+			printf("fd: %d\n", client_fd);
 			if(client_fd >= 0)
 			{
-				EXPECT_EQ(client_len, sizeof(client_addr));
+                EXPECT_EQ(client_len, sizeof(client_addr));
 				EXPECT_EQ(client_addr.sin_family, AF_INET);
 
 				struct sockaddr_in temp_addr;
 				socklen_t temp_len = sizeof(temp_addr);
-				int ret = getsockname(client_fd, (struct sockaddr*)&temp_addr, &temp_len);
-				EXPECT_EQ(ret, 0);
+
+                int ret = getsockname(client_fd, (struct sockaddr*)&temp_addr, &temp_len);
+
+                EXPECT_EQ(ret, 0);
 				EXPECT_TRUE( (addr.sin_addr.s_addr == 0) ||
 						(addr.sin_addr.s_addr == temp_addr.sin_addr.s_addr));
+
 				EXPECT_EQ(addr.sin_family, temp_addr.sin_family);
 				EXPECT_EQ(addr.sin_port, temp_addr.sin_port);
 
@@ -88,8 +95,11 @@ protected:
 		}
 
 		EXPECT_EQ((int)client_sockets.size(), expected_accept);
-		for(auto client_fd : client_sockets)
+
+
+        for(auto client_fd : client_sockets)
 		{
+
 			int same_count = 0;
 			for(auto client_fd2 : client_sockets)
 			{
@@ -99,7 +109,7 @@ protected:
 			EXPECT_EQ(same_count, 1);
 		}
 
-		for(auto client_fd : client_sockets)
+        for(auto client_fd : client_sockets)
 		{
 			close(client_fd);
 		}
@@ -143,6 +153,7 @@ protected:
 			int ret = connect(client_socket, (struct sockaddr*)&addr, len);
 			if(ret == 0)
 			{
+			    printf("ASDF\n");
 				struct sockaddr_in temp_addr;
 				socklen_t temp_len = sizeof(temp_addr);
 				int ret = getpeername(client_socket, (struct sockaddr*)&temp_addr, &temp_len);
@@ -168,13 +179,15 @@ protected:
 		EXPECT_EQ((int)client_sockets.size(), expected_connect);
 		for(auto client_fd : client_sockets)
 		{
-			int same_count = 0;
+            int same_count = 0;
 			for(auto client_fd2 : client_sockets)
 			{
 				if(client_fd == client_fd2)
 					same_count++;
 			}
 			EXPECT_EQ(same_count, 1);
+            EXPECT_EQ(0, 0);
+
 		}
 
 		for(auto client_fd : client_sockets)

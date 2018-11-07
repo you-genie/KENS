@@ -21,7 +21,7 @@
 
 namespace E {
     enum class MachineType {
-        SERVER, CLIENT
+        SERVER, CLIENT, SERVER_CLIENT
     };
 
     enum class Label {
@@ -38,10 +38,14 @@ namespace E {
     struct Connection {
         uint32_t seq_num;
         uint32_t ack_num;
-        sockaddr *cli_addr_ptr;
+        int established = 0;
+        sockaddr_in *cli_addr_ptr;
+        int peer_fd;
+        int fd;
     };
 
     struct ConnectionBucket {
+        int not_established = 0;
         std::vector<Connection *> connections;
     };
 
@@ -55,15 +59,18 @@ namespace E {
 
     struct Socket {
         int fd;
+        int pid;
         int max_backlog;
-        ConnectionBucket *backlog;
-
+        ConnectionBucket *backlog = new ConnectionBucket;
+        std::vector<int> cli_sockets = std::vector<int>();
         Label state_label;
         MachineType socket_type;
 
         int domain;
         int type;
         int protocol;
+        int is_bind = 0;
+        int is_timewait;
 
         struct sockaddr *addr_ptr;
         socklen_t sock_len;
@@ -95,6 +102,28 @@ namespace E {
 
     class Debug {
     public:
+        Debug(){};
+
+        void Log(char *string) {
+            printf("========== %s ==========\n", string);
+        };
+
+        void Log(char *string, char *string2) {
+            printf("========== %s %s ==========\n", string, string2);
+        };
+
+        void Log(char *string, int num) {
+            printf("========== %s: %d ==========\n", string, num);
+        };
+
+        void Log(char *string, uint8_t num) {
+            printf("========== %s: %d ==========\n", string, num);
+        };
+
+        void LogDivider() {
+            printf("*******************************\n");
+        };
+
         void Log(Label label) {
             ToString(label, this->debug_str);
             printf("Label: %s\n", debug_str);
@@ -124,7 +153,14 @@ namespace E {
         void ToString(Connection connection, char *ret_string);
 
         void ToString(MachineType machineType, char *ret_string);
-    }
+    };
+
+    struct BlockValue {
+        struct sockaddr *sockaddr_ptr;
+        socklen_t *socklen_ptr;
+        int pid;
+        int fd;
+    };
 
     class TCPAssignment
             : public HostModule,
@@ -136,12 +172,25 @@ namespace E {
     private:
         virtual void timerCallback(void *payload) final;
 
-        void CreatePacketHeader(Packet *packet, TCPHeader *packet_header, uint32_t *src_ip, uint32_t *dest_ip, int length);
+        void CreatePacketHeader(
+                Packet *packet, TCPHeader *packet_header, uint32_t *src_ip, uint32_t *dest_ip, int length);
+
+        void CreatePacketHeaderWithFlag(
+                uint8_t *flags,
+                Socket *socket_ptr,
+                Packet *packet,
+                TCPHeader *packet_header,
+                uint32_t *src_ip,
+                uint32_t *dest_ip,
+                int length);
 
     public:
         SocketBucket socket_bucket;
+        SocketBucket cli_bucket;
 
         char debug_str[50];
+
+        Debug *debug = new Debug();
 
         TCPAssignment(Host *host);
 
