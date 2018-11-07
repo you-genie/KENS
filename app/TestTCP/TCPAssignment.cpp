@@ -20,6 +20,7 @@ using E::Signal;
 using E::Debug;
 
 namespace E {
+    BlockValue block_value;
 
 /**
  * STATIC VARIABLES END
@@ -202,7 +203,7 @@ namespace E {
     int FindParentFdWithPort(uint16_t port, int *fd_ret, SocketBucket socket_bucket) {
         for (int i = 0; i < socket_bucket.sockets.size(); i++) {
             Socket *socket_ptr = socket_bucket.sockets[i];
-            if ((sockaddr_in *)socket_ptr->addr_ptr->sin_port == port
+            if (((sockaddr_in *)socket_ptr->addr_ptr)->sin_port == port
             && socket_ptr->socket_type != MachineType::SERVER_CLIENT) {
                 *fd_ret = socket_ptr->fd;
                 return 1;
@@ -566,6 +567,19 @@ namespace E {
 
         *client_addr_len = sizeof(struct sockaddr);
 
+        // if socket has recent connection -> child
+        if (server_socket_ptr->backlog_ready.size() != 0) {
+            int fd = server_socket_ptr->backlog_ready[0];
+            Socket *server_cli_socket_ptr = new Socket;
+            FindSocketWithFd(fd, server_cli_socket_ptr, socket_bucket);
+
+            memcpy(client_addr, (struct sockaddr *)server_cli_socket_ptr->peer_values->peer_addr_ptr,
+                    sizeof(server_cli_socket_ptr->peer_values->peer_addr_ptr));
+            server_socket_ptr->backlog_ready.erase(server_socket_ptr->backlog_ready.begin());
+            returnSystemCall(syscallUUID, fd);
+            return;
+        }
+/*
         debug->Log("connection", (int)server_socket_ptr->backlog->connections.size());
         debug->Log("not_est", (int)server_socket_ptr->backlog->not_established);
         if (server_socket_ptr->backlog->connections.size() - server_socket_ptr->backlog->not_established > 0) {
@@ -583,57 +597,17 @@ namespace E {
                 }
             }
         }
-        // Create new socket with given pid.
-        /**
-                for (int i = 0; i < server_socket_ptr->backlog->connections.size(); i++) {
-
-                    Connection *connection_ptr = server_socket_ptr->backlog->connections[i];
-                    if (connection_ptr->established == 1) {
-
-                        // Put connection to new client socket.
-                        Connection *new_connection = new Connection;
-                        memcpy(new_connection, connection_ptr, sizeof(Connection));
-
-                        cli_socket_ptr->backlog->connections.push_back(new_connection);
-
-                        // Set addr value
-                        struct sockaddr *addr_ptr_ret = new sockaddr;
-
-                        memcpy(addr_ptr_ret, server_socket_ptr->addr_ptr, 16);
-                        memcpy(client_addr, addr_ptr_ret, 16);
-
-                        cli_socket_ptr->sock_len = server_socket_ptr->sock_len;
-                        struct sockaddr *new_addr_ptr = new sockaddr;
-                        memcpy(new_addr_ptr, server_socket_ptr->addr_ptr, 16);
-                        cli_socket_ptr->addr_ptr = new_addr_ptr;
-
-                        socket_bucket.sockets.push_back(cli_socket_ptr);
-                        server_socket_ptr->cli_sockets->sockets.push_back(cli_socket_ptr);
-
-                        debug->Log("YO0");
-
-                        // Set server socket state to LISTEN again!
-                        server_socket_ptr->state_label = Label::LISTEN;
-
-                        // Erase corresponding connection from server socket.
-                        server_socket_ptr->backlog->connections.erase(server_socket_ptr->backlog->connections.begin() + i);
-
-                        RemoveSocketWithFd(listen_fd, &socket_bucket);
-
-                        socket_bucket.sockets.push_back(server_socket_ptr);
-                        returnSystemCall(syscallUUID, fd);
-
-                        return;
-                    }
-                }
-                server_socket_ptr->cli_sockets->sockets.push_back(cli_socket_ptr); // insert empty socket.
-         **/
-
+*/
         debug->Log("Has NO connection");
         server_socket_ptr->syscallUUID = syscallUUID;
 
         RemoveSocketWithFd(listen_fd, &socket_bucket);
         socket_bucket.sockets.push_back(server_socket_ptr);
+
+        block_value.fd = listen_fd;
+        block_value.pid = pid;
+        block_value.sockaddr_ptr = client_addr;
+        block_value.socklen_ptr = client_addr_len;
     }
 
     void TCPAssignment::syscall_getpeername(UUID syscallUUID, int pid, int listen_fd,
@@ -849,7 +823,7 @@ namespace E {
                     // Create new file descriptor.
                     int fd = 0;
                     fd = createFileDescriptor(dest_socket_ptr->pid);
-                    debug->Log("fd\n", fd);
+                    debug->Log("fd", fd);
 
                     // Set socket values in established_socket_ptr
                     established_socket_ptr->fd = fd;
@@ -861,6 +835,10 @@ namespace E {
                     established_socket_ptr->type = dest_socket_ptr->type;
                     established_socket_ptr->socket_type = MachineType::SERVER_CLIENT;
                     established_socket_ptr->sock_len = dest_socket_ptr->sock_len;
+
+                    established_socket_ptr->seq_num = ntohl(packet_header->ack_num);
+                    established_socket_ptr->ack_num = ntohl(packet_header->seq_num) + (uint32_t) 1;
+                    established_socket_ptr->addr_ptr = new sockaddr;
 
                     memcpy(established_socket_ptr->addr_ptr, dest_socket_ptr->addr_ptr, 16);
 
@@ -874,24 +852,10 @@ namespace E {
                             peer_cli_ptr->addr_ptr, sizeof(peer_cli_ptr->addr_ptr));
                 }
 
-                Connection *new_connection_ptr = new Connection;
-                FindConnectionWithPort(packet_header->src_port, new_connection_ptr, dest_socket_ptr->backlog);
-                new_connection_ptr->seq_num = ntohl(packet_header->ack_num);
-                new_connection_ptr->ack_num = ntohl(packet_header->seq_num) + (uint32_t) 1;
-                new_connection_ptr->established = 1;
-                Socket *socket_cli_ptr = new Socket;
-
-                int peer_port = 0;
-                FindParentFdWithPort(packet_header->src_port, &peer_port, socket_bucket);
-
-                FindParentSocketWithPort(packet_header->src_port, socket_cli_ptr, socket_bucket);
-                new_connection_ptr->peer_fd = socket_cli_ptr->fd;
-                new_connection_ptr->fd = established_socket_ptr->fd;
-
-                established_socket_ptr->backlog->connections.push_back(new_connection_ptr);
-
+                // Set ready_backlog for further accept.
                 RemoveConnectionWithPort(packet_header->src_port, dest_socket_ptr->backlog);
-                dest_socket_ptr->backlog->connections.push_back(new_connection_ptr);
+                dest_socket_ptr->backlog_ready.push_back(established_socket_ptr->fd);
+
                 dest_socket_ptr->backlog->not_established = dest_socket_ptr->backlog->not_established - 1;
 
                 dest_socket_ptr->cli_sockets.push_back(established_socket_ptr->fd);
@@ -905,7 +869,14 @@ namespace E {
                 delete new_header;
                 delete packet_header;
 
-                returnSystemCall(dest_socket_ptr->syscallUUID, established_socket_ptr->fd);
+                // 함수를 다시 불러보쟈...
+                this->syscall_accept(
+                        dest_socket_ptr->syscallUUID,
+                        block_value.pid,
+                        block_value.fd,
+                        block_value.sockaddr_ptr,
+                        block_value.socklen_ptr);
+//                returnSystemCall(dest_socket_ptr->syscallUUID, established_socket_ptr->fd);
             }
             else if (dest_socket_ptr->state_label == Label::ESTABLISHED && fin){
                 new_header->offset_res_flags = 0x10;
