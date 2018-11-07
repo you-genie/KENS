@@ -856,6 +856,37 @@ namespace E {
                 dest_socket_ptr->seq_num = dest_socket_ptr->seq_num + (uint32_t) 1;
                 this->freePacket(packet);
 
+                if (dest_socket_ptr->backlog->not_established > 0 &&
+                dest_socket_ptr->backlog->not_established < dest_socket_ptr->max_backlog) {
+                    debug->Log("not established", dest_socket_ptr->backlog->not_established);
+                    Connection *connection = dest_socket_ptr->backlog->connections[0]; // First connection
+                    dest_socket_ptr->backlog->connections.erase(
+                            dest_socket_ptr->backlog->connections.begin());
+                    dest_socket_ptr->backlog->not_established =
+                            dest_socket_ptr->backlog->not_established - 1;
+                    Packet *new_new_packet = this->clonePacket(packet);
+
+                    // Set header
+                    new_header->dest_port = connection->cli_addr_ptr->sin_port;
+                    new_header->seq_num = connection->seq_num;
+                    new_header->ack_num = connection->ack_num + 1;
+                    new_header->offset_res_flags = 0x12; // syn ack
+
+                    CreatePacketHeader(new_new_packet, new_header, dest_ip,
+                            &(connection->cli_addr_ptr->sin_addr.s_addr), 20);
+
+                    // Set state to SYN_RECEIVED again
+                    dest_socket_ptr->state_label = Label::SYN_RCVD;
+                    dest_socket_ptr->seq_num = connection->seq_num;
+                    dest_socket_ptr->ack_num = connection->ack_num + 1;
+
+                    // Set syscallUUID
+                    dest_socket_ptr->syscallUUID = listen_value->syscallUUID;
+
+                    // Send packet.
+                    this->sendPacket("IPv4", new_new_packet);
+                }
+
                 RemoveSocketWithFd(dest_socket_ptr->fd, &socket_bucket);
                 socket_bucket.sockets.push_back(dest_socket_ptr);
                 socket_bucket.sockets.push_back(established_socket_ptr);
