@@ -21,7 +21,7 @@
 
 namespace E {
     enum class MachineType {
-        SERVER, CLIENT
+        SERVER, CLIENT, SERVER_CLIENT
     };
 
     enum class Label {
@@ -40,6 +40,8 @@ namespace E {
         uint32_t ack_num;
         int established = 0;
         sockaddr_in *cli_addr_ptr;
+        int peer_fd;
+        int fd;
     };
 
     struct ConnectionBucket {
@@ -57,15 +59,18 @@ namespace E {
 
     struct Socket {
         int fd;
+        int pid;
         int max_backlog;
-        ConnectionBucket *backlog;
-
+        ConnectionBucket *backlog = new ConnectionBucket;
+        std::vector<int> cli_sockets = std::vector<int>();
         Label state_label;
         MachineType socket_type;
 
         int domain;
         int type;
         int protocol;
+        int is_bind = 0;
+        int is_timewait;
 
         struct sockaddr *addr_ptr;
         socklen_t sock_len;
@@ -148,6 +153,13 @@ namespace E {
         void ToString(Connection connection, char *ret_string);
 
         void ToString(MachineType machineType, char *ret_string);
+    };
+
+    struct BlockValue {
+        struct sockaddr *sockaddr_ptr;
+        socklen_t *socklen_ptr;
+        int pid;
+        int fd;
     };
 
     class TCPAssignment
