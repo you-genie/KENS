@@ -241,13 +241,10 @@ namespace E {
     int FindParentSocketWithPort(uint16_t port, Socket *socket_ptr_ret, SocketBucket socket_bucket) {
         for (int i = 0; i < socket_bucket.sockets.size(); i++) {
             Socket *socket_ptr = socket_bucket.sockets[i];
-            printf("CC+++++++++++++++\n");
 
             if (((sockaddr_in *)socket_ptr->addr_ptr)->sin_port == port) {
-                printf("BB+++++++++++++++\n");
 
                 if (socket_ptr->socket_type != MachineType::SERVER_CLIENT) {
-                    printf("AA+++++++++++++++\n");
                     memcpy(socket_ptr_ret, socket_ptr, sizeof(Socket));
 
                     return 1;
@@ -580,7 +577,7 @@ namespace E {
     }
     void TCPAssignment::syscall_accept(UUID syscallUUID, int pid, int listen_fd,
                                        struct sockaddr *client_addr, socklen_t *client_addr_len) {
-        debug->Log("ACCEPT!");
+        debug->Log("syscall_accept");
         Socket *server_socket_ptr = new Socket;
         if (FindSocketWithFd(listen_fd, server_socket_ptr, socket_bucket) == -1) {
             debug->Log("No Socket");
@@ -596,6 +593,8 @@ namespace E {
             memcpy(client_addr, (struct sockaddr *)server_cli_socket_ptr->peer_values->peer_addr_ptr,
                     sizeof(server_cli_socket_ptr->peer_values->peer_addr_ptr));
             server_socket_ptr->backlog_ready.erase(server_socket_ptr->backlog_ready.begin());
+            RemoveSocketWithFd(listen_fd, &socket_bucket);
+            socket_bucket.sockets.push_back(server_socket_ptr);
 
             returnSystemCall(syscallUUID, fd);
             return;
@@ -630,7 +629,7 @@ namespace E {
                 (sockaddr *)cli_socket_ptr->peer_values->peer_addr_ptr,
                 sizeof(cli_socket_ptr->peer_values->peer_addr_ptr));
 
-        returnSystemCall(syscallUUID, -1);
+        returnSystemCall(syscallUUID, 0);
 
     }
 
@@ -843,14 +842,11 @@ namespace E {
                     established_socket_ptr->ack_num = ntohl(packet_header->seq_num) + (uint32_t) 1;
                     established_socket_ptr->addr_ptr = new sockaddr;
 
-                    debug->Log("3");
-
                     memcpy(established_socket_ptr->addr_ptr, dest_socket_ptr->addr_ptr, 16);
 
                     // Set peer value
                     Socket *peer_cli_ptr = new Socket;
 
-                    debug->Log("Src Port", packet_header->src_port);
                     FindParentSocketWithPort(packet_header->src_port, peer_cli_ptr, socket_bucket);
                     established_socket_ptr->peer_values->peer_fd = peer_cli_ptr->fd;
                     established_socket_ptr->peer_values->peer_addr_ptr = new sockaddr_in;
