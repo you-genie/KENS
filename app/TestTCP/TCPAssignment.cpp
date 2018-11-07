@@ -636,14 +636,11 @@ namespace E {
             returnSystemCall(syscallUUID, -1);
         }
 
-        // get connection
-        for (int i = 0; i < cli_socket_ptr->backlog->connections.size(); i++) {
-            Connection *connection_ptr = cli_socket_ptr->backlog->connections[i];
-
-            memcpy(client_addr, connection_ptr->cli_addr_ptr, sizeof(connection_ptr->cli_addr_ptr));
-            *client_addr_len = sizeof(connection_ptr->cli_addr_ptr);
-            returnSystemCall(syscallUUID, 0);
-        }
+        // Get value from peer_values
+        memcpy(client_addr,
+                (sockaddr *)cli_socket_ptr->peer_values->peer_addr_ptr,
+                sizeof(cli_socket_ptr->peer_values->peer_addr_ptr));
+        
         returnSystemCall(syscallUUID, -1);
 
     }
