@@ -595,6 +595,7 @@ namespace E {
             server_socket_ptr->backlog_ready.erase(server_socket_ptr->backlog_ready.begin());
             RemoveSocketWithFd(listen_fd, &socket_bucket);
             socket_bucket.sockets.push_back(server_socket_ptr);
+            block_value->isCalled = 0;
 
             returnSystemCall(syscallUUID, fd);
             return;
@@ -610,6 +611,7 @@ namespace E {
         block_value->pid = pid;
         block_value->sockaddr_ptr = client_addr;
         block_value->socklen_ptr = client_addr_len;
+        block_value->isCalled = 1;
     }
 
     void TCPAssignment::syscall_getpeername(UUID syscallUUID, int pid, int listen_fd,
