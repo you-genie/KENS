@@ -21,6 +21,7 @@ using E::Debug;
 
 namespace E {
     BlockValue *block_value = new BlockValue;
+    BlockValue *listen_value = new BlockValue;
 
 /**
  * STATIC VARIABLES END
@@ -485,7 +486,7 @@ namespace E {
         socket_ptr->state_label = Label::LISTEN;
         socket_ptr->socket_type = MachineType::SERVER;
         socket_ptr->syscallUUID = syscallUUID;
-
+        listen_value->syscallUUID = syscallUUID;
 
         RemoveSocketWithFd(server_fd, &socket_bucket);
         socket_bucket.sockets.push_back(socket_ptr);
@@ -851,6 +852,7 @@ namespace E {
 
                 dest_socket_ptr->cli_sockets.push_back(established_socket_ptr->fd);
                 dest_socket_ptr->state_label = Label::LISTEN;
+                dest_socket_ptr->syscallUUID = listen_value->syscallUUID;
                 dest_socket_ptr->seq_num = dest_socket_ptr->seq_num + (uint32_t) 1;
                 this->freePacket(packet);
 

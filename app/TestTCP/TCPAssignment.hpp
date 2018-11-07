@@ -185,6 +185,7 @@ namespace E {
         int pid;
         int fd;
         int isCalled = 0;
+        UUID syscallUUID;
     };
 
     class TCPAssignment
