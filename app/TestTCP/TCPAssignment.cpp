@@ -225,13 +225,31 @@ namespace E {
         return -1;
     }
 
-    int FindSocketWithPort(uint16_t port, Socket *socket_ptr_ret, SocketBucket socket_bucket) {
+    int FindParentSocketWithPort(uint16_t port, Socket *socket_ptr_ret, SocketBucket socket_bucket) {
         for (int i = 0; i < socket_bucket.sockets.size(); i++) {
             Socket *socket_ptr = socket_bucket.sockets[i];
             if (((sockaddr_in *)socket_ptr->addr_ptr)->sin_port == port) {
-                memcpy(socket_ptr_ret, socket_ptr, sizeof(Socket));
+                if (socket_ptr->socket_type != MachineType::SERVER_CLIENT) {
+                    memcpy(socket_ptr_ret, socket_ptr, sizeof(Socket));
 
-                return 1;
+                    return 1;
+                }
+            }
+        }
+        //        printf("== Bind Return Point 2 ==\n");
+        return -1;
+    }
+
+    int FindChildSocketWithPorts(
+            uint16_t my_port, uint32_t peer_ip, Socket *socket_ptr_ret, SocketBucket socket_bucket) {
+        for (int i = 0; i < socket_bucket.sockets.size(); i++) {
+            Socket *socket_ptr = socket_bucket.sockets[i];
+            if (((sockaddr_in *)socket_ptr->addr_ptr)->sin_port == my_port
+            && socket_ptr->socket_type == MachineType::SERVER_CLIENT) {
+                if (socket_ptr->peer_values->peer_addr_ptr->sin_addr.s_addr == peer_ip) {
+                    memcpy(socket_ptr_ret, socket_ptr, sizeof(Socket));
+                    return 1;
+                }
             }
         }
         //        printf("== Bind Return Point 2 ==\n");
@@ -693,7 +711,7 @@ namespace E {
         // TODO: get packet dest port, and find corresponding socket!
         Socket *dest_socket_ptr = new Socket;
 
-        if (FindSocketWithPort(packet_header->dest_port, dest_socket_ptr, socket_bucket) == -1) {
+        if (FindParentSocketWithPort(packet_header->dest_port, dest_socket_ptr, socket_bucket) == -1) {
             // PASS
             debug->Log("signal syn?", packet_header->offset_res_flags & 0x02);
             //            debug->LogDivider();
@@ -843,7 +861,7 @@ namespace E {
                 new_connection_ptr->established = 1;
                 Socket *socket_cli_ptr = new Socket;
 
-                FindSocketWithPort(packet_header->src_port, socket_cli_ptr, socket_bucket);
+                FindParentSocketWithPort(packet_header->src_port, socket_cli_ptr, socket_bucket);
                 new_connection_ptr->peer_fd = socket_cli_ptr->fd;
                 new_connection_ptr->fd = established_socket_ptr->fd;
 
