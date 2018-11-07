@@ -199,6 +199,18 @@ namespace E {
         return -1;
     }
 
+    int FindParentFdWithPort(uint16_t port, int *fd_ret, SocketBucket socket_bucket) {
+        for (int i = 0; i < socket_bucket.sockets.size(); i++) {
+            Socket *socket_ptr = socket_bucket.sockets[i];
+            if ((sockaddr_in *)socket_ptr->addr_ptr->sin_port == port
+            && socket_ptr->socket_type != MachineType::SERVER_CLIENT) {
+                *fd_ret = socket_ptr->fd;
+                return 1;
+            }
+        }
+        return -1; // error occured
+    }
+
     int FindSocketWithFd(int fd, Socket *socket_ptr_ret, SocketBucket socket_bucket) {
         for (int i = 0; i < socket_bucket.sockets.size(); i++) {
             Socket *socket_ptr = socket_bucket.sockets[i];
@@ -640,7 +652,7 @@ namespace E {
         memcpy(client_addr,
                 (sockaddr *)cli_socket_ptr->peer_values->peer_addr_ptr,
                 sizeof(cli_socket_ptr->peer_values->peer_addr_ptr));
-        
+
         returnSystemCall(syscallUUID, -1);
 
     }
@@ -834,10 +846,12 @@ namespace E {
                 }
 
                 if (flag == 0) {
+                    // Create new file descriptor.
                     int fd = 0;
                     fd = createFileDescriptor(dest_socket_ptr->pid);
-                    debug->Log("fd", fd);
+                    debug->Log("fd\n", fd);
 
+                    // Set socket values in established_socket_ptr
                     established_socket_ptr->fd = fd;
                     established_socket_ptr->addr_ptr = new sockaddr;
 
@@ -849,6 +863,15 @@ namespace E {
                     established_socket_ptr->sock_len = dest_socket_ptr->sock_len;
 
                     memcpy(established_socket_ptr->addr_ptr, dest_socket_ptr->addr_ptr, 16);
+
+                    // Set peer value
+                    Socket *peer_cli_ptr = new Socket;
+
+                    FindParentSocketWithPort(packet_header->src_port, peer_cli_ptr, socket_bucket);
+                    established_socket_ptr->peer_values->peer_fd = peer_cli_ptr->fd;
+                    established_socket_ptr->peer_values->peer_addr_ptr = new sockaddr_in;
+                    memcpy(established_socket_ptr->peer_values->peer_addr_ptr,
+                            peer_cli_ptr->addr_ptr, sizeof(peer_cli_ptr->addr_ptr));
                 }
 
                 Connection *new_connection_ptr = new Connection;
@@ -857,6 +880,9 @@ namespace E {
                 new_connection_ptr->ack_num = ntohl(packet_header->seq_num) + (uint32_t) 1;
                 new_connection_ptr->established = 1;
                 Socket *socket_cli_ptr = new Socket;
+
+                int peer_port = 0;
+                FindParentFdWithPort(packet_header->src_port, &peer_port, socket_bucket);
 
                 FindParentSocketWithPort(packet_header->src_port, socket_cli_ptr, socket_bucket);
                 new_connection_ptr->peer_fd = socket_cli_ptr->fd;
@@ -911,21 +937,25 @@ namespace E {
                 printf("== SYN SENT sending ACK to server == \n");
                 dest_socket_ptr->state_label = Label::ESTABLISHED;
 
+                // Set peer values
+                int peer_fd = 0;
+                FindParentFdWithPort(packet_header->src_port, &peer_fd, socket_bucket);
+                dest_socket_ptr->peer_values->peer_fd = peer_fd;
+
                 sockaddr_in *new_addr_ptr = new sockaddr_in;
                 new_addr_ptr->sin_family = AF_INET;
                 new_addr_ptr->sin_addr.s_addr = *src_ip;
                 new_addr_ptr->sin_port = packet_header->src_port;
 
-                Connection *peer_connection_ptr = new Connection;
-                peer_connection_ptr->established = 1;
-                peer_connection_ptr->cli_addr_ptr = new_addr_ptr;
+                dest_socket_ptr->peer_values->peer_addr_ptr = new_addr_ptr;
 
-                dest_socket_ptr->backlog->connections.push_back(peer_connection_ptr);
+                // Set Seq_num
                 dest_socket_ptr->seq_num = (dest_socket_ptr->seq_num) + (uint32_t)1;
 
                 RemoveSocketWithFd(dest_socket_ptr->fd, &socket_bucket);
                 socket_bucket.sockets.push_back(dest_socket_ptr);
 
+                // Send Packet
                 new_header->offset_res_flags = 0x10;
                 CreatePacketHeader(new_packet, new_header, dest_ip, src_ip, 20);
                 this->sendPacket("IPv4", new_packet);
@@ -935,7 +965,7 @@ namespace E {
                 delete new_header;
                 returnSystemCall(dest_socket_ptr->syscallUUID, 0);
             }
-            else if (fin){
+            else if (fin) {
                 new_header->offset_res_flags = 0x10;
                 CreatePacketHeader(new_packet, new_header, dest_ip, src_ip, 20);
                 this->sendPacket("IPv4", new_packet);
