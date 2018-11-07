@@ -68,6 +68,7 @@ namespace E {
         int max_backlog;
         ConnectionBucket *backlog = new ConnectionBucket;
         std::vector<int> cli_sockets = std::vector<int>();
+        std::vector<int> backlog_ready = std::vector<int>();
         Label state_label;
         MachineType socket_type;
 
@@ -138,17 +139,17 @@ namespace E {
 
         void Log(Signal signal) {
             ToString(signal, this->debug_str);
-            printf("Label: %s\n", debug_str);
+            printf("Signal: %s\n", debug_str);
         };
 
         void Log(Connection connection) {
             ToString(connection, this->debug_str);
-            printf("Label: %s\n", debug_str);
+            printf("Connection: %s\n", debug_str);
         };
 
         void Log(MachineType machine_type) {
             ToString(machine_type, this->debug_str);
-            printf("Label: %s\n", debug_str);
+            printf("Socket Type: %s\n", debug_str);
         };
     private:
         char debug_str[50];
