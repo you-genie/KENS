@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites tests="8" failures="2" disabled="0" errors="0" timestamp="2018-11-07T20:58:14" time="0.188" name="AllTests">
-  <testsuite name="TestEnv_Reliable" tests="8" failures="2" disabled="0" errors="0" time="0.188">
+<testsuites tests="8" failures="2" disabled="0" errors="0" timestamp="2018-11-08T01:04:55" time="0.189" name="AllTests">
+  <testsuite name="TestEnv_Reliable" tests="8" failures="2" disabled="0" errors="0" time="0.189">
     <testcase name="TestBind_Simple" status="run" time="0.001" classname="TestEnv_Reliable" />
-    <testcase name="TestBind_DoubleBind" status="run" time="0" classname="TestEnv_Reliable" />
+    <testcase name="TestBind_DoubleBind" status="run" time="0.001" classname="TestEnv_Reliable" />
     <testcase name="TestBind_GetSockName" status="run" time="0" classname="TestEnv_Reliable" />
     <testcase name="TestBind_OverlapPort" status="run" time="0.001" classname="TestEnv_Reliable" />
     <testcase name="TestBind_OverlapClosed" status="run" time="0" classname="TestEnv_Reliable">

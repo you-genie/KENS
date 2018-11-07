@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites tests="15" failures="5" disabled="0" errors="0" timestamp="2018-11-07T20:56:32" time="6.846" name="AllTests">
-  <testsuite name="TestEnv_Reliable" tests="2" failures="2" disabled="0" errors="0" time="0.198">
-    <testcase name="TestAccept_Backlog1" status="run" time="0.127" classname="TestEnv_Reliable">
+<testsuites tests="15" failures="4" disabled="0" errors="0" timestamp="2018-11-08T01:15:01" time="1.052" name="AllTests">
+  <testsuite name="TestEnv_Reliable" tests="2" failures="2" disabled="0" errors="0" time="0.157">
+    <testcase name="TestAccept_Backlog1" status="run" time="0.098" classname="TestEnv_Reliable">
       <failure message="testhandshake.cpp:97&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 1&#x0A;To be equal to: expected_accept&#x0A;      Which is: 3" type=""><![CDATA[testhandshake.cpp:97
       Expected: (int)client_sockets.size()
       Which is: 1
@@ -18,7 +18,7 @@ To be equal to: expected_connect
 To be equal to: expected_connect
       Which is: 1]]></failure>
     </testcase>
-    <testcase name="TestAccept_Backlog2" status="run" time="0.071" classname="TestEnv_Reliable">
+    <testcase name="TestAccept_Backlog2" status="run" time="0.059" classname="TestEnv_Reliable">
       <failure message="testhandshake.cpp:97&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 5&#x0A;To be equal to: expected_accept&#x0A;      Which is: 6" type=""><![CDATA[testhandshake.cpp:97
       Expected: (int)client_sockets.size()
       Which is: 5
@@ -26,33 +26,35 @@ To be equal to: expected_accept
       Which is: 6]]></failure>
     </testcase>
   </testsuite>
-  <testsuite name="TestEnv_Any" tests="13" failures="3" disabled="0" errors="0" time="6.648">
-    <testcase name="TestClose_Connect_CloseFirst" status="run" time="0.029" classname="TestEnv_Any" />
-    <testcase name="TestClose_Connect_CloseLater" status="run" time="0.026" classname="TestEnv_Any" />
-    <testcase name="TestClose_Connect_CloseSimultaneous" status="run" time="0.03" classname="TestEnv_Any" />
-    <testcase name="TestClose_Accept_CloseLater" status="run" time="0.033" classname="TestEnv_Any" />
-    <testcase name="TestClose_Accept_CloseFirst" status="run" time="0.038" classname="TestEnv_Any" />
-    <testcase name="TestClose_Accept_CloseSimultaneous" status="run" time="0.022" classname="TestEnv_Any" />
-    <testcase name="TestAccept_BeforeAccept" status="run" time="0.016" classname="TestEnv_Any" />
-    <testcase name="TestAccept_AfterAccept" status="run" time="0.021" classname="TestEnv_Any" />
-    <testcase name="TestAccept_MultipleInterface1" status="run" time="4.449" classname="TestEnv_Any">
-      <failure message="testhandshake.cpp:97&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 1&#x0A;To be equal to: expected_accept&#x0A;      Which is: 3" type=""><![CDATA[testhandshake.cpp:97
-      Expected: (int)client_sockets.size()
-      Which is: 1
-To be equal to: expected_accept
-      Which is: 3]]></failure>
+  <testsuite name="TestEnv_Any" tests="13" failures="2" disabled="0" errors="0" time="0.895">
+    <testcase name="TestClose_Connect_CloseFirst" status="run" time="0.002" classname="TestEnv_Any" />
+    <testcase name="TestClose_Connect_CloseLater" status="run" time="0.002" classname="TestEnv_Any" />
+    <testcase name="TestClose_Connect_CloseSimultaneous" status="run" time="0.002" classname="TestEnv_Any" />
+    <testcase name="TestClose_Accept_CloseLater" status="run" time="0.022" classname="TestEnv_Any" />
+    <testcase name="TestClose_Accept_CloseFirst" status="run" time="0.019" classname="TestEnv_Any" />
+    <testcase name="TestClose_Accept_CloseSimultaneous" status="run" time="0.05" classname="TestEnv_Any" />
+    <testcase name="TestAccept_BeforeAccept" status="run" time="0.031" classname="TestEnv_Any" />
+    <testcase name="TestAccept_AfterAccept" status="run" time="0.033" classname="TestEnv_Any" />
+    <testcase name="TestAccept_MultipleInterface1" status="run" time="0.474" classname="TestEnv_Any">
+      <failure message="testhandshake.cpp:78&#x0A;      Expected: client_addr.sin_family&#x0A;      Which is: &apos;\0&apos;&#x0A;To be equal to: 2" type=""><![CDATA[testhandshake.cpp:78
+      Expected: client_addr.sin_family
+      Which is: '\0'
+To be equal to: 2]]></failure>
+      <failure message="testhandshake.cpp:109&#x0A;      Expected: same_count&#x0A;      Which is: 2&#x0A;To be equal to: 1" type=""><![CDATA[testhandshake.cpp:109
+      Expected: same_count
+      Which is: 2
+To be equal to: 1]]></failure>
+      <failure message="testhandshake.cpp:109&#x0A;      Expected: same_count&#x0A;      Which is: 2&#x0A;To be equal to: 1" type=""><![CDATA[testhandshake.cpp:109
+      Expected: same_count
+      Which is: 2
+To be equal to: 1]]></failure>
       <failure message="testhandshake.cpp:97&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 0&#x0A;To be equal to: expected_accept&#x0A;      Which is: 5" type=""><![CDATA[testhandshake.cpp:97
       Expected: (int)client_sockets.size()
       Which is: 0
 To be equal to: expected_accept
       Which is: 5]]></failure>
-      <failure message="testhandshake.cpp:179&#x0A;      Expected: (int)client_sockets.size()&#x0A;      Which is: 2&#x0A;To be equal to: expected_connect&#x0A;      Which is: 5" type=""><![CDATA[testhandshake.cpp:179
-      Expected: (int)client_sockets.size()
-      Which is: 2
-To be equal to: expected_connect
-      Which is: 5]]></failure>
     </testcase>
-    <testcase name="TestAccept_MultipleInterface2" status="run" time="0.186" classname="TestEnv_Any">
+    <testcase name="TestAccept_MultipleInterface2" status="run" time="0.247" classname="TestEnv_Any">
       <failure message="testhandshake.cpp:87&#x0A;Value of: (addr.sin_addr.s_addr == 0) || (addr.sin_addr.s_addr == temp_addr.sin_addr.s_addr)&#x0A;  Actual: false&#x0A;Expected: true" type=""><![CDATA[testhandshake.cpp:87
 Value of: (addr.sin_addr.s_addr == 0) || (addr.sin_addr.s_addr == temp_addr.sin_addr.s_addr)
   Actual: false
@@ -67,93 +69,8 @@ Expected: true]]></failure>
 To be equal to: expected_accept
       Which is: 4]]></failure>
     </testcase>
-    <testcase name="TestConnect_BeforeAccept" status="run" time="0.033" classname="TestEnv_Any" />
-    <testcase name="TestConnect_AfterAccept" status="run" time="0.029" classname="TestEnv_Any" />
-    <testcase name="TestConnect_SimultaneousConnect" status="run" time="1.733" classname="TestEnv_Any">
-      <failure message="testhandshake.cpp:642&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testhandshake.cpp:642
-      Expected: ret
-      Which is: -1
-To be equal to: 0]]></failure>
-      <failure message="testhandshake.cpp:647&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testhandshake.cpp:647
-      Expected: ret
-      Which is: -1
-To be equal to: 0]]></failure>
-      <failure message="testhandshake.cpp:648&#x0A;      Expected: addr.sin_addr.s_addr&#x0A;      Which is: 67174410&#x0A;To be equal to: temp_addr.sin_addr.s_addr&#x0A;      Which is: 28672" type=""><![CDATA[testhandshake.cpp:648
-      Expected: addr.sin_addr.s_addr
-      Which is: 67174410
-To be equal to: temp_addr.sin_addr.s_addr
-      Which is: 28672]]></failure>
-      <failure message="testhandshake.cpp:649&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\x10&apos; (16)" type=""><![CDATA[testhandshake.cpp:649
-      Expected: addr.sin_family
-      Which is: '\x2' (2)
-To be equal to: temp_addr.sin_family
-      Which is: '\x10' (16)]]></failure>
-      <failure message="testhandshake.cpp:650&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 14640&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 2274" type=""><![CDATA[testhandshake.cpp:650
-      Expected: addr.sin_port
-      Which is: 14640
-To be equal to: temp_addr.sin_port
-      Which is: 2274]]></failure>
-      <failure message="testhandshake.cpp:653&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testhandshake.cpp:653
-      Expected: ret
-      Which is: -1
-To be equal to: 0]]></failure>
-      <failure message="testhandshake.cpp:655&#x0A;      Expected: bind_addr.sin_addr.s_addr&#x0A;      Which is: 117483712&#x0A;To be equal to: temp_addr.sin_addr.s_addr&#x0A;      Which is: 28672" type=""><![CDATA[testhandshake.cpp:655
-      Expected: bind_addr.sin_addr.s_addr
-      Which is: 117483712
-To be equal to: temp_addr.sin_addr.s_addr
-      Which is: 28672]]></failure>
-      <failure message="testhandshake.cpp:656&#x0A;      Expected: bind_addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;\x10&apos; (16)" type=""><![CDATA[testhandshake.cpp:656
-      Expected: bind_addr.sin_family
-      Which is: '\x2' (2)
-To be equal to: temp_addr.sin_family
-      Which is: '\x10' (16)]]></failure>
-      <failure message="testhandshake.cpp:657&#x0A;      Expected: bind_addr.sin_port&#x0A;      Which is: 52822&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 2274" type=""><![CDATA[testhandshake.cpp:657
-      Expected: bind_addr.sin_port
-      Which is: 52822
-To be equal to: temp_addr.sin_port
-      Which is: 2274]]></failure>
-      <failure message="testhandshake.cpp:642&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testhandshake.cpp:642
-      Expected: ret
-      Which is: -1
-To be equal to: 0]]></failure>
-      <failure message="testhandshake.cpp:647&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testhandshake.cpp:647
-      Expected: ret
-      Which is: -1
-To be equal to: 0]]></failure>
-      <failure message="testhandshake.cpp:648&#x0A;      Expected: addr.sin_addr.s_addr&#x0A;      Which is: 117483712&#x0A;To be equal to: temp_addr.sin_addr.s_addr&#x0A;      Which is: 28672" type=""><![CDATA[testhandshake.cpp:648
-      Expected: addr.sin_addr.s_addr
-      Which is: 117483712
-To be equal to: temp_addr.sin_addr.s_addr
-      Which is: 28672]]></failure>
-      <failure message="testhandshake.cpp:649&#x0A;      Expected: addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;@&apos; (64, 0x40)" type=""><![CDATA[testhandshake.cpp:649
-      Expected: addr.sin_family
-      Which is: '\x2' (2)
-To be equal to: temp_addr.sin_family
-      Which is: '@' (64, 0x40)]]></failure>
-      <failure message="testhandshake.cpp:650&#x0A;      Expected: addr.sin_port&#x0A;      Which is: 52822&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 2282" type=""><![CDATA[testhandshake.cpp:650
-      Expected: addr.sin_port
-      Which is: 52822
-To be equal to: temp_addr.sin_port
-      Which is: 2282]]></failure>
-      <failure message="testhandshake.cpp:653&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testhandshake.cpp:653
-      Expected: ret
-      Which is: -1
-To be equal to: 0]]></failure>
-      <failure message="testhandshake.cpp:655&#x0A;      Expected: bind_addr.sin_addr.s_addr&#x0A;      Which is: 67174410&#x0A;To be equal to: temp_addr.sin_addr.s_addr&#x0A;      Which is: 28672" type=""><![CDATA[testhandshake.cpp:655
-      Expected: bind_addr.sin_addr.s_addr
-      Which is: 67174410
-To be equal to: temp_addr.sin_addr.s_addr
-      Which is: 28672]]></failure>
-      <failure message="testhandshake.cpp:656&#x0A;      Expected: bind_addr.sin_family&#x0A;      Which is: &apos;\x2&apos; (2)&#x0A;To be equal to: temp_addr.sin_family&#x0A;      Which is: &apos;@&apos; (64, 0x40)" type=""><![CDATA[testhandshake.cpp:656
-      Expected: bind_addr.sin_family
-      Which is: '\x2' (2)
-To be equal to: temp_addr.sin_family
-      Which is: '@' (64, 0x40)]]></failure>
-      <failure message="testhandshake.cpp:657&#x0A;      Expected: bind_addr.sin_port&#x0A;      Which is: 14640&#x0A;To be equal to: temp_addr.sin_port&#x0A;      Which is: 2282" type=""><![CDATA[testhandshake.cpp:657
-      Expected: bind_addr.sin_port
-      Which is: 14640
-To be equal to: temp_addr.sin_port
-      Which is: 2282]]></failure>
-    </testcase>
+    <testcase name="TestConnect_BeforeAccept" status="run" time="0.006" classname="TestEnv_Any" />
+    <testcase name="TestConnect_AfterAccept" status="run" time="0.003" classname="TestEnv_Any" />
+    <testcase name="TestConnect_SimultaneousConnect" status="run" time="0.004" classname="TestEnv_Any" />
   </testsuite>
 </testsuites>
