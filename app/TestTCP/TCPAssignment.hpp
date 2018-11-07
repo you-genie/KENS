@@ -44,6 +44,11 @@ namespace E {
         int fd;
     };
 
+    struct Peer {
+        sockaddr_in *peer_addr_ptr;
+        int peer_fd;
+    };
+
     struct ConnectionBucket {
         int not_established = 0;
         std::vector<Connection *> connections;
@@ -77,6 +82,8 @@ namespace E {
 
         uint32_t seq_num;
         uint32_t ack_num;
+
+        Peer *peer_values = new Peer;
 
         UUID syscallUUID;
     };
