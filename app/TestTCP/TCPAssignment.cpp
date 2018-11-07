@@ -747,6 +747,30 @@ namespace E {
             return;
         }
 
+        if (syn) {
+            if (dest_socket_ptr->backlog->not_established < dest_socket_ptr->max_backlog) {
+                debug->Log("not Established", dest_socket_ptr->backlog->not_established);
+                debug->Log("max backlog", dest_socket_ptr->max_backlog);
+                // ignore other arrived packets.
+                Connection *new_connection_ptr = new Connection;
+
+                // Set new client address pointer;
+                sockaddr_in *new_cli_addr_ptr = new sockaddr_in;
+                new_cli_addr_ptr->sin_addr.s_addr = *src_ip;
+                new_cli_addr_ptr->sin_family = AF_INET;
+                new_cli_addr_ptr->sin_port = packet_header->src_port;
+
+                // set client address pointer to new connection pointer
+                new_connection_ptr->cli_addr_ptr = new_cli_addr_ptr;
+                printf("%d: %d\n", new_connection_ptr->cli_addr_ptr->sin_addr.s_addr,
+                       new_connection_ptr->cli_addr_ptr->sin_port);
+
+                // set destination socket (a.k.a. server socket) new connection & raise unestablished one.
+                dest_socket_ptr->backlog->connections.push_back(new_connection_ptr);
+                dest_socket_ptr->backlog->not_established = dest_socket_ptr->backlog->not_established + 1;
+            }
+        }
+
         if (send == Signal::ERR) {
             this->freePacket(packet);
             delete packet_header;
@@ -757,27 +781,6 @@ namespace E {
         /* Do appropriate action */
         if (dest_socket_ptr->socket_type == MachineType::SERVER) { /* if the machine is server */
             if (dest_socket_ptr->state_label == Label::LISTEN && syn) {
-                if (dest_socket_ptr->backlog->not_established < dest_socket_ptr->max_backlog) {
-                    debug->Log("not Established", dest_socket_ptr->backlog->not_established);
-                    debug->Log("max backlog", dest_socket_ptr->max_backlog);
-                    // ignore other arrived packets.
-                    Connection *new_connection_ptr = new Connection;
-
-                    // Set new client address pointer;
-                    sockaddr_in *new_cli_addr_ptr = new sockaddr_in;
-                    new_cli_addr_ptr->sin_addr.s_addr = *src_ip;
-                    new_cli_addr_ptr->sin_family = AF_INET;
-                    new_cli_addr_ptr->sin_port = packet_header->src_port;
-
-                    // set client address pointer to new connection pointer
-                    new_connection_ptr->cli_addr_ptr = new_cli_addr_ptr;
-                    printf("%d: %d\n", new_connection_ptr->cli_addr_ptr->sin_addr.s_addr,
-                           new_connection_ptr->cli_addr_ptr->sin_port);
-
-                    // set destination socket (a.k.a. server socket) new connection & raise unestablished one.
-                    dest_socket_ptr->backlog->connections.push_back(new_connection_ptr);
-                    dest_socket_ptr->backlog->not_established = dest_socket_ptr->backlog->not_established + 1;
-                }
 
                 new_header->offset_res_flags = 0x12;
                 CreatePacketHeader(new_packet, new_header, dest_ip, src_ip, 20);
@@ -825,6 +828,7 @@ namespace E {
                     established_socket_ptr->seq_num = ntohl(packet_header->ack_num);
                     established_socket_ptr->ack_num = ntohl(packet_header->seq_num) + (uint32_t) 1;
                     established_socket_ptr->addr_ptr = new sockaddr;
+                    established_socket_ptr->syscallUUID = dest_socket_ptr->syscallUUID;
 
                     memcpy(established_socket_ptr->addr_ptr, dest_socket_ptr->addr_ptr, 16);
 
@@ -858,11 +862,11 @@ namespace E {
 
                 if (block_value->isCalled == 0) {
                     // accept is not yet called.
-                    returnSystemCall(dest_socket_ptr->syscallUUID, 0);
+                    returnSystemCall(established_socket_ptr->syscallUUID, 0);
                 } else {
                     // 함수를 다시 불러보쟈...
                     this->syscall_accept(
-                            dest_socket_ptr->syscallUUID,
+                            established_socket_ptr->syscallUUID,
                             block_value->pid,
                             block_value->fd,
                             block_value->sockaddr_ptr,
