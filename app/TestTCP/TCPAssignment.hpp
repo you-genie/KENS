@@ -168,6 +168,7 @@ namespace E {
         socklen_t *socklen_ptr;
         int pid;
         int fd;
+        int isCalled = 0;
     };
 
     class TCPAssignment

@@ -874,14 +874,18 @@ namespace E {
                 delete new_header;
                 delete packet_header;
 
-                // 함수를 다시 불러보쟈...
-                this->syscall_accept(
-                        dest_socket_ptr->syscallUUID,
-                        block_value->pid,
-                        block_value->fd,
-                        block_value->sockaddr_ptr,
-                        block_value->socklen_ptr);
-//                returnSystemCall(dest_socket_ptr->syscallUUID, established_socket_ptr->fd);
+                if (block_value->isCalled == 0) {
+                    // accept is not yet called.
+                    returnSystemCall(dest_socket_ptr->syscallUUID, 0);
+                } else {
+                    // 함수를 다시 불러보쟈...
+                    this->syscall_accept(
+                            dest_socket_ptr->syscallUUID,
+                            block_value->pid,
+                            block_value->fd,
+                            block_value->sockaddr_ptr,
+                            block_value->socklen_ptr);
+                }
             }
             else if (dest_socket_ptr->state_label == Label::ESTABLISHED && fin){
                 new_header->offset_res_flags = 0x10;
