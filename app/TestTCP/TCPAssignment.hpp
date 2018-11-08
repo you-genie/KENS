@@ -51,6 +51,7 @@ namespace E {
 
     struct ConnectionBucket {
         int not_established = 0;
+        int established = 0;
         std::vector<Connection *> connections;
     };
 
@@ -211,6 +212,9 @@ namespace E {
                 int length);
 
     public:
+        BlockValue *block_value = new BlockValue;
+        BlockValue *listen_value = new BlockValue;
+
         SocketBucket socket_bucket;
         SocketBucket cli_bucket;
 

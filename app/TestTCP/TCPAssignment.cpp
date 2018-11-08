@@ -20,8 +20,8 @@ using E::Signal;
 using E::Debug;
 
 namespace E {
-    BlockValue *block_value = new BlockValue;
-    BlockValue *listen_value = new BlockValue;
+//    BlockValue *block_value = new BlockValue;
+//    BlockValue *listen_value = new BlockValue;
 
 /**
  * STATIC VARIABLES END
@@ -255,12 +255,12 @@ namespace E {
     }
 
     int FindChildSocketWithPorts(
-            uint16_t my_port, uint32_t peer_ip, Socket *socket_ptr_ret, SocketBucket socket_bucket) {
+            uint16_t my_port, uint16_t peer_port, Socket *socket_ptr_ret, SocketBucket socket_bucket) {
         for (int i = 0; i < socket_bucket.sockets.size(); i++) {
             Socket *socket_ptr = socket_bucket.sockets[i];
             if (((sockaddr_in *) socket_ptr->addr_ptr)->sin_port == my_port
                 && socket_ptr->socket_type == MachineType::SERVER_CLIENT) {
-                if (socket_ptr->peer_values->peer_addr_ptr->sin_addr.s_addr == peer_ip) {
+                if (socket_ptr->peer_values->peer_addr_ptr->sin_port == peer_port) {
                     memcpy(socket_ptr_ret, socket_ptr, sizeof(Socket));
                     return 1;
                 }
@@ -315,21 +315,12 @@ namespace E {
 
         Socket *socket_ret = new Socket;
 
-        if (E::FindSocketWithFd(param1, socket_ret, this->socket_bucket) != 0) {
-
+        if (FindSocketWithFd(param1, socket_ret, this->socket_bucket) != -1) {
             struct sockaddr *addr_ptr_ret = new sockaddr;
 
             memcpy(addr_ptr_ret, socket_ret->addr_ptr, 16);
 
-            *param2_ptr = *addr_ptr_ret;
-
-            *param3_ptr = sizeof(socket_ret->addr_ptr);
-
-            returnSystemCall(syscallUUID, 0);
-        } else if (E::FindSocketWithFd(param1, socket_ret, this->cli_bucket) != 0) {
-            debug->Log("SHET!2");
-
-            memcpy(param2_ptr, socket_ret->addr_ptr, sizeof(struct sockaddr));
+            memcpy(param2_ptr, addr_ptr_ret, 16);
             *param3_ptr = sizeof(socket_ret->addr_ptr);
 
             returnSystemCall(syscallUUID, 0);
@@ -566,25 +557,38 @@ namespace E {
             returnSystemCall(syscallUUID, -1);
         }
 
+        block_value->syscallUUID = syscallUUID;
+        debug->Log("established", server_socket_ptr->backlog->established);
+
+
         // if socket has recent connection -> child
-        if (server_socket_ptr->backlog_ready.size() != 0) {
+        if (server_socket_ptr->backlog->established > 0) {
             int fd = server_socket_ptr->backlog_ready[0];
+            debug->Log("fd", fd);
             Socket *server_cli_socket_ptr = new Socket;
             int i = FindSocketWithFd(fd, server_cli_socket_ptr, socket_bucket);
 
+            memcpy(server_cli_socket_ptr->addr_ptr, server_socket_ptr->addr_ptr, 16); // Set values HERE!
             memcpy(client_addr, (struct sockaddr *) server_cli_socket_ptr->peer_values->peer_addr_ptr,
                    sizeof(server_cli_socket_ptr->peer_values->peer_addr_ptr));
+            *client_addr_len =16;
+
+            server_socket_ptr->backlog->established = server_socket_ptr->backlog->established - 1;
             server_socket_ptr->backlog_ready.erase(server_socket_ptr->backlog_ready.begin());
+
             RemoveSocketWithFd(listen_fd, &socket_bucket);
             socket_bucket.sockets.push_back(server_socket_ptr);
-            block_value->isCalled = 0;
+            RemoveSocketWithFd(fd, &socket_bucket);
+            socket_bucket.sockets.push_back(server_cli_socket_ptr);
+            block_value = new BlockValue;
+//            block_value->isCalled = 0;
 
+            debug->StarLog("syscallUUID", (int)syscallUUID);
             returnSystemCall(syscallUUID, fd);
             return;
         }
 
         debug->Log("Has NO connection");
-        server_socket_ptr->syscallUUID = syscallUUID;
 
         RemoveSocketWithFd(listen_fd, &socket_bucket);
         socket_bucket.sockets.push_back(server_socket_ptr);
@@ -666,8 +670,8 @@ namespace E {
     void TCPAssignment::packetArrived(std::string fromModule, Packet *packet) {
         /* Extract the IP address and port number of source and destination from the recv pkt */
         /* Extract the IP address and port number of source and destination from the recv pkt */
-        debug->LogDivider();
-        debug->BigLog("Packet arrived");
+//        debug->LogDivider();
+//        debug->BigLog("Packet arrived");
         uint32_t *src_ip = new uint32_t;
         uint32_t *dest_ip = new uint32_t;
 
@@ -711,15 +715,20 @@ namespace E {
         } else {
             recv = Signal::NONE;
         }
-
-        debug->Log("received signal");
-        debug->Log(recv);
+        if (!fin) {
+            debug->LogDivider();
+            debug->Log(recv);
+            debug->Log(dest_socket_ptr->state_label);
+        }
 
         StateMachine *state_machine = new StateMachine(dest_socket_ptr->state_label, dest_socket_ptr->socket_type);
-        debug->Log(dest_socket_ptr->state_label);
+//        debug->Log(dest_socket_ptr->state_label);
 
         Signal send = state_machine->GetSendSignalAndSetNextNode(recv);
-        debug->Log(send);
+        if (!fin) {
+            debug->Log(send);
+        }
+//        debug->Log(send);
 
         /* Packet Creation */
         Packet *new_packet = this->clonePacket(packet);
@@ -750,6 +759,7 @@ namespace E {
 
         if (syn) {
             if (dest_socket_ptr->backlog->not_established < dest_socket_ptr->max_backlog) {
+                debug->StarLog("add backlog");
                 debug->Log("not Established", dest_socket_ptr->backlog->not_established);
                 debug->Log("max backlog", dest_socket_ptr->max_backlog);
                 // ignore other arrived packets.
@@ -774,6 +784,7 @@ namespace E {
 
         if (send == Signal::ERR) {
             this->freePacket(packet);
+            this->freePacket(new_packet);
             delete packet_header;
             delete new_header;
             return;
@@ -800,20 +811,22 @@ namespace E {
                 int flag = 0;
                 Socket *established_socket_ptr = new Socket;
 
-                for (int i = 0; i < dest_socket_ptr->cli_sockets.size(); i++) {
-                    int cli_fd = dest_socket_ptr->cli_sockets[i];
-                    Socket *cli_socket = new Socket;
-                    FindSocketWithFd(cli_fd, cli_socket, socket_bucket);
-                    if (((sockaddr_in *) cli_socket->addr_ptr)->sin_port == packet_header->src_port) {
-                        flag = 1;
-                    }
-                }
+//                for (int i = 0; i < dest_socket_ptr->cli_sockets.size(); i++) {
+//                    int cli_fd = dest_socket_ptr->cli_sockets[i];
+//                    Socket *cli_socket = new Socket;
+//                    FindSocketWithFd(cli_fd, cli_socket, socket_bucket);
+//                    if (((sockaddr_in *) cli_socket->addr_ptr)->sin_port == packet_header->src_port) {
+//                        flag = 1;
+//                    }
+//                }
 
                 if (flag == 0) {
                     // Create new file descriptor.
                     int fd = 0;
                     fd = createFileDescriptor(dest_socket_ptr->pid);
-                    debug->Log("fd", fd);
+//                    debug->Log("fd", fd);
+//                    debug->Log("established?", dest_socket_ptr->backlog->not_established);
+//                    debug->Log("Max Backlog", dest_socket_ptr->max_backlog);
 
                     // Set socket values in established_socket_ptr
                     established_socket_ptr->fd = fd;
@@ -831,7 +844,7 @@ namespace E {
                     established_socket_ptr->addr_ptr = new sockaddr;
                     established_socket_ptr->syscallUUID = dest_socket_ptr->syscallUUID;
 
-                    memcpy(established_socket_ptr->addr_ptr, dest_socket_ptr->addr_ptr, 16);
+//                    memcpy(established_socket_ptr->addr_ptr, dest_socket_ptr->addr_ptr, 16); // NOT HERE!!
 
                     // Set peer value
                     Socket *peer_cli_ptr = new Socket;
@@ -842,6 +855,9 @@ namespace E {
                     established_socket_ptr->peer_values->peer_addr_ptr->sin_addr.s_addr = *src_ip;
                     established_socket_ptr->peer_values->peer_addr_ptr->sin_port = packet_header->src_port;
                     established_socket_ptr->peer_values->peer_addr_ptr->sin_family = AF_INET;
+
+                    debug->StarLog("IP", (int)*src_ip);
+                    debug->StarLog("Port", packet_header->src_port);
                 }
 
                 // Set ready_backlog for further accept.
@@ -849,21 +865,17 @@ namespace E {
                 dest_socket_ptr->backlog_ready.push_back(established_socket_ptr->fd);
 
                 dest_socket_ptr->backlog->not_established = dest_socket_ptr->backlog->not_established - 1;
+                dest_socket_ptr->backlog->established = dest_socket_ptr->backlog->established + 1;
 
                 dest_socket_ptr->cli_sockets.push_back(established_socket_ptr->fd);
                 dest_socket_ptr->state_label = Label::LISTEN;
-                dest_socket_ptr->syscallUUID = listen_value->syscallUUID;
+//                dest_socket_ptr->syscallUUID = listen_value->syscallUUID;
                 dest_socket_ptr->seq_num = dest_socket_ptr->seq_num + (uint32_t) 1;
-                this->freePacket(packet);
 
                 if (dest_socket_ptr->backlog->not_established > 0 &&
-                dest_socket_ptr->backlog->not_established < dest_socket_ptr->max_backlog) {
-                    debug->Log("not established", dest_socket_ptr->backlog->not_established);
+                dest_socket_ptr->backlog->not_established <= dest_socket_ptr->max_backlog) {
+                    debug->StarLog("Picking out Packet....");
                     Connection *connection = dest_socket_ptr->backlog->connections[0]; // First connection
-                    dest_socket_ptr->backlog->connections.erase(
-                            dest_socket_ptr->backlog->connections.begin());
-                    dest_socket_ptr->backlog->not_established =
-                            dest_socket_ptr->backlog->not_established - 1;
                     Packet *new_new_packet = this->clonePacket(packet);
 
                     // Set header
@@ -871,6 +883,8 @@ namespace E {
                     new_header->seq_num = connection->seq_num;
                     new_header->ack_num = connection->ack_num + 1;
                     new_header->offset_res_flags = 0x12; // syn ack
+
+                    debug->Log("new picked port", new_header->dest_port);
 
                     CreatePacketHeader(new_new_packet, new_header, dest_ip,
                             &(connection->cli_addr_ptr->sin_addr.s_addr), 20);
@@ -886,6 +900,8 @@ namespace E {
                     // Send packet.
                     this->sendPacket("IPv4", new_new_packet);
                 }
+                this->freePacket(packet);
+                this->freePacket(new_packet);
 
                 RemoveSocketWithFd(dest_socket_ptr->fd, &socket_bucket);
                 socket_bucket.sockets.push_back(dest_socket_ptr);
@@ -895,11 +911,13 @@ namespace E {
 
                 if (block_value->isCalled == 0) {
                     // accept is not yet called.
-                    returnSystemCall(established_socket_ptr->syscallUUID, 0);
+//                    returnSystemCall(established_socket_ptr->syscallUUID, 0);
+                    printf("NOT\n");
+
                 } else {
                     // 함수를 다시 불러보쟈...
                     this->syscall_accept(
-                            established_socket_ptr->syscallUUID,
+                            block_value->syscallUUID,
                             block_value->pid,
                             block_value->fd,
                             block_value->sockaddr_ptr,
@@ -931,13 +949,8 @@ namespace E {
             if (dest_socket_ptr->state_label == Label::SYN_SENT && syn && ack) {
                 // Final shake of Handshaking
                 printf("== SYN SENT sending ACK to server == \n");
-                dest_socket_ptr->state_label = Label::ESTABLISHED;
 
                 // Set peer values
-                int peer_fd = 0;
-                FindParentFdWithPort(packet_header->src_port, &peer_fd, socket_bucket);
-                dest_socket_ptr->peer_values->peer_fd = peer_fd;
-
                 sockaddr_in *new_addr_ptr = new sockaddr_in;
                 new_addr_ptr->sin_family = AF_INET;
                 new_addr_ptr->sin_addr.s_addr = *src_ip;
@@ -948,18 +961,21 @@ namespace E {
                 // Set Seq_num
                 dest_socket_ptr->seq_num = (dest_socket_ptr->seq_num) + (uint32_t) 1;
 
-                RemoveSocketWithFd(dest_socket_ptr->fd, &socket_bucket);
-                socket_bucket.sockets.push_back(dest_socket_ptr);
-
                 // Send Packet
                 new_header->offset_res_flags = 0x10;
                 CreatePacketHeader(new_packet, new_header, dest_ip, src_ip, 20);
                 this->sendPacket("IPv4", new_packet);
 
+                dest_socket_ptr->state_label = Label::ESTABLISHED;
+                RemoveSocketWithFd(dest_socket_ptr->fd, &socket_bucket);
+                socket_bucket.sockets.push_back(dest_socket_ptr);
+
                 this->freePacket(packet);
                 delete packet_header;
                 delete new_header;
+
                 returnSystemCall(dest_socket_ptr->syscallUUID, 0);
+                return;
             } else if (fin) {
                 new_header->offset_res_flags = 0x10;
                 CreatePacketHeader(new_packet, new_header, dest_ip, src_ip, 20);
