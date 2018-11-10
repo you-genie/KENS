@@ -33,7 +33,7 @@ namespace E {
 
     enum class Signal {
         SYN, ACK, FIN, SYN_ACK, FIN_ACK, OPEN, CLOSE, DATA, ERR, NONE
-    }; // err contains timeout
+    };
 
     struct Connection {
         uint32_t seq_num;
@@ -51,7 +51,6 @@ namespace E {
 
     struct ConnectionBucket {
         int not_established = 0;
-        int established = 0;
         std::vector<Connection *> connections;
     };
 
@@ -78,6 +77,9 @@ namespace E {
         int protocol;
         int is_bind = 0;
         int is_timewait;
+        int send_fin = 0;
+        int close_fin = 0;
+        int close_ack = 0;
 
         struct sockaddr *addr_ptr;
         socklen_t sock_len;

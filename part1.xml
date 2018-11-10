@@ -1,32 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites tests="8" failures="2" disabled="0" errors="0" timestamp="2018-11-08T01:04:55" time="0.189" name="AllTests">
-  <testsuite name="TestEnv_Reliable" tests="8" failures="2" disabled="0" errors="0" time="0.189">
-    <testcase name="TestBind_Simple" status="run" time="0.001" classname="TestEnv_Reliable" />
+<testsuites tests="8" failures="0" disabled="0" errors="0" timestamp="2018-11-10T21:44:12" time="6.275" name="AllTests">
+  <testsuite name="TestEnv_Reliable" tests="8" failures="0" disabled="0" errors="0" time="6.275">
+    <testcase name="TestBind_Simple" status="run" time="0.002" classname="TestEnv_Reliable" />
     <testcase name="TestBind_DoubleBind" status="run" time="0.001" classname="TestEnv_Reliable" />
-    <testcase name="TestBind_GetSockName" status="run" time="0" classname="TestEnv_Reliable" />
+    <testcase name="TestBind_GetSockName" status="run" time="0.001" classname="TestEnv_Reliable" />
     <testcase name="TestBind_OverlapPort" status="run" time="0.001" classname="TestEnv_Reliable" />
-    <testcase name="TestBind_OverlapClosed" status="run" time="0" classname="TestEnv_Reliable">
-      <failure message="testbind.cpp:229&#x0A;      Expected: ret&#x0A;      Which is: -1&#x0A;To be equal to: 0" type=""><![CDATA[testbind.cpp:229
-      Expected: ret
-      Which is: -1
-To be equal to: 0]]></failure>
-    </testcase>
-    <testcase name="TestBind_DifferentIP_SamePort" status="run" time="0" classname="TestEnv_Reliable" />
-    <testcase name="TestBind_SameIP_DifferentPort" status="run" time="0.001" classname="TestEnv_Reliable" />
-    <testcase name="TestOpen" status="run" time="0.185" classname="TestEnv_Reliable">
-      <failure message="testopen.cpp:65&#x0A;      Expected: success&#x0A;      Which is: 1024&#x0A;To be equal to: ((size_t)test_size) * ((size_t)test_repeat)&#x0A;      Which is: 131072" type=""><![CDATA[testopen.cpp:65
-      Expected: success
-      Which is: 1024
-To be equal to: ((size_t)test_size) * ((size_t)test_repeat)
-      Which is: 131072]]></failure>
-      <failure message="testopen.cpp:66&#x0A;      Expected: failed&#x0A;      Which is: 130048&#x0A;To be equal to: 0" type=""><![CDATA[testopen.cpp:66
-      Expected: failed
-      Which is: 130048
-To be equal to: 0]]></failure>
-      <failure message="testopen.cpp:67&#x0A;      Expected: duplicated&#x0A;      Which is: 66519552&#x0A;To be equal to: 0" type=""><![CDATA[testopen.cpp:67
-      Expected: duplicated
-      Which is: 66519552
-To be equal to: 0]]></failure>
-    </testcase>
+    <testcase name="TestBind_OverlapClosed" status="run" time="0.001" classname="TestEnv_Reliable" />
+    <testcase name="TestBind_DifferentIP_SamePort" status="run" time="0.001" classname="TestEnv_Reliable" />
+    <testcase name="TestBind_SameIP_DifferentPort" status="run" time="0" classname="TestEnv_Reliable" />
+    <testcase name="TestOpen" status="run" time="6.268" classname="TestEnv_Reliable" />
   </testsuite>
 </testsuites>

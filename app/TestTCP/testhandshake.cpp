@@ -69,7 +69,7 @@ protected:
 			memset(&client_addr, 0, client_len);
 
 			int client_fd = accept(server_socket, (struct sockaddr*)&client_addr, &client_len);
-//			printf("testhandshake fd: %d\n", client_fd);
+			printf("testhandshake fd: %d\n", client_fd);
 			if(client_fd >= 0)
 			{
                 EXPECT_EQ(client_len, sizeof(client_addr));
@@ -153,7 +153,7 @@ protected:
 			addr.sin_port = htons(atoi(env["CONNECT_PORT"].c_str()));
 
 			int ret = connect(client_socket, (struct sockaddr*)&addr, len);
-            printf("testhandshake connect ret: %d\n", ret);
+            printf("testhandshake connect ret: %d, port: %d\n", ret, addr.sin_port);
 
             if(ret == 0)
 			{
