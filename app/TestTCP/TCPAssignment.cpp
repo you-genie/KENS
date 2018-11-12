@@ -638,6 +638,10 @@ namespace E {
 
     }
 
+    void TCPAssignment::syscall_write(UUID syscallUUID, int pid, int fd, void *write_content, int size_write){
+        
+    };
+
     void TCPAssignment::systemCallback(UUID syscallUUID, int pid, const SystemCallParameter &param) {
         switch (param.syscallNumber) {
             case SOCKET:
@@ -650,7 +654,7 @@ namespace E {
                 //this->syscall_read(syscallUUID, pid, param.param1_int, param.param2_ptr, param.param3_int);
                 break;
             case WRITE:
-                //this->syscall_write(syscallUUID, pid, param.param1_int, param.param2_ptr, param.param3_int);
+                this->syscall_write(syscallUUID, pid, param.param1_int, param.param2_ptr, param.param3_int);
                 break;
             case CONNECT:
                 this->syscall_connect(syscallUUID, pid, param.param1_int,
@@ -1315,14 +1319,14 @@ namespace E {
      */
     int ReadDataWithLen(char *data_ret, int len, ReadBuffer *read_buffer) {
         int total_dataHolder_length = read_buffer->packet_data_bucket.size();
-/* data_ret_index: to identify the location of the data in the data_ret */
+        /* data_ret_index: to identify the location of the data in the data_ret */
         int data_ret_index = 0;
         int delete_index = 0;
         int max_size = read_buffer->max_size;
         int rwnd = read_buffer->rwnd;
 
-/* max_size - rwnd = allocated size in read Buffer */
-/* If a len is larger than total data holder length, just read all from the buffer */
+        /* max_size - rwnd = allocated size in read Buffer */
+        /* If a len is larger than total data holder length, just read all from the buffer */
         if (len >= max_size - rwnd) {
             data_ret = (char *) malloc(max_size - rwnd);
             for (int i = 0; i < total_dataHolder_length; i++) {
