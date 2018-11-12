@@ -50,7 +50,7 @@ namespace E {
     struct WriteBuffer {
         int rwnd;
         int max_size = 4096;
-        int unack_size;
+        int unack_size = 4096;
         std::vector<DataHolder *> packet_data_bucket = std::vector<DataHolder *>();
     };
 

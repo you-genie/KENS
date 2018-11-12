@@ -639,7 +639,30 @@ namespace E {
     }
 
     void TCPAssignment::syscall_write(UUID syscallUUID, int pid, int fd, void *write_content, int size_write){
-        
+        // TODO: find socket.
+        Socket *socket_ptr = new Socket;
+        if (FindSocketWithFd(fd, socket_ptr, socket_bucket) == -1) {
+            returnSystemCall(syscallUUID, ERR_BASIC); // You can delete this code if want to block in no-socket.
+            return;
+        }
+
+        // TODO: check whether given data is larger then write max buffer.
+        if (size_write > socket_ptr->writeBuffer->max_size) {
+            debug->Log("write data is bigger than max buffer size");
+            // TODO: YOU SHOULD BLOCK THIS VALUE
+            return;
+        }
+
+        // TODO: check with rwnd & all packet size
+        int sending_data_total = socket_ptr->writeBuffer->max_size
+                - socket_ptr->writeBuffer->unack_size
+                + size_write;
+        if (sending_data_total > socket_ptr->writeBuffer->rwnd) {
+            debug->Log("packet is bigger than receive window size");
+            // TODO: YOU SHOULD BLOCK THIS VALUE
+            return;
+        }
+
     };
 
     void TCPAssignment::systemCallback(UUID syscallUUID, int pid, const SystemCallParameter &param) {
