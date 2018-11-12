@@ -35,6 +35,27 @@ namespace E {
         SYN, ACK, FIN, SYN_ACK, FIN_ACK, OPEN, CLOSE, DATA, ERR, NONE
     };
 
+    struct DataHolder {
+        char *data = new char;
+        int data_size;
+        int seq_num;
+    };
+
+    struct WriteBuffer {
+        int rwnd;
+        int max_size = 4096;
+        int unack_size;
+        std::vector<DataHolder *> packet_data_bucket = std::vector<DataHolder *>();
+    };
+
+    struct ReadBuffer {
+        int rwnd;
+        int max_size = 4096;
+        int last_rcvd_size;
+        int last_read_size;
+        std::vector<DataHolder *> packet_data_bucket = std::vector<DataHolder *>();
+    };
+
     struct Connection {
         uint32_t seq_num;
         uint32_t ack_num;
@@ -89,6 +110,8 @@ namespace E {
 
         Peer *peer_values = new Peer;
 
+        WriteBuffer *writeBuffer = new WriteBuffer;
+        ReadBuffer *readBuffer = new ReadBuffer;
         UUID syscallUUID;
     };
 
@@ -113,7 +136,7 @@ namespace E {
 
     class Debug {
     public:
-        Debug(){};
+        Debug() {};
 
         void Log(char *string) {
             printf("%s\n", string);
@@ -212,6 +235,24 @@ namespace E {
                 uint32_t *src_ip,
                 uint32_t *dest_ip,
                 int length);
+        
+        /**
+         *
+         * @param seq_num
+         * @param index 여기다가 인덱스 담아주기
+         * @param write_buffer
+         * @return index value, if no such data exist, -1
+         * 여기서 -1이 난다는 거는요 중간에 ack=100 ack=100 ack=100같은거
+         */
+        int FindDataIndexWithSeq(int seq_num, WriteBuffer *write_buffer);
+
+        /**
+         * 다 지우는 로직 좀 짜봅시다 내가 까먹음
+         * @param index 얘로 지움. a.erase(...begin() + index);
+         * @param write_buffer
+         * @return -1 에러라면!
+         */
+        int DeleteDataWithIndex(int index, WriteBuffer *write_buffer);
 
     public:
         BlockValue *block_value = new BlockValue;
@@ -226,10 +267,38 @@ namespace E {
 
         TCPAssignment(Host *host);
 
+        /**
+         * seq_num으로 찾아서 (FindDataIndexWithSeq) DeleteDataWithIndex로 지움.
+         * @param seq_num
+         * @param write_buffer
+         * @return -1 에러라면!!!
+         */
+        int DeleteDataWithSeq(int seq_num, WriteBuffer *write_buffer);
+
+        /**
+         * safe coding 필요함. 맥스 사이즈에서 알아서 뺴서 섹폴 안나게
+         * 읽은 만큼 없애야됨!!!!!!!!!!!!!
+         *  *** 여기서 len이 더 긴 경우 다 읽으면 됨.
+         * @param data_ret 여기다가
+         * @param len 요만큼
+         * @param read_buffer 여기서 읽어서 복사하세요. 아마 memcpy로 하는 게 복장터지지않을듯
+         * @return -1 에러면
+         */
+        int ReadDataWithLen(char *data_ret, int len, ReadBuffer *read_buffer);
+
+        /**
+         * 저거 위에 있는 DeleteDataWithIndex처럼 똑같이하면될걸?
+         * @param index 이만큼
+         * @param read_buffer 여기에서 지워주세요.
+         * @return
+         */
+        int DeleteDataWithLen(int index, ReadBuffer *read_buffer);
+
         void syscall_socket(
                 UUID syscallUUID, int pid, int param1_int, int param2_int);
+
         void syscall_close(
-                UUID syscallUUID,  int pid, int fd);
+                UUID syscallUUID, int pid, int fd);
 
         void syscall_getsockname(
                 UUID syscallUUID,
@@ -242,17 +311,22 @@ namespace E {
                 int pid, int fd, struct sockaddr *sockaddr_ptr, socklen_t socklen_ptr);
 
         void syscall_connect(UUID syscallUUID, int pid, int client_fd,
-                             struct sockaddr* server_addr, socklen_t server_addr_length);
+                             struct sockaddr *server_addr, socklen_t server_addr_length);
 
         void syscall_listen(UUID syscallUUID, int pid, int server_fd, int max_backlog);
 
         void syscall_accept(UUID syscallUUID, int pid, int listen_fd,
-                            struct sockaddr* client_addr, socklen_t* client_addr_len);
+                            struct sockaddr *client_addr, socklen_t *client_addr_len);
 
         void syscall_getpeername(UUID syscallUUID, int pid, int listen_fd,
-                                 struct sockaddr* client_addr, socklen_t *client_addr_len);
+                                 struct sockaddr *client_addr, socklen_t *client_addr_len);
 
-        unsigned short checksum(unsigned short* ptr_packet, int size_packet);
+        void syscall_read(UUID syscallUUID, int pid, int fd, void *read_content, int size_read);
+
+        void syscall_write(UUID syscallUUID, int pid, int fd, void *write_content, int size_write);
+
+
+        unsigned short checksum(unsigned short *ptr_packet, int size_packet);
 
         virtual void initialize();
 
