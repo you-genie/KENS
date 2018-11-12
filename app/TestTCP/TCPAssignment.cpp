@@ -703,7 +703,11 @@ namespace E {
             socket_ptr->writeBuffer->packet_data_bucket.push_back(data_holder_ptr);
         }
 
-        
+        // TODO: set buffer's nonack value, and set all socket value in socket_bucket.
+        socket_ptr->writeBuffer->unack_size -= size_write;
+        socket_ptr->seq_num = socket_ptr->writeBuffer->packet_data_bucket[0]->seq_num;
+        RemoveSocketWithFd(fd, &socket_bucket);
+        socket_bucket.sockets.push_back(socket_ptr);
 
     };
 
