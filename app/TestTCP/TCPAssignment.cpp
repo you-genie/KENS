@@ -131,7 +131,7 @@ namespace E {
     void Debug::ToString(MachineType machineType, char *ret_string) {
         if (machineType == MachineType::CLIENT) {
             memcpy(ret_string, "Client", 10);
-        } else if(machineType == MachineType::SERVER){
+        } else if (machineType == MachineType::SERVER) {
             memcpy(ret_string, "Server", 10);
         } else
             memcpy(ret_string, "ServerC", 10);
@@ -277,7 +277,7 @@ namespace E {
             returnSystemCall(syscallUUID, -1);
         }
 
-        if (socket_temp->state_label == Label::CLOSED){
+        if (socket_temp->state_label == Label::CLOSED) {
             int ret = RemoveSocketWithFd(fd, &socket_bucket);
             if (ret == -1) {
                 returnSystemCall(syscallUUID, -1);
@@ -285,8 +285,7 @@ namespace E {
                 removeFileDescriptor(pid, fd);
                 returnSystemCall(syscallUUID, fd);
             }
-        }
-        else {
+        } else {
             debug->Log(socket_temp->state_label);
             TCPHeader *packet_header = new TCPHeader;
             packet_header->src_port = ((sockaddr_in *) socket_temp->addr_ptr)->sin_port;
@@ -299,7 +298,7 @@ namespace E {
 
             Packet *packet = this->allocatePacket(54);
             uint32_t *src_ip = &(((sockaddr_in *) socket_temp->addr_ptr)->sin_addr.s_addr);
-            printf("** src_ip: %d\n",*src_ip);
+            printf("** src_ip: %d\n", *src_ip);
             /* TODO Get peer address */
             uint32_t *dest_ip = &(socket_temp->peer_values->peer_addr_ptr->sin_addr.s_addr);
 
@@ -592,7 +591,7 @@ namespace E {
 
             memcpy(client_addr, (struct sockaddr *) server_cli_socket_ptr->peer_values->peer_addr_ptr,
                    sizeof(server_cli_socket_ptr->peer_values->peer_addr_ptr));
-            *client_addr_len =16;
+            *client_addr_len = 16;
 
             server_socket_ptr->backlog_ready.erase(server_socket_ptr->backlog_ready.begin());
 
@@ -601,7 +600,7 @@ namespace E {
             block_value = new BlockValue;
             //            block_value->isCalled = 0;
 
-            debug->StarLog("syscallUUID", (int)syscallUUID);
+            debug->StarLog("syscallUUID", (int) syscallUUID);
             returnSystemCall(syscallUUID, fd);
             return;
         }
@@ -775,7 +774,7 @@ namespace E {
         }
 
         if (syn && dest_socket_ptr->socket_type == MachineType::SERVER &&
-            dest_socket_ptr->backlog->not_established < dest_socket_ptr->max_backlog){
+            dest_socket_ptr->backlog->not_established < dest_socket_ptr->max_backlog) {
             Connection *new_connection_ptr = new Connection;
 
             // Set new client address pointer;
@@ -793,8 +792,8 @@ namespace E {
             dest_socket_ptr->backlog->connections.push_back(new_connection_ptr);
             dest_socket_ptr->backlog->not_established = dest_socket_ptr->backlog->not_established + 1;
 
-            if ( dest_socket_ptr->state_label == Label::LISTEN ||
-                 dest_socket_ptr->state_label == Label::SYN_RCVD ) {
+            if (dest_socket_ptr->state_label == Label::LISTEN ||
+                dest_socket_ptr->state_label == Label::SYN_RCVD) {
                 new_header->offset_res_flags = 0x12;
                 CreatePacketHeader(new_packet, new_header, dest_ip, src_ip, 20);
                 this->sendPacket("IPv4", new_packet);
@@ -836,11 +835,11 @@ namespace E {
                     established_socket_ptr->ack_num = (uint32_t) 0;
                     established_socket_ptr->syscallUUID = dest_socket_ptr->syscallUUID;
 
-                    memcpy(&(((sockaddr_in *)established_socket_ptr->addr_ptr)->sin_addr.s_addr),
+                    memcpy(&(((sockaddr_in *) established_socket_ptr->addr_ptr)->sin_addr.s_addr),
                            dest_ip, sizeof(uint32_t));
                     memcpy(&(((sockaddr_in *) established_socket_ptr->addr_ptr)->sin_port),
                            &(packet_header->dest_port), sizeof(packet_header->dest_port));
-                    ((sockaddr_in *)(established_socket_ptr->addr_ptr))->sin_family = AF_INET;
+                    ((sockaddr_in * )(established_socket_ptr->addr_ptr))->sin_family = AF_INET;
 
                     // Set peer value
                     Socket *peer_cli_ptr = new Socket;
@@ -887,7 +886,7 @@ namespace E {
 
                     // Set state to SYN_RECEIVED again
                     dest_socket_ptr->state_label = Label::SYN_RCVD;
-                    dest_socket_ptr->seq_num = dest_socket_ptr-> seq_num + (uint32_t) 1;
+                    dest_socket_ptr->seq_num = dest_socket_ptr->seq_num + (uint32_t) 1;
 
                     // Set syscallUUID
                     dest_socket_ptr->syscallUUID = listen_value->syscallUUID;
@@ -949,8 +948,8 @@ namespace E {
                 socket_bucket.sockets.push_back(child_socket_ptr);
 
                 int remove_fd = 0;
-                if(child_socket_ptr->close_ack == 1 &&
-                   child_socket_ptr->close_fin == 1){ /* If the child recv both fin and ack from peer  */
+                if (child_socket_ptr->close_ack == 1 &&
+                    child_socket_ptr->close_fin == 1) { /* If the child recv both fin and ack from peer  */
                     remove_fd = child_socket_ptr->fd;
                     removeFileDescriptor(child_socket_ptr->pid, child_socket_ptr->fd);
                     RemoveSocketWithFd(child_socket_ptr->fd, &socket_bucket);
@@ -976,14 +975,14 @@ namespace E {
                     return;
                 };
 
-                if (child_socket_ptr->send_fin == 1 )
+                if (child_socket_ptr->send_fin == 1)
                     child_socket_ptr->close_ack = 1;
                 RemoveSocketWithFd(child_socket_ptr->fd, &socket_bucket);
                 socket_bucket.sockets.push_back(child_socket_ptr);
 
                 int remove_fd = 0;
-                if(child_socket_ptr->close_ack == 1 &&
-                   child_socket_ptr->close_fin == 1){ /* If the child recv both fin and ack from peer  */
+                if (child_socket_ptr->close_ack == 1 &&
+                    child_socket_ptr->close_fin == 1) { /* If the child recv both fin and ack from peer  */
                     printf("** Child recv ack **\n");
                     remove_fd = child_socket_ptr->fd;
                     removeFileDescriptor(child_socket_ptr->pid, child_socket_ptr->fd);
@@ -997,15 +996,14 @@ namespace E {
                 delete packet_header;
                 delete new_header;
                 return;
-            }
-            else {
+            } else {
                 this->freePacket(packet);
                 this->freePacket(new_packet);
                 delete packet_header;
                 delete new_header;
                 return;
             }
-        } else{ /* if the machine is Client */
+        } else { /* if the machine is Client */
             if (dest_socket_ptr->state_label == Label::SYN_SENT && syn && ack) {
                 // Final shake of Handshaking
                 dest_socket_ptr->state_label = Label::ESTABLISHED;
@@ -1056,8 +1054,7 @@ namespace E {
                 this->freePacket(new_packet);
                 delete packet_header;
                 delete new_header;
-            }
-            else {
+            } else {
                 this->freePacket(packet);
                 this->freePacket(new_packet);
                 delete packet_header;
@@ -1251,6 +1248,106 @@ namespace E {
 
         current_node = next_node;
         return (int) current_node;
+    }
+
+    int TCPAssignment::FindDataIndexWithSeq(int seq_num, E::WriteBuffer *write_buffer) {
+        // Find data index with seq num.
+        for (int i = 0; i < write_buffer->packet_data_bucket.size(); i++) {
+            DataHolder *data_holder = write_buffer->packet_data_bucket[i];
+            if (data_holder->seq_num == seq_num) {
+                return i;
+            }
+        }
+        return ERR_BASIC;
+    }
+
+    int TCPAssignment::DeleteDataWithIndex(int index, E::WriteBuffer *write_buffer) {
+        if (write_buffer->packet_data_bucket.size() < index) {
+            return ERR_BASIC;
+        }
+        int size;
+        for (int i = 0; i < index + 1; i++) {
+            size += write_buffer->packet_data_bucket[i]->data_size;
+        }
+        write_buffer->packet_data_bucket.erase(
+                write_buffer->packet_data_bucket.begin(),
+                write_buffer->packet_data_bucket.begin() + index);
+        return size;
+    }
+
+    int TCPAssignment::DeleteDataWithSeq(int seq_num, E::WriteBuffer *write_buffer) {
+        int index = FindDataIndexWithSeq(seq_num, write_buffer);
+        if (index >= 0) {
+            int size = DeleteDataWithIndex(index, write_buffer);
+            write_buffer->unack_size = write_buffer->unack_size + size;
+            return size;
+        } else {
+            return index;
+        }
+
+    }
+
+    /**
+     * 저거 위에 있는 DeleteDataWithIndex처럼 똑같이하면될걸?
+     * @param index 이만큼
+     * @param read_buffer 여기에서 지워주세요.
+     * @return
+     */
+    int DeleteDataWithLen(int index, ReadBuffer *read_buffer) {
+        if (read_buffer->packet_data_bucket.size() < index)
+            return -1;
+        else
+            read_buffer->packet_data_bucket.erase(read_buffer->packet_data_bucket.begin(),
+                    read_buffer->packet_data_bucket.begin() + index);
+
+        return 1;
+    }
+
+
+    /**
+     * safe coding 필요함. 맥스 사이즈에서 알아서 뺴서 섹폴 안나게
+     * 읽은 만큼 없애야됨!!!!!!!!!!!!!
+     *  *** 여기서 len이 더 긴 경우 다 읽으면 됨.
+     * @param data_ret 여기다가
+     * @param len 요만큼
+     * @param read_buffer 여기서 읽어서 복사하세요. 아마 memcpy로 하는 게 복장터지지않을듯
+     * @return -1 에러면
+     */
+    int ReadDataWithLen(char *data_ret, int len, ReadBuffer *read_buffer) {
+        int total_dataHolder_length = read_buffer->packet_data_bucket.size();
+/* data_ret_index: to identify the location of the data in the data_ret */
+        int data_ret_index = 0;
+        int delete_index = 0;
+        int max_size = read_buffer->max_size;
+        int rwnd = read_buffer->rwnd;
+
+/* max_size - rwnd = allocated size in read Buffer */
+/* If a len is larger than total data holder length, just read all from the buffer */
+        if (len >= max_size - rwnd) {
+            data_ret = (char *) malloc(max_size - rwnd);
+            for (int i = 0; i < total_dataHolder_length; i++) {
+                memcpy(data_ret + data_ret_index, read_buffer->packet_data_bucket[i]->data,
+                       read_buffer->packet_data_bucket[i]->data_size);
+                data_ret_index += read_buffer->packet_data_bucket[i]->data_size;
+                delete_index++;
+            }
+            if (DeleteDataWithLen(delete_index, read_buffer) == -1)
+                return -1;
+            return 1;
+        } else {
+            data_ret = (char *) malloc(len);
+            int read_size = 0;
+            for (int i = 0; len >= read_size;) {
+                memcpy(data_ret + data_ret_index, read_buffer->packet_data_bucket[i]->data,
+                       read_buffer->packet_data_bucket[i]->data_size);
+                data_ret_index += read_buffer->packet_data_bucket[i]->data_size;
+                read_size += read_buffer->packet_data_bucket[i]->data_size;
+                delete_index++;
+            }
+            if (DeleteDataWithLen(delete_index, read_buffer) == -1)
+                return -1;
+            return 1;
+        }
     }
 
 }
