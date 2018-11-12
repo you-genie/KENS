@@ -663,6 +663,48 @@ namespace E {
             return;
         }
 
+        // TODO: set buffer write values. Get seq
+        int last_index = socket_ptr->writeBuffer->packet_data_bucket.size();
+        int last_seq = socket_ptr->writeBuffer->packet_data_bucket[last_index]->seq_num;
+
+        // TODO: compare with max packet size.
+        int max_packet_length = 8192;
+
+        if (size_write > max_packet_length) {
+            // TODO: logic for 'dividing' packet.
+            int written_byte_num = 0;
+            int packet_num = (size_write - written_byte_num) / max_packet_length;
+
+            for (int i = 0; i < packet_num; i++) {
+                DataHolder *data_holder_ptr = new DataHolder;
+                last_seq += size_write;
+                data_holder_ptr->seq_num = last_seq;
+
+                // 마지막 세트의 경우 패킷에 담을 데이터 사이즈가 쪼꼬미
+                int cpy_size = max_packet_length;
+                if ((size_write - written_byte_num) < max_packet_length) {
+                    cpy_size = size_write - written_byte_num;
+                }
+
+                data_holder_ptr->data_size = cpy_size;
+                memcpy(data_holder_ptr->data, write_content, cpy_size);
+                socket_ptr->writeBuffer->packet_data_bucket.push_back(data_holder_ptr);
+
+                // iteration
+                written_byte_num += cpy_size;
+            }
+        } else {
+            // TODO: logic for 'unique' packet.
+            DataHolder *data_holder_ptr = new DataHolder;
+            last_seq += size_write;
+            data_holder_ptr->seq_num = last_seq;
+            data_holder_ptr->data_size = size_write;
+            memcpy(data_holder_ptr->data, write_content, size_write);
+            socket_ptr->writeBuffer->packet_data_bucket.push_back(data_holder_ptr);
+        }
+
+        
+
     };
 
     void TCPAssignment::systemCallback(UUID syscallUUID, int pid, const SystemCallParameter &param) {
