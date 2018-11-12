@@ -20,6 +20,12 @@
 #include <E/E_TimerModule.hpp>
 
 namespace E {
+    enum Error {
+        ERR_BASIC = -1,
+        ERR_DATA_SIZE_OVERFLOW = -2,
+        ERR_RCWD_OVERFLOW = -3
+    };
+
     enum class MachineType {
         SERVER, CLIENT, SERVER_CLIENT
     };
@@ -193,6 +199,12 @@ namespace E {
             ToString(machine_type, this->debug_str);
             printf("Socket Type: %s\n", debug_str);
         };
+
+        void Log(Error error) {
+            ToString(error, this->debug_str);
+            printf("Error Message: %s\n", debug_str);
+        }
+
     private:
         char debug_str[50];
 
@@ -203,6 +215,19 @@ namespace E {
         void ToString(Connection connection, char *ret_string);
 
         void ToString(MachineType machineType, char *ret_string);
+
+        void ToString(Error error, char *ret_string) {
+            switch (error) {
+                case ERR_BASIC:
+                    memcpy(ret_string, "basic error", sizeof(50));
+                    break;
+                case ERR_DATA_SIZE_OVERFLOW:
+                    memcpy(ret_string, "data size is over buffer size", sizeof(50));
+                    break;
+                case ERR_RCWD_OVERFLOW:
+                    memcpy(ret_string, "data size is over rcwd", sizeof(50));
+            }
+        }
     };
 
     struct BlockValue {
@@ -235,7 +260,7 @@ namespace E {
                 uint32_t *src_ip,
                 uint32_t *dest_ip,
                 int length);
-        
+
         /**
          *
          * @param seq_num
@@ -251,6 +276,7 @@ namespace E {
          * @param index 얘로 지움. a.erase(...begin() + index);
          * @param write_buffer
          * @return -1 에러라면!
+         * 아닌 경우 지우는 데이터 사이즈를 리턴한다.
          */
         int DeleteDataWithIndex(int index, WriteBuffer *write_buffer);
 
