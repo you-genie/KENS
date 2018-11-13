@@ -232,9 +232,12 @@ protected:
 				{
 					total_size += write_byte;
 					remaining -= write_byte;
+					printf("remaining: %d\n", remaining);
 					EXPECT_GE(remaining, 0);
-					if(remaining == 0)
+					if(remaining == 0){
+						printf("??");
 						break;
+					}
 				}
 				if(write_byte < 0)
 					break;
