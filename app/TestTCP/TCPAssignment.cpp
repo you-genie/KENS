@@ -467,6 +467,7 @@ namespace E {
 
         // TODO: change each states of socket.
         cli_socket->socket_type = MachineType::CLIENT;
+        cli_socket->seq_num = cli_socket->seq_num + (uint32_t) 1;
         cli_socket->syscallUUID = syscallUUID;
 
         //        debug->LogDivider();
@@ -645,25 +646,43 @@ namespace E {
         // TODO: find socket.
         debug->BigLog("syscall write");
         Socket *socket_ptr = new Socket;
+
+        /*********************************/
+        /******* ERROR management ********/
+        /*********************************/
         if (FindSocketWithFd(fd, socket_ptr, socket_bucket) == -1) {
             returnSystemCall(syscallUUID, ERR_BASIC); // You can delete this code if want to block in no-socket.
             return;
         }
 
-        // TODO: check whether given data is larger then write max buffer.
-        if (size_write > socket_ptr->writeBuffer->max_size) {
-            debug->Log("write data is bigger than max buffer size");
+        // TODO: check whether given data is larger than remaining buffer size
+        // TODO: we should pending the write() if the internal write buffer is full.
+        if (size_write > socket_ptr->writeBuffer->max_size - socket_ptr->writeBuffer->unack_size) {
+            debug->Log("write data is bigger than remaining write buffer");
             // TODO: YOU SHOULD BLOCK THIS VALUE
             return;
         }
 
-        // TODO: check with cwnd & all packet size
-        int sending_data_total = socket_ptr->writeBuffer->unack_size + size_write;
-        if (sending_data_total > socket_ptr->writeBuffer->cwnd) {
+        // TODO: check with peer rwnd & all packet size
+        int sending_data_total = socket_ptr->writeBuffer->max_size
+                                 - socket_ptr->writeBuffer->unack_size
+                                 + size_write;
+        /*
+        if (sending_data_total > socket_ptr->writeBuffer->peer_rwnd) {
             debug->Log("packet is bigger than sending window size");
             // TODO: YOU SHOULD BLOCK THIS VALUE
             return;
         }
+         */
+
+        printf("** size write: %d\n", size_write);
+        /* If the size_write is less than 0, return -1 */
+        if (size_write < 0)
+            returnSystemCall(syscallUUID, -1);
+
+        /********************************/
+        /***** Data send preparation ****/
+        /********************************/
 
         // TODO: set buffer write values. Get seq
         int last_index = socket_ptr->writeBuffer->packet_data_bucket.size() - 1;
@@ -676,16 +695,14 @@ namespace E {
         }
 
         debug->Log("last seq: ", last_seq);
-        printf("** size write: %d\n", size_write);
-        /* Temporary test */
-        if (size_write < 0)
-            return;
+        int packet_num = 1;
+
         // TODO: compare with max packet size.
         int max_packet_length = 1440;
         if (size_write > max_packet_length) {
             // TODO: logic for 'dividing' packet.
             int written_byte_num = 0;
-            int packet_num = ((size_write - written_byte_num) / max_packet_length) + 1;
+            packet_num = ((size_write - written_byte_num) / max_packet_length) + 1;
 
             for (int i = 0; i < packet_num; i++) {
                 DataHolder *data_holder_ptr = new DataHolder;
@@ -713,8 +730,8 @@ namespace E {
             // TODO: logic for 'unique' packet.
             DataHolder *data_holder_ptr = new DataHolder;
             last_seq += size_write;
-            data_holder_ptr->seq_num = last_seq;
             data_holder_ptr->data_size = size_write;
+            data_holder_ptr->seq_num =last_seq;
 
             debug->Log("1");
             data_holder_ptr->data = (char *)malloc(size_write);
@@ -723,23 +740,31 @@ namespace E {
 
             socket_ptr->writeBuffer->packet_data_bucket.push_back(data_holder_ptr);
             debug->Log("3");
-
         }
+
         // TODO: set buffer's nonack value, and set all socket value in socket_bucket.
-        socket_ptr->writeBuffer->unack_size -= size_write;
-        socket_ptr->seq_num = socket_ptr->writeBuffer->packet_data_bucket[0]->seq_num;
+        socket_ptr->writeBuffer->unack_size += size_write;
+        printf("** unack_Size: %d\n", socket_ptr->writeBuffer->unack_size);
 
         RemoveSocketWithFd(fd, &socket_bucket);
         socket_bucket.sockets.push_back(socket_ptr);
         int send_data = 0;
 
         // TODO: send packet. 우선은 혼잡에 대한 생각은 하지 말고, 해당 write데이터에 대한 것만.
-        for (int i = 0; i < socket_ptr->writeBuffer->packet_data_bucket.size(); i++) {
+        int bucket_size = socket_ptr->writeBuffer->packet_data_bucket.size();
+        for (int i = bucket_size - packet_num; i < bucket_size; i++) {
             debug->Log("Send Packet!!");
             DataHolder *packet_data_ptr = socket_ptr->writeBuffer->packet_data_bucket[i];
             int packet_size = 54 + packet_data_ptr->data_size;
-            send_data += packet_data_ptr->data_size;
 
+            /* if the packet that we are going to send is larger than the peer rwnd */
+            if (packet_data_ptr->data_size > socket_ptr->writeBuffer->peer_rwnd) {
+                debug->Log("packet is bigger than sending window size");
+                // TODO: YOU SHOULD BLOCK THIS VALUE
+                return;
+            }
+
+            send_data += packet_data_ptr->data_size;
             // allocate packet with computed packet size.
             Packet *packet = this->allocatePacket(packet_size);
 
@@ -766,15 +791,22 @@ namespace E {
 
             /* socket value changing */
             socket_ptr->writeBuffer->unack_size += packet_data_ptr->data_size;
-            socket_ptr->writeBuffer->cwnd =
-                    socket_ptr->writeBuffer->max_size - socket_ptr->writeBuffer->unack_size;
             socket_ptr->seq_num = socket_ptr->seq_num + (uint32_t) packet_data_ptr->data_size;
+
             RemoveSocketWithFd(fd, &socket_bucket);
             socket_bucket.sockets.push_back(socket_ptr);
+
+            printf("socket_ptr->seq_num = %d\n", socket_ptr->seq_num);
         }
 
+        /* TODO: return syscall management; in write() or in packetArrived ? */
         returnSystemCall(syscallUUID, send_data);
-    };
+    }
+
+    void TCPAssignment::syscall_read(UUID syscallUUID, int pid,
+                                     int fd, void* save_buffer, int read_size){
+        debug->BigLog("syscall read");
+    }
 
     void TCPAssignment::systemCallback(UUID syscallUUID, int pid, const SystemCallParameter &param) {
         switch (param.syscallNumber) {
@@ -785,7 +817,7 @@ namespace E {
                 this->syscall_close(syscallUUID, pid, param.param1_int);
                 break;
             case READ:
-                //this->syscall_read(syscallUUID, pid, param.param1_int, param.param2_ptr, param.param3_int);
+                this->syscall_read(syscallUUID, pid, param.param1_int, param.param2_ptr, param.param3_int);
                 break;
             case WRITE:
                 this->syscall_write(syscallUUID, pid, param.param1_int, param.param2_ptr, param.param3_int);
@@ -830,11 +862,12 @@ namespace E {
 
         TCPHeader *packet_header = new TCPHeader;
 
-        // TODO: get packet header, dest_ip, src_ip
+        // get packet header, dest_ip, src_ip
         packet->readData(14 + 12, src_ip, 4);
         packet->readData(14 + 16, dest_ip, 4);
         packet->readData(14 + 20, packet_header, 20);
-        // TODO: get packet dest port, and find corresponding socket!
+
+        // get packet dest port, and find corresponding socket!
         Socket *dest_socket_ptr = new Socket;
 
         if (FindParentSocketWithPort(packet_header->dest_port, dest_socket_ptr, socket_bucket) == -1) {
@@ -866,15 +899,48 @@ namespace E {
         } else {
             recv = Signal::NONE;
         }
-        if (!fin) {
-            //            debug->LogDivider();
+
+        /***************************************/
+        /****** Packet validity checking *******/
+        /***************************************/
+        /* 1. checksum recalculation */
+
+        /***************************************/
+        /****** SENDING DATA ACK MANAGER *******/
+        /***************************************/
+        if ( !fin && !syn && ack && dest_socket_ptr->socket_type == MachineType::CLIENT
+             && dest_socket_ptr->state_label == Label::ESTABLISHED){
+            uint32_t data_seq_num = ntohl(packet_header->ack_num);
+            uint16_t peer_rwnd_temp = ntohs(packet_header->window);
+
+            /* TODO Change the variables in the write buffer and the socket */
+            int data_index = FindDataIndexWithSeq(data_seq_num, dest_socket_ptr->writeBuffer);
+            dest_socket_ptr->last_ack = data_seq_num;
+            printf("** last_ack: %d\n", data_seq_num);
+
+            /* TODO writeBuffer unack size, peer_rwnd management */
+            printf("** unack size: %d\n", dest_socket_ptr->writeBuffer->unack_size);
+            printf("** data_size: %d\n", dest_socket_ptr->writeBuffer->packet_data_bucket[data_index]->data_size);
+            dest_socket_ptr->writeBuffer->unack_size = dest_socket_ptr->writeBuffer->unack_size
+                                                       - dest_socket_ptr->writeBuffer->packet_data_bucket[data_index]->data_size;
+            dest_socket_ptr->writeBuffer->peer_rwnd = peer_rwnd_temp;
+
+            /* TODO Delete the data holder in the writeBuffer */
+            DeleteDataWithIndex(data_index, dest_socket_ptr->writeBuffer);
+            RemoveSocketWithFd(dest_socket_ptr->fd, &socket_bucket);
+            socket_bucket.sockets.push_back(dest_socket_ptr);
+            return;
         }
 
-        //        debug->Log(recv);
-
+        /***************************************/
+        /******** HANDSHAKING MAGAGER **********/
+        /***************************************/
         StateMachine *state_machine = new StateMachine(dest_socket_ptr->state_label, dest_socket_ptr->socket_type);
-        //        debug->Log(dest_socket_ptr->state_label);
+        debug->Log(dest_socket_ptr->state_label);
+        debug->Log(recv);
+
         Signal send = state_machine->GetSendSignalAndSetNextNode(recv);
+        debug->Log(send);
 
         /* Packet Creation */
         Packet *new_packet = this->clonePacket(packet);
@@ -886,10 +952,16 @@ namespace E {
         new_header->src_port = htons(ntohs(packet_header->dest_port));
         new_header->ack_num = htonl(ntohl(packet_header->seq_num) + (uint32_t) 1);
         new_header->seq_num = htonl(dest_socket_ptr->seq_num);
-        new_header->window = packet_header->window;
+        if (dest_socket_ptr->socket_type == MachineType::CLIENT)
+            new_header->window = htons((uint16_t)4096);
+        else
+            new_header->window = packet_header->window;
         new_header->checksum = (uint16_t) 0;
         new_header->urgent_ptr = (uint16_t) 0;
 
+        /***************************************/
+        /******** HANDSHAKING MAGAGER **********/
+        /***************************************/
         /* If the socket is in TIME_WAIT, re-send the ACK to server */
         if (dest_socket_ptr->is_timewait == 1 && dest_socket_ptr->state_label == Label::TIME_WAIT) {
             //            debug->StarLog("resend ack to server");
@@ -918,8 +990,6 @@ namespace E {
 
             // set client address pointer to new connection pointer
             new_connection_ptr->cli_addr_ptr = new_cli_addr_ptr;
-            //            printf("%d: %d\n", new_connection_ptr->cli_addr_ptr->sin_addr.s_addr,
-            //                   new_connection_ptr->cli_addr_ptr->sin_port);
 
             // set destination socket (a.k.a. server socket) new connection & raise unestablished one.
             dest_socket_ptr->backlog->connections.push_back(new_connection_ptr);
@@ -1001,11 +1071,7 @@ namespace E {
                 if (dest_socket_ptr->backlog->not_established > 0 &&
                     dest_socket_ptr->backlog->not_established <= dest_socket_ptr->max_backlog) {
                     debug->StarLog("Picking out Packet....");
-                    Connection *connection = dest_socket_ptr->backlog->connections[0]; // First connection
-                    //                    dest_socket_ptr->backlog->connections.erase(
-                    //                            dest_socket_ptr->backlog->connections.begin());
-                    //                    dest_socket_ptr->backlog->not_established =
-                    //                            dest_socket_ptr->backlog->not_established - 1;
+                    Connection *connection = dest_socket_ptr->backlog->connections[0];
                     Packet *new_new_packet = this->clonePacket(packet);
 
                     // Set header
@@ -1019,13 +1085,13 @@ namespace E {
 
                     // Set state to SYN_RECEIVED again
                     dest_socket_ptr->state_label = Label::SYN_RCVD;
-                    dest_socket_ptr->seq_num = dest_socket_ptr->seq_num + (uint32_t) 1;
 
                     // Set syscallUUID
                     dest_socket_ptr->syscallUUID = listen_value->syscallUUID;
 
                     // Send packet.
                     this->sendPacket("IPv4", new_new_packet);
+                    dest_socket_ptr->seq_num = (dest_socket_ptr->seq_num) + (uint32_t) 1;
                 }
                 this->freePacket(packet);
                 this->freePacket(new_packet);
@@ -1036,7 +1102,6 @@ namespace E {
                 delete packet_header;
 
                 if (block_value->isCalled == 0) {
-                    //                    printf("NOT\n");
                     // accept is not yet called.
                     returnSystemCall(established_socket_ptr->syscallUUID, 0);
                 } else {
@@ -1050,11 +1115,9 @@ namespace E {
                 }
             } else if (dest_socket_ptr->state_label == Label::LISTEN && fin) { /* parent server socket recv fin */
                 /* Find the child socket which belongs to parent socket */
-                //                printf("** Parent recv fin **\n");
                 Socket *child_socket_ptr = new Socket;
                 if (FindChildSocketWithPorts(packet_header->dest_port, *src_ip, child_socket_ptr,
                                              socket_bucket) == -1) {
-                    //                    printf("** cannot find child in recv fin **\n");
                     this->freePacket(packet);
                     this->freePacket(new_packet);
                     delete packet_header;
@@ -1063,18 +1126,14 @@ namespace E {
                     return;
                 }
 
-                //                debug->Log(child_socket_ptr->state_label);
-
                 printf("** Child recv fin **\n");
                 new_header->offset_res_flags = 0x10;
                 new_header->seq_num = ntohl(child_socket_ptr->seq_num);
                 CreatePacketHeader(new_packet, new_header, dest_ip, src_ip, 20, NULL);
                 this->sendPacket("IPv4", new_packet);
+                dest_socket_ptr->seq_num = (dest_socket_ptr->seq_num) + (uint32_t) 1;
 
-                //                debug->Log(child_socket_ptr->state_label);
                 child_socket_ptr->state_label = Label::CLOSE_WAIT;
-                //                debug->Log(child_socket_ptr->state_label);
-                child_socket_ptr->seq_num = (child_socket_ptr->seq_num) + (uint32_t) 1;
                 child_socket_ptr->close_fin = 1;
 
                 RemoveSocketWithFd(child_socket_ptr->fd, &socket_bucket);
@@ -1096,11 +1155,9 @@ namespace E {
                 return;
             } else if (dest_socket_ptr->state_label == Label::LISTEN && ack) {
                 /* Find the child socket which belongs to parent socket */
-                //                printf("** Parent recv ack **\n");
                 Socket *child_socket_ptr = new Socket;
                 if (FindChildSocketWithPorts(packet_header->dest_port, *src_ip, child_socket_ptr,
                                              socket_bucket) == -1) {
-                    //                    printf("** cannot find child in recv ack **\n");
                     this->freePacket(packet);
                     this->freePacket(new_packet);
                     delete packet_header;
@@ -1154,8 +1211,10 @@ namespace E {
 
                 // Send Packet
                 new_header->offset_res_flags = 0x10;
+
                 CreatePacketHeader(new_packet, new_header, dest_ip, src_ip, 20, NULL);
                 this->sendPacket("IPv4", new_packet);
+                dest_socket_ptr->seq_num = (dest_socket_ptr->seq_num) + (uint32_t) 1;
 
                 this->freePacket(packet);
                 delete packet_header;
@@ -1169,8 +1228,8 @@ namespace E {
                 CreatePacketHeader(new_packet, new_header, dest_ip, src_ip, 20, NULL);
                 this->sendPacket("IPv4", new_packet);
 
-                dest_socket_ptr->state_label = (Label) state_machine->Transit(recv);
                 dest_socket_ptr->seq_num = (dest_socket_ptr->seq_num) + (uint32_t) 1;
+                dest_socket_ptr->state_label = (Label) state_machine->Transit(recv);
                 RemoveSocketWithFd(dest_socket_ptr->fd, &socket_bucket);
                 socket_bucket.sockets.push_back(dest_socket_ptr);
 
@@ -1206,7 +1265,6 @@ namespace E {
             RemoveSocketWithFd(dest_socket_ptr->fd, &socket_bucket);
             socket_bucket.sockets.push_back(dest_socket_ptr);
             if (FindSocketWithFd(dest_socket_ptr->fd, socket_temp, socket_bucket) != -1)
-                //                printf("** client socket Remove waiting **\n ");
                 /* Start Timer: waiting for 60 seconds */
                 addTimer(dest_socket_ptr, 60);
         }
@@ -1383,7 +1441,7 @@ namespace E {
         return (int) current_node;
     }
 
-    int TCPAssignment::FindDataIndexWithSeq(int seq_num, E::WriteBuffer *write_buffer) {
+    int TCPAssignment::FindDataIndexWithSeq(uint32_t seq_num, E::WriteBuffer *write_buffer) {
         // Find data index with seq num.
         for (int i = 0; i < write_buffer->packet_data_bucket.size(); i++) {
             DataHolder *data_holder = write_buffer->packet_data_bucket[i];
@@ -1408,7 +1466,7 @@ namespace E {
         return size;
     }
 
-    int TCPAssignment::DeleteDataWithSeq(int seq_num, E::WriteBuffer *write_buffer) {
+    int TCPAssignment::DeleteDataWithSeq(uint32_t seq_num, E::WriteBuffer *write_buffer) {
         int index = FindDataIndexWithSeq(seq_num, write_buffer);
         if (index >= 0) {
             int size = DeleteDataWithIndex(index, write_buffer);
@@ -1484,4 +1542,3 @@ namespace E {
     }
 
 }
-			
