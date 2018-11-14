@@ -642,170 +642,203 @@ namespace E {
 
     }
 
-    void TCPAssignment::syscall_write(UUID syscallUUID, int pid, int fd, void *write_content, int size_write){
-        // TODO: find socket.
-        debug->BigLog("syscall write");
-        Socket *socket_ptr = new Socket;
+void TCPAssignment::syscall_write(UUID syscallUUID, int pid, int fd, void *write_content, int size_write){
+	// TODO: find socket.
+	debug->BigLog("syscall write");
+	Socket *socket_ptr = new Socket;
+	if (FindSocketWithFd(fd, socket_ptr, socket_bucket) == -1) {
+		returnSystemCall(syscallUUID, ERR_BASIC); // You can delete this code if want to block in no-socket.
+		return;
+	}
 
-        /*********************************/
-        /******* ERROR management ********/
-        /*********************************/
-        if (FindSocketWithFd(fd, socket_ptr, socket_bucket) == -1) {
-            returnSystemCall(syscallUUID, ERR_BASIC); // You can delete this code if want to block in no-socket.
-            return;
-        }
+	/*********************************/
+	/******* ERROR management ********/
+	/*********************************/
+	// TODO: check whether given data is larger than remaining buffer size
+	// TODO: we should pending the write() if the internal write buffer is full.
+	if (size_write > socket_ptr->writeBuffer->max_size - socket_ptr->writeBuffer->unack_size) {
+		debug->Log("write data is bigger than remaining write buffer");
+		// TODO: YOU SHOULD BLOCK THIS VALUE
+		return;
+	}
 
-        // TODO: check whether given data is larger than remaining buffer size
-        // TODO: we should pending the write() if the internal write buffer is full.
-        if (size_write > socket_ptr->writeBuffer->max_size - socket_ptr->writeBuffer->unack_size) {
-            debug->Log("write data is bigger than remaining write buffer");
-            // TODO: YOU SHOULD BLOCK THIS VALUE
-            return;
-        }
+	// TODO: check with peer rwnd & all packet size
+	int sending_data_total = socket_ptr->writeBuffer->max_size
+			- socket_ptr->writeBuffer->unack_size
+			+ size_write;
+	/*
+	if (sending_data_total > socket_ptr->writeBuffer->peer_rwnd) {
+		debug->Log("packet is bigger than sending window size");
+		// TODO: YOU SHOULD BLOCK THIS VALUE
+		return;
+	}
+	 */
 
-        // TODO: check with peer rwnd & all packet size
-        int sending_data_total = socket_ptr->writeBuffer->max_size
-                                 - socket_ptr->writeBuffer->unack_size
-                                 + size_write;
-        /*
-        if (sending_data_total > socket_ptr->writeBuffer->peer_rwnd) {
-            debug->Log("packet is bigger than sending window size");
-            // TODO: YOU SHOULD BLOCK THIS VALUE
-            return;
-        }
-         */
+	printf("** size write: %d\n", size_write);
+	/* If the size_write is less than 0, return -1 */
+	if (size_write < 0)
+		returnSystemCall(syscallUUID, -1);
 
-        printf("** size write: %d\n", size_write);
-        /* If the size_write is less than 0, return -1 */
-        if (size_write < 0)
-            returnSystemCall(syscallUUID, -1);
+	/********************************/
+	/***** Data send preparation ****/
+	/********************************/
 
-        /********************************/
-        /***** Data send preparation ****/
-        /********************************/
+	// TODO: set buffer write values. Get seq
+	int last_index = socket_ptr->writeBuffer->packet_data_bucket.size() - 1;
+	int last_seq, data_seq;
+	if (last_index == -1) {
+		// there are no data in writeBuffer
+		last_seq = socket_ptr->seq_num;
+	} else {
+		last_seq = socket_ptr->writeBuffer->packet_data_bucket[last_index]->seq_num;
+	}
 
-        // TODO: set buffer write values. Get seq
-        int last_index = socket_ptr->writeBuffer->packet_data_bucket.size() - 1;
-        int last_seq;
-        if (last_index == -1) {
-            // there are no data in writeBuffer
-            last_seq = socket_ptr->seq_num;
-        } else {
-            last_seq = socket_ptr->writeBuffer->packet_data_bucket[last_index]->seq_num;
-        }
+	debug->Log("last seq: ", last_seq);
+	int packet_num = 1;
+	data_seq = last_seq;
 
-        debug->Log("last seq: ", last_seq);
-        int packet_num = 1;
+	// TODO: compare with max packet size.
+	int max_packet_length = 1440;
+	if (size_write > max_packet_length) {
+		// TODO: logic for 'dividing' packet.
+		int written_byte_num = 0;
+		packet_num = ((size_write - written_byte_num) / max_packet_length) + 1;
 
-        // TODO: compare with max packet size.
-        int max_packet_length = 1440;
-        if (size_write > max_packet_length) {
-            // TODO: logic for 'dividing' packet.
-            int written_byte_num = 0;
-            packet_num = ((size_write - written_byte_num) / max_packet_length) + 1;
+		for (int i = 0; i < packet_num; i++) {
+			DataHolder *data_holder_ptr = new DataHolder;
+			// 마지막 세트의 경우 패킷에 담을 데이터 사이즈가 쪼꼬미
+			int cpy_size = max_packet_length;
+			if ((size_write - written_byte_num) < max_packet_length) {
+				cpy_size = size_write - written_byte_num;
+			}
 
-            for (int i = 0; i < packet_num; i++) {
-                DataHolder *data_holder_ptr = new DataHolder;
-                //			last_seq += size_write;
-                //			data_holder_ptr->seq_num = last_seq;
+			/* Set the variables in the data holder */
+			last_seq += cpy_size;
+			data_holder_ptr->seq_num = last_seq;
+			data_holder_ptr->data_size = cpy_size;
+			data_holder_ptr->data = (char *)malloc(sizeof(char) * cpy_size);
+			memcpy(data_holder_ptr->data, (char *)write_content + written_byte_num, cpy_size);
+			socket_ptr->writeBuffer->packet_data_bucket.push_back(data_holder_ptr);
 
-                // 마지막 세트의 경우 패킷에 담을 데이터 사이즈가 쪼꼬미
-                int cpy_size = max_packet_length;
-                if ((size_write - written_byte_num) < max_packet_length) {
-                    cpy_size = size_write - written_byte_num;
-                }
+			// iteration
+			written_byte_num += cpy_size;
+		}
+	} else {
+		// TODO: logic for 'unique' packet.
+		DataHolder *data_holder_ptr = new DataHolder;
+		last_seq += size_write;
+		data_holder_ptr->data_size = size_write;
+		data_holder_ptr->seq_num =last_seq;
 
-                /* Set the variables in the data holder */
-                last_seq += cpy_size;
-                data_holder_ptr->seq_num = last_seq;
-                data_holder_ptr->data_size = cpy_size;
-                data_holder_ptr->data = (char *)malloc(sizeof(char) * cpy_size);
-                memcpy(data_holder_ptr->data, (char *)write_content + written_byte_num, cpy_size);
-                socket_ptr->writeBuffer->packet_data_bucket.push_back(data_holder_ptr);
+		data_holder_ptr->data = (char *)malloc(size_write);
+		memcpy(data_holder_ptr->data, write_content, size_write);
+		socket_ptr->writeBuffer->packet_data_bucket.push_back(data_holder_ptr);
+	}
 
-                // iteration
-                written_byte_num += cpy_size;
-            }
-        } else {
-            // TODO: logic for 'unique' packet.
-            DataHolder *data_holder_ptr = new DataHolder;
-            last_seq += size_write;
-            data_holder_ptr->data_size = size_write;
-            data_holder_ptr->seq_num =last_seq;
+	// TODO: set buffer's nonack value, and set all socket value in socket_bucket.
+	printf("** unack_Size: %d\n", socket_ptr->writeBuffer->unack_size);
 
-            debug->Log("1");
-            data_holder_ptr->data = (char *)malloc(size_write);
-            memcpy(data_holder_ptr->data, write_content, size_write);
-            debug->Log("2");
+	RemoveSocketWithFd(fd, &socket_bucket);
+	socket_bucket.sockets.push_back(socket_ptr);
+	int send_data = 0;
 
-            socket_ptr->writeBuffer->packet_data_bucket.push_back(data_holder_ptr);
-            debug->Log("3");
-        }
+	// TODO: send packet. 우선은 혼잡에 대한 생각은 하지 말고, 해당 write데이터에 대한 것만.
+	int bucket_size = socket_ptr->writeBuffer->packet_data_bucket.size();
+	for (int i = bucket_size - packet_num; i < bucket_size; i++) {
+		debug->Log("Send Packet!!");
+		DataHolder *packet_data_ptr = socket_ptr->writeBuffer->packet_data_bucket[i];
+		int packet_size = 54 + packet_data_ptr->data_size;
 
-        // TODO: set buffer's nonack value, and set all socket value in socket_bucket.
-        socket_ptr->writeBuffer->unack_size += size_write;
-        printf("** unack_Size: %d\n", socket_ptr->writeBuffer->unack_size);
+		/* if the packet that we are going to send is larger than the peer rwnd */
+		if (packet_data_ptr->data_size > socket_ptr->writeBuffer->peer_rwnd) {
+			debug->Log("packet is bigger than sending window size");
+			// TODO: YOU SHOULD BLOCK THIS VALUE
+			return;
+		}
 
-        RemoveSocketWithFd(fd, &socket_bucket);
-        socket_bucket.sockets.push_back(socket_ptr);
-        int send_data = 0;
+		send_data += packet_data_ptr->data_size;
+		// allocate packet with computed packet size.
+		Packet *packet = this->allocatePacket(packet_size);
 
-        // TODO: send packet. 우선은 혼잡에 대한 생각은 하지 말고, 해당 write데이터에 대한 것만.
-        int bucket_size = socket_ptr->writeBuffer->packet_data_bucket.size();
-        for (int i = bucket_size - packet_num; i < bucket_size; i++) {
-            debug->Log("Send Packet!!");
-            DataHolder *packet_data_ptr = socket_ptr->writeBuffer->packet_data_bucket[i];
-            int packet_size = 54 + packet_data_ptr->data_size;
+		// set header
+		TCPHeader *packet_header = new TCPHeader;
+		packet_header->src_port = ((sockaddr_in *) socket_ptr->addr_ptr)->sin_port;
+		packet_header->dest_port = socket_ptr->peer_values->peer_addr_ptr->sin_port;
+		packet_header->offset_res_flags = 0x00;
+		packet_header->head_length = 0x50;
+		packet_header->window = htons(socket_ptr->readBuffer->rwnd);
+		packet_header->seq_num = htonl(data_seq);
+		packet_header->ack_num = htonl(socket_ptr->ack_num);
+		packet_header->checksum = (uint16_t) 0;
 
-            /* if the packet that we are going to send is larger than the peer rwnd */
-            if (packet_data_ptr->data_size > socket_ptr->writeBuffer->peer_rwnd) {
-                debug->Log("packet is bigger than sending window size");
-                // TODO: YOU SHOULD BLOCK THIS VALUE
-                return;
-            }
+		// set ip
+		uint32_t *src_ip = &(((sockaddr_in *) socket_ptr->addr_ptr)->sin_addr.s_addr);
+		uint32_t *dest_ip = &(socket_ptr->peer_values->peer_addr_ptr->sin_addr.s_addr);
 
-            send_data += packet_data_ptr->data_size;
-            // allocate packet with computed packet size.
-            Packet *packet = this->allocatePacket(packet_size);
+		CreatePacketHeader(packet, packet_header, src_ip, dest_ip,
+				20 + packet_data_ptr->data_size, packet_data_ptr->data);
+		packet->writeData(2, &packet_size, 2);
 
-            // set header
-            TCPHeader *packet_header = new TCPHeader;
-            packet_header->src_port = ((sockaddr_in *) socket_ptr->addr_ptr)->sin_port;
-            packet_header->dest_port = socket_ptr->peer_values->peer_addr_ptr->sin_port;
-            packet_header->offset_res_flags = 0x00;
-            packet_header->head_length = 0x50;
-            packet_header->window = htons(socket_ptr->readBuffer->rwnd);
-            packet_header->seq_num = htonl(packet_data_ptr->seq_num);
-            packet_header->ack_num = htonl(socket_ptr->ack_num);
-            packet_header->checksum = (uint16_t) 0;
+		this->sendPacket("IPv4", packet);
 
-            // set ip
-            uint32_t *src_ip = &(((sockaddr_in *) socket_ptr->addr_ptr)->sin_addr.s_addr);
-            uint32_t *dest_ip = &(socket_ptr->peer_values->peer_addr_ptr->sin_addr.s_addr);
+		/* socket value changing */
+		socket_ptr->writeBuffer->unack_size += packet_data_ptr->data_size;
+		socket_ptr->seq_num = socket_ptr->seq_num + (uint32_t) packet_data_ptr->data_size;
 
-            CreatePacketHeader(packet, packet_header, src_ip, dest_ip,
-                               20 + packet_data_ptr->data_size, packet_data_ptr->data);
-            packet->writeData(2, &packet_size, 2);
+		RemoveSocketWithFd(fd, &socket_bucket);
+		socket_bucket.sockets.push_back(socket_ptr);
 
-            this->sendPacket("IPv4", packet);
+		printf("socket_ptr->seq_num = %d\n", socket_ptr->seq_num);
+	}
 
-            /* socket value changing */
-            socket_ptr->writeBuffer->unack_size += packet_data_ptr->data_size;
-            socket_ptr->seq_num = socket_ptr->seq_num + (uint32_t) packet_data_ptr->data_size;
-
-            RemoveSocketWithFd(fd, &socket_bucket);
-            socket_bucket.sockets.push_back(socket_ptr);
-
-            printf("socket_ptr->seq_num = %d\n", socket_ptr->seq_num);
-        }
-
-        /* TODO: return syscall management; in write() or in packetArrived ? */
-        returnSystemCall(syscallUUID, send_data);
-    }
+	/* TODO: return syscall management; in write() or in packetArrived ? */
+	returnSystemCall(syscallUUID, send_data);
+}
 
     void TCPAssignment::syscall_read(UUID syscallUUID, int pid,
-                                     int fd, void* save_buffer, int read_size){
+                                     int fd, void* read_content, int read_size){
         debug->BigLog("syscall read");
+        Socket *socket_ptr = new Socket;
+
+        if (FindSocketWithFd(fd, socket_ptr, socket_bucket) == -1) {
+            debug->StarLog("No socket available");
+            returnSystemCall(syscallUUID, -1);
+        }
+
+        // TODO: READ BUFFER에 값이 있는 경우, read_size만큼 쳐박는다.
+        if (socket_ptr->readBuffer->packet_data_bucket.size() > 0) {
+            if (socket_ptr->readBuffer->last_rcvd_size < read_size) {
+                // read buffer에 있는 값이 읽을 값보다 더 적다. last_rcvd_size를 0으로 만들어 주고, read_size를 재조정한 후 블록.
+                int buffer_read_size = ReadDataWithLen((char *)read_content, read_size, socket_ptr->readBuffer);
+                if (buffer_read_size == -1) {
+                    // there was some error!
+                    return;
+                }
+                read_size -= buffer_read_size;
+                block_read_value->syscallUUID = syscallUUID;
+                block_read_value->pid = pid;
+                block_read_value->fd = fd;
+                block_read_value->read_content = read_content;
+                block_read_value->read_size = read_size;
+
+            } else {
+                // read buffer에 있는 값이 읽을 값보다 더 크거나 같다. read_size만큼 리턴해 주고, last_rcvd_size 처리를 해 준 후 리.
+                int buffer_read_size = ReadDataWithLen((char *)read_content, read_size, socket_ptr->readBuffer);
+                if (buffer_read_size == -1) {
+                    // There was some error!
+                    return;
+                }
+                returnSystemCall(syscallUUID, read_size);
+            }
+        } else {
+            // 블록.
+            block_read_value->syscallUUID = syscallUUID;
+            block_read_value->pid = pid;
+            block_read_value->fd = fd;
+            block_read_value->read_content = read_content;
+            block_read_value->read_size = read_size;
+        }
+
     }
 
     void TCPAssignment::systemCallback(UUID syscallUUID, int pid, const SystemCallParameter &param) {
@@ -1484,7 +1517,7 @@ namespace E {
  * @param read_buffer 여기에서 지워주세요.
  * @return
  */
-    int DeleteDataWithLen(int index, ReadBuffer *read_buffer) {
+    int TCPAssignment::DeleteDataWithLen(int index, ReadBuffer *read_buffer) {
         if (read_buffer->packet_data_bucket.size() < index)
             return -1;
         else
@@ -1504,13 +1537,15 @@ namespace E {
  * @param read_buffer 여기서 읽어서 복사하세요. 아마 memcpy로 하는 게 복장터지지않을듯
  * @return -1 에러면
  */
-    int ReadDataWithLen(char *data_ret, int len, ReadBuffer *read_buffer) {
+    int TCPAssignment::ReadDataWithLen(char *data_ret, int len, ReadBuffer *read_buffer) {
         int total_dataHolder_length = read_buffer->packet_data_bucket.size();
         /* data_ret_index: to identify the location of the data in the data_ret */
         int data_ret_index = 0;
         int delete_index = 0;
         int max_size = read_buffer->max_size;
         int rwnd = read_buffer->rwnd;
+
+        // TODO: last_rcvd_size 변경.
 
         /* max_size - rwnd = allocated size in read Buffer */
         /* If a len is larger than total data holder length, just read all from the buffer */
@@ -1524,7 +1559,7 @@ namespace E {
             }
             if (DeleteDataWithLen(delete_index, read_buffer) == -1)
                 return -1;
-            return 1;
+            return data_ret_index;
         } else {
             data_ret = (char *) malloc(len);
             int read_size = 0;
@@ -1537,7 +1572,7 @@ namespace E {
             }
             if (DeleteDataWithLen(delete_index, read_buffer) == -1)
                 return -1;
-            return 1;
+            return data_ret_index;
         }
     }
 

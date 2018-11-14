@@ -45,8 +45,8 @@ namespace E {
     struct ReadBuffer {
         int rwnd = 4096;
         int max_size = 4096;
-        int last_rcvd_size;
-        int last_read_size;
+        int last_rcvd_size = 0;
+        int last_read_size = 0;
         std::vector<DataHolder *> packet_data_bucket = std::vector<DataHolder *>();
     };
     struct Connection {
@@ -190,6 +190,15 @@ namespace E {
         int isCalled = 0;
         UUID syscallUUID;
     };
+
+    struct BlockReadValue {
+        void *read_content;
+        int pid;
+        UUID syscallUUID;
+        int read_size;
+        int fd;
+    };
+
     class TCPAssignment
             : public HostModule,
               public NetworkModule,
@@ -229,6 +238,7 @@ namespace E {
     public:
         BlockValue *block_value = new BlockValue;
         BlockValue *listen_value = new BlockValue;
+        BlockReadValue *block_read_value = new BlockReadValue;
         SocketBucket socket_bucket;
         SocketBucket cli_bucket;
         char debug_str[50];
