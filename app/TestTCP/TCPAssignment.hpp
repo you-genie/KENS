@@ -43,8 +43,8 @@ namespace E {
         std::vector<DataHolder *> packet_data_bucket = std::vector<DataHolder *>();
     };
     struct ReadBuffer {
-        int rwnd = 4096;
-        int max_size = 4096;
+        int rwnd = 8192;
+        int max_size = 8192;
         int last_rcvd_size = 0;
         int last_read_size = 0;
         std::vector<DataHolder *> packet_data_bucket = std::vector<DataHolder *>();
@@ -94,6 +94,7 @@ namespace E {
         uint32_t seq_num = 0;
         uint32_t ack_num = 0;
         uint32_t last_ack = 0;
+        uint32_t fin_seq = 0;
         Peer *peer_values = new Peer;
         WriteBuffer *writeBuffer = new WriteBuffer;
         ReadBuffer *readBuffer = new ReadBuffer;
@@ -197,6 +198,16 @@ namespace E {
         UUID syscallUUID;
         int read_size;
         int fd;
+        int isCalled = 0;
+    };
+
+    struct BlockWriteValue {
+        void *write_content;
+        int pid;
+        UUID syscallUUID;
+        int write_size;
+        int fd;
+        int isCalled = 0;
     };
 
     class TCPAssignment
@@ -235,10 +246,13 @@ namespace E {
          * 아닌 경우 지우는 데이터 사이즈를 리턴한다.
          */
         int DeleteDataWithIndex(int index, WriteBuffer *write_buffer);
+
+        int FindDataWithSeq(uint32_t seq_num, ReadBuffer *read_buffer);
     public:
         BlockValue *block_value = new BlockValue;
         BlockValue *listen_value = new BlockValue;
         BlockReadValue *block_read_value = new BlockReadValue;
+        BlockWriteValue *block_write_value = new BlockWriteValue;
         SocketBucket socket_bucket;
         SocketBucket cli_bucket;
         char debug_str[50];

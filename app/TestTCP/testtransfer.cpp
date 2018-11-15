@@ -153,6 +153,8 @@ protected:
 		free(send_buffer);
 		free(recv_buffer);
 
+		printf("============total_size: %d\n", total_size);
+
 		EXPECT_EQ(expect_size, total_size);
 
 		close(client_fd);
@@ -232,10 +234,8 @@ protected:
 				{
 					total_size += write_byte;
 					remaining -= write_byte;
-					printf("remaining: %d\n", remaining);
 					EXPECT_GE(remaining, 0);
 					if(remaining == 0){
-						printf("??");
 						break;
 					}
 				}
@@ -249,7 +249,9 @@ protected:
 				while((read_byte = read(client_socket, recv_buffer + (buffer_size - remaining), remaining)) >= 0)
 				{
 					total_size += read_byte;
-					remaining -= read_byte;
+                    printf("============total_size: %d\n", total_size);
+
+                    remaining -= read_byte;
 					EXPECT_GE(remaining, 0);
 					if(remaining == 0)
 						break;
@@ -273,7 +275,7 @@ protected:
 		free(send_buffer);
 		free(recv_buffer);
 
-		EXPECT_EQ(expect_size, total_size);
+        EXPECT_EQ(expect_size, total_size);
 
 		close(client_socket);
 	}
