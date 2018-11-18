@@ -32,9 +32,9 @@ namespace E {
         SYN, ACK, FIN, SYN_ACK, FIN_ACK, OPEN, CLOSE, DATA, ERR, NONE
     };
     struct DataHolder {
-        char *data = new char;
-        int data_size;
-        uint32_t seq_num;
+        char *data;
+        int data_size = 0;
+        uint32_t seq_num = 0;
     };
     struct WriteBuffer {
         int peer_rwnd = 4096;

@@ -128,7 +128,8 @@ protected:
 				int read_byte = 0;
 				while((read_byte = read(client_fd, recv_buffer + (buffer_size - remaining), remaining)) >= 0)
 				{
-					total_size += read_byte;
+                    printf("============total_size: %d\n", total_size);
+                    total_size += read_byte;
 					remaining -= read_byte;
 					EXPECT_GE(remaining, 0);
 					if(remaining == 0)

@@ -812,9 +812,11 @@ namespace E {
         debug->BigLog("syscall read");
         Socket *socket_ptr = new Socket;
 
+        // TODO: Find Socket
         if (FindSocketWithFd(fd, socket_ptr, socket_bucket) == -1) {
             debug->StarLog("No socket available");
             returnSystemCall(syscallUUID, -1);
+            return;
         }
 
         // TODO: READ BUFFER에 값이 있는 경우, read_size만큼 쳐박는다.
@@ -827,7 +829,7 @@ namespace E {
                     // there was some error!
                     return;
                 }
-                debug->StarLog("a");
+                debug->StarLog("Data is smaller than read size");
 
                 read_size -= buffer_read_size;
                 block_read_value->syscallUUID = syscallUUID;
@@ -837,8 +839,14 @@ namespace E {
                 block_read_value->read_size = read_size;
                 block_read_value->isCalled = 1;
 
+                RemoveSocketWithFd(fd, &socket_bucket);
+                socket_bucket.sockets.push_back(socket_ptr);
+
+                return;
+
             } else {
                 // read buffer에 있는 값이 읽을 값보다 더 크거나 같다. read_size만큼 리턴해 주고, last_rcvd_size 처리를 해 준 후 리.
+//                int buffer_read_size = 2;
                 int buffer_read_size = ReadDataWithLen((char *)read_content, read_size, socket_ptr->readBuffer);
                 debug->StarLog("a", buffer_read_size);
 
@@ -846,9 +854,18 @@ namespace E {
                     // There was some error!
                     return;
                 }
-                block_read_value = new BlockReadValue;
+                block_read_value->isCalled = 0;
+                free(block_read_value->read_content);
+
+                debug->StarLog("syscallUUID in read", (int) syscallUUID);
+//                block_read_value->isCalled = 0;
                 debug->StarLog("a");
+
+                RemoveSocketWithFd(fd, &socket_bucket);
+                socket_bucket.sockets.push_back(socket_ptr);
+
                 returnSystemCall(syscallUUID, buffer_read_size);
+                return;
             }
         } else {
             debug->Log("HERE IS NO DATA");
@@ -859,6 +876,7 @@ namespace E {
             block_read_value->read_content = read_content;
             block_read_value->read_size = read_size;
             block_read_value->isCalled = 1;
+            return;
         }
 
     }
@@ -965,26 +983,32 @@ namespace E {
         /***************************************/
         uint32_t data_seq_num = ntohl(packet_header->ack_num);
 
-        if ( !fin && !syn && ack
-             && ( dest_socket_ptr->state_label == Label::ESTABLISHED ||
-                  dest_socket_ptr->state_label == Label::FIN_WAIT_1)
-             && data_seq_num != ( dest_socket_ptr->fin_seq + (uint32_t) 1) ) {
+        if ( dest_socket_ptr->socket_type == MachineType::SERVER ) {
+            int found = FindChildSocketWithPorts(packet_header->dest_port, *src_ip, dest_socket_ptr, socket_bucket);
+            // Find child socket!
+        }
+
+        if (!fin && !syn && ack
+            && (dest_socket_ptr->state_label == Label::ESTABLISHED ||
+                dest_socket_ptr->state_label == Label::FIN_WAIT_1)
+            && dest_socket_ptr->fin_seq == 0) {
+//             && data_seq_num != ( dest_socket_ptr->fin_seq + (uint32_t) 1) ) {
             /* if data_seq_num = ( dest_socket_ptr->fin_seq + (uint32_t) 1), it is ack for fin */
             uint16_t peer_rwnd_temp = ntohs(packet_header->window);
-            uint16_t data_size;
+            uint16_t data_size = 0;
 
             packet->readData(14+2, &data_size, 2);
             data_size = ntohs(data_size); /* extract the header size */
             data_size -= 40;
-            printf("** data size: %d\n", data_size);
+            debug->StarLog("data size", data_size);
 
             if ((int)data_size > 0 ) { /* data came! */
-                debug->StarLog("DATA CAME");
+                debug->BigLog("DATA CAME");
 
                 // TODO: check readBuffer whether it's resend.
                 if (FindDataWithSeq(data_seq_num, dest_socket_ptr->readBuffer) == -1) {
                     // TODO: insert it on readBuffer
-                    debug->StarLog("NO DATA");
+                    debug->StarLog("NOT RESEND");
 
                     DataHolder *dataHolder = new DataHolder;
                     dataHolder->seq_num = data_seq_num;
@@ -996,12 +1020,15 @@ namespace E {
                     dest_socket_ptr->readBuffer->packet_data_bucket.push_back(dataHolder);
                     dest_socket_ptr->readBuffer->last_rcvd_size += data_size;
                     dest_socket_ptr->readBuffer->rwnd -= data_size;
+                } else {
+                    debug->StarLog("RESEND...");
                 }
 
                 // TODO: send ACK to src.
                 debug->StarLog("1");
                 Packet *new_packet = this->allocatePacket(54);
                 TCPHeader *new_header = new TCPHeader;
+
                 new_header->head_length = packet_header->head_length;
                 new_header->offset_res_flags = 0x10; // ACK
                 new_header->dest_port = htons(ntohs(packet_header->src_port));
@@ -1011,31 +1038,34 @@ namespace E {
                 new_header->window = htons(dest_socket_ptr->readBuffer->rwnd);
                 new_header->urgent_ptr = (uint16_t) 0;
                 new_header->checksum = (uint16_t) 0;
-                debug->StarLog("2");
+                debug->StarLog("2: copy header value");
 
 
                 CreatePacketHeader(new_packet, new_header, dest_ip, src_ip, 20, NULL);
-                debug->StarLog("3");
+                debug->StarLog("3: create packet header");
 
                 this->sendPacket("IPv4", new_packet);
                 // TODO: save options in socket.
                 RemoveSocketWithFd(dest_socket_ptr->fd, &socket_bucket);
                 socket_bucket.sockets.push_back(dest_socket_ptr);
-                debug->StarLog("4");
+                debug->StarLog("4: save socket");
 
                 this->freePacket(packet);
 
                 if (block_read_value->isCalled == 1) {
+                    debug->StarLog("Block Value Call");
                     this->syscall_read(
                             block_read_value->syscallUUID,
                             block_read_value->pid,
                             block_read_value->fd,
                             block_read_value->read_content,
                             block_read_value->read_size);
+                    return;
                 }
                 debug->StarLog("5");
 
                 // TODO: save socket.
+//                returnSystemCall(block_read_value->syscallUUID, 0);
                 return;
             }
 
@@ -1649,32 +1679,48 @@ namespace E {
         int max_size = read_buffer->max_size;
         int rwnd = read_buffer->rwnd;
 
+        block_read_value->isCalled = 0;
+
         /* max_size - rwnd = allocated size in read Buffer */
         /* If a len is larger than total data holder length, just read all from the buffer */
         if (len >= max_size - rwnd) {
-            data_ret = (char *) malloc(max_size - rwnd);
+//            data_ret = (char *) malloc(max_size - rwnd);
             for (int i = 0; i < total_dataHolder_length; i++) {
+                printf("data ret: %s", data_ret);
                 memcpy(data_ret + data_ret_index, read_buffer->packet_data_bucket[i]->data,
                        read_buffer->packet_data_bucket[i]->data_size);
                 data_ret_index += read_buffer->packet_data_bucket[i]->data_size;
                 delete_index++;
             }
+
+            read_buffer->rwnd += data_ret_index;
+            read_buffer->last_rcvd_size -= data_ret_index;
+            if (read_buffer->last_rcvd_size < 0) {
+                return -1;
+            }
             if (DeleteDataWithLen(delete_index, read_buffer) == -1)
                 return -1;
-            return 1;
+            return data_ret_index;
         } else {
-            data_ret = (char *) malloc(len);
+//            data_ret = (char *) malloc(len);
             int read_size = 0;
-            for (int i = 0; len >= read_size;) {
+            for (int i = 0; len >= read_size; i++) {
                 memcpy(data_ret + data_ret_index, read_buffer->packet_data_bucket[i]->data,
                        read_buffer->packet_data_bucket[i]->data_size);
+                printf("data ret: %s\n", data_ret);
+
                 data_ret_index += read_buffer->packet_data_bucket[i]->data_size;
                 read_size += read_buffer->packet_data_bucket[i]->data_size;
                 delete_index++;
             }
+            read_buffer->rwnd += data_ret_index;
+            read_buffer->last_rcvd_size -= data_ret_index;
+            if (read_buffer->last_rcvd_size < 0) {
+                return -1;
+            }
             if (DeleteDataWithLen(delete_index, read_buffer) == -1)
                 return -1;
-            return 1;
+            return data_ret_index;
         }
     }
     int TCPAssignment::FindDataWithSeq(uint32_t seq_num, E::ReadBuffer *read_buffer) {
