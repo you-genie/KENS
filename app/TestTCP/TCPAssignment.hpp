@@ -47,6 +47,7 @@ namespace E {
         int max_size = 8192;
         int last_rcvd_size = 0;
         int last_read_size = 0;
+        int buffer_data_size = 0;
         std::vector<DataHolder *> packet_data_bucket = std::vector<DataHolder *>();
     };
     struct Connection {
@@ -197,6 +198,7 @@ namespace E {
         int pid;
         UUID syscallUUID;
         int read_size;
+        int read_offset = 0;
         int fd;
         int isCalled = 0;
     };

@@ -812,6 +812,8 @@ namespace E {
         debug->BigLog("syscall read");
         Socket *socket_ptr = new Socket;
 
+        block_read_value->isCalled = 0;
+
         // TODO: Find Socket
         if (FindSocketWithFd(fd, socket_ptr, socket_bucket) == -1) {
             debug->StarLog("No socket available");
@@ -819,63 +821,108 @@ namespace E {
             return;
         }
 
-        // TODO: READ BUFFER에 값이 있는 경우, read_size만큼 쳐박는다.
-        if (socket_ptr->readBuffer->packet_data_bucket.size() > 0) {
-            debug->Log("HERE IS DATA");
-            if (socket_ptr->readBuffer->last_rcvd_size < read_size) {
-                // read buffer에 있는 값이 읽을 값보다 더 적다. last_rcvd_size를 0으로 만들어 주고, read_size를 재조정한 후 블록.
-                int buffer_read_size = ReadDataWithLen((char *)read_content, read_size, socket_ptr->readBuffer);
-                if (buffer_read_size == -1) {
-                    // there was some error!
-                    return;
-                }
-                debug->StarLog("Data is smaller than read size");
+        debug->Log("read size", read_size);
+        debug->Log("buffer size", socket_ptr->readBuffer->buffer_data_size);
+        debug->Log("read offset", block_read_value->read_offset);
 
-                read_size -= buffer_read_size;
-                block_read_value->syscallUUID = syscallUUID;
-                block_read_value->pid = pid;
-                block_read_value->fd = fd;
-                block_read_value->read_content = read_content;
-                block_read_value->read_size = read_size;
-                block_read_value->isCalled = 1;
+        // TODO: READ BUFFER에 얼마나 들어가 있는지 사이즈 확인.
 
-                RemoveSocketWithFd(fd, &socket_bucket);
-                socket_bucket.sockets.push_back(socket_ptr);
+        // TODO: 만약에 현재 READ BUFFER에 있는 값보다 RC가 더 큰 경우 우선 RC에 값을 꾸겨넣는다.
+        if (socket_ptr->readBuffer->buffer_data_size < read_size - block_read_value->read_offset) {
+            // TODO: RC에 버퍼에 들어 있는 모든 값을 꾸겨넣는다.
+            int data_index = 0;
+            int delete_index = 0;
+            int basic_offset = block_read_value->read_offset;
 
-                return;
-
-            } else {
-                // read buffer에 있는 값이 읽을 값보다 더 크거나 같다. read_size만큼 리턴해 주고, last_rcvd_size 처리를 해 준 후 리.
-//                int buffer_read_size = 2;
-                int buffer_read_size = ReadDataWithLen((char *)read_content, read_size, socket_ptr->readBuffer);
-                debug->StarLog("a", buffer_read_size);
-
-                if (buffer_read_size == -1) {
-                    // There was some error!
-                    return;
-                }
-                block_read_value->isCalled = 0;
-                free(block_read_value->read_content);
-
-                debug->StarLog("syscallUUID in read", (int) syscallUUID);
-//                block_read_value->isCalled = 0;
-                debug->StarLog("a");
-
-                RemoveSocketWithFd(fd, &socket_bucket);
-                socket_bucket.sockets.push_back(socket_ptr);
-
-                returnSystemCall(syscallUUID, buffer_read_size);
-                return;
+            for (int i = 0; i < socket_ptr->readBuffer->packet_data_bucket.size(); i++) {
+                memcpy(
+                        (char *)read_content + basic_offset + data_index,
+                        socket_ptr->readBuffer->packet_data_bucket[i]->data,
+                        socket_ptr->readBuffer->packet_data_bucket[i]->data_size);
+                data_index += socket_ptr->readBuffer->packet_data_bucket[i]->data_size;
+                delete_index++;
             }
-        } else {
-            debug->Log("HERE IS NO DATA");
-            // 블록.
+
+            socket_ptr->readBuffer->rwnd += data_index; // 이거 계산하는 거 다시
+            socket_ptr->readBuffer->last_read_size += data_index;
+            socket_ptr->readBuffer->buffer_data_size = 0;
+
+            // TODO: 읽은 만큼 버퍼에서 삭제 부탁하므니다.
+            if (socket_ptr->readBuffer->packet_data_bucket.size() < delete_index) {
+                debug->StarLog("망함");
+            } else if (delete_index == 0) {
+                // 아무 짓도 하지 마세영
+            } else {
+                socket_ptr->readBuffer->packet_data_bucket.erase(
+                        socket_ptr->readBuffer->packet_data_bucket.begin(),
+                        socket_ptr->readBuffer->packet_data_bucket.begin()+ delete_index);
+            }
+
+            // TODO: 소켓값 저장
+            RemoveSocketWithFd(fd, &socket_bucket);
+            socket_bucket.sockets.push_back(socket_ptr);
+
+            // TODO: block 값 생성.
+            block_read_value->isCalled = 1;
+            block_read_value->read_offset = data_index;
             block_read_value->syscallUUID = syscallUUID;
-            block_read_value->pid = pid;
-            block_read_value->fd = fd;
             block_read_value->read_content = read_content;
             block_read_value->read_size = read_size;
-            block_read_value->isCalled = 1;
+            block_read_value->fd = fd;
+            block_read_value->pid = pid;
+
+            return;
+
+        } else {
+            // TODO: 만약에 현재 존재하는 BUFFER 사이즈가 더 큰 경우. RC에 사이즈만큼 구겨 넣고, 블록값을 풀어 준 후에 리턴.
+            int data_index = 0;
+            int delete_index = 0;
+            int basic_offset = block_read_value->read_offset;
+            int left_len = read_size - basic_offset;
+
+            for (int i = 0; i < socket_ptr->readBuffer->packet_data_bucket.size() && left_len > 0; i++) {
+                int copy_size = socket_ptr->readBuffer->packet_data_bucket[i]->data_size;
+                if (left_len - copy_size < 0) {
+                    // 사이즈 넘었지롱
+                    copy_size = left_len;
+                }
+                memcpy(
+                        (char *)read_content + basic_offset + data_index,
+                        socket_ptr->readBuffer->packet_data_bucket[i]->data,
+                        copy_size);
+                data_index += copy_size;
+                left_len -= copy_size;
+                delete_index++;
+            }
+
+            socket_ptr->readBuffer->rwnd += data_index; // 이거 계산하는 거 다시
+            socket_ptr->readBuffer->last_read_size += data_index;
+            socket_ptr->readBuffer->buffer_data_size = 0;
+
+            // TODO: 읽은 만큼 버퍼에서 삭제 부탁하므니다.
+            if (socket_ptr->readBuffer->packet_data_bucket.size() < delete_index) {
+                debug->StarLog("망함");
+            } else if (delete_index == 0) {
+                // 아무 짓도 하지 마세영
+            } else {
+                socket_ptr->readBuffer->packet_data_bucket.erase(
+                        socket_ptr->readBuffer->packet_data_bucket.begin(),
+                        socket_ptr->readBuffer->packet_data_bucket.begin()+ delete_index);
+            }
+
+            // TODO: 소켓값 저장
+            RemoveSocketWithFd(fd, &socket_bucket);
+            socket_bucket.sockets.push_back(socket_ptr);
+
+            // TODO: block 값 삭제.
+            block_read_value->isCalled = 0;
+            block_read_value->read_offset = 0;
+            block_read_value->syscallUUID = 0;
+            block_read_value->read_size = 0;
+            block_read_value->fd = 0;
+            block_read_value->pid = 0;
+
+            returnSystemCall(syscallUUID, read_size);
             return;
         }
 
@@ -981,7 +1028,7 @@ namespace E {
         /***************************************/
         /****** SENDING DATA ACK MANAGER *******/
         /***************************************/
-        uint32_t data_seq_num = ntohl(packet_header->ack_num);
+        uint32_t data_seq_num = ntohl(packet_header->seq_num);
 
         if ( dest_socket_ptr->socket_type == MachineType::SERVER ) {
             int found = FindChildSocketWithPorts(packet_header->dest_port, *src_ip, dest_socket_ptr, socket_bucket);
@@ -1000,15 +1047,16 @@ namespace E {
             packet->readData(14+2, &data_size, 2);
             data_size = ntohs(data_size); /* extract the header size */
             data_size -= 40;
-            debug->StarLog("data size", data_size);
 
             if ((int)data_size > 0 ) { /* data came! */
                 debug->BigLog("DATA CAME");
+                debug->StarLog("data size", data_size);
 
                 // TODO: check readBuffer whether it's resend.
                 if (FindDataWithSeq(data_seq_num, dest_socket_ptr->readBuffer) == -1) {
                     // TODO: insert it on readBuffer
                     debug->StarLog("NOT RESEND");
+                    debug->Log("ack?", (int)data_seq_num);
 
                     DataHolder *dataHolder = new DataHolder;
                     dataHolder->seq_num = data_seq_num;
@@ -1017,15 +1065,17 @@ namespace E {
 
                     packet->readData(54, dataHolder->data, data_size);
 
+                    dest_socket_ptr->readBuffer->buffer_data_size += data_size;
                     dest_socket_ptr->readBuffer->packet_data_bucket.push_back(dataHolder);
                     dest_socket_ptr->readBuffer->last_rcvd_size += data_size;
-                    dest_socket_ptr->readBuffer->rwnd -= data_size;
+                    dest_socket_ptr->readBuffer->rwnd = dest_socket_ptr->readBuffer->max_size
+                            - dest_socket_ptr->readBuffer->last_rcvd_size
+                            + dest_socket_ptr->readBuffer->last_read_size;
                 } else {
                     debug->StarLog("RESEND...");
                 }
 
                 // TODO: send ACK to src.
-                debug->StarLog("1");
                 Packet *new_packet = this->allocatePacket(54);
                 TCPHeader *new_header = new TCPHeader;
 
@@ -1038,17 +1088,14 @@ namespace E {
                 new_header->window = htons(dest_socket_ptr->readBuffer->rwnd);
                 new_header->urgent_ptr = (uint16_t) 0;
                 new_header->checksum = (uint16_t) 0;
-                debug->StarLog("2: copy header value");
 
 
                 CreatePacketHeader(new_packet, new_header, dest_ip, src_ip, 20, NULL);
-                debug->StarLog("3: create packet header");
 
                 this->sendPacket("IPv4", new_packet);
                 // TODO: save options in socket.
                 RemoveSocketWithFd(dest_socket_ptr->fd, &socket_bucket);
                 socket_bucket.sockets.push_back(dest_socket_ptr);
-                debug->StarLog("4: save socket");
 
                 this->freePacket(packet);
 
@@ -1062,7 +1109,7 @@ namespace E {
                             block_read_value->read_size);
                     return;
                 }
-                debug->StarLog("5");
+                debug->StarLog("no block call");
 
                 // TODO: save socket.
 //                returnSystemCall(block_read_value->syscallUUID, 0);
