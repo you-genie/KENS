@@ -11,6 +11,8 @@
 #include <E/Networking/E_NetworkUtil.hpp>
 #include "TCPAssignment.hpp"
 #include <string.h>
+#include <inttypes.h>
+
 
 using E::SocketBucket;
 using E::Socket;
@@ -1056,7 +1058,8 @@ namespace E {
                 if (FindDataWithSeq(data_seq_num, dest_socket_ptr->readBuffer) == -1) {
                     // TODO: insert it on readBuffer
                     debug->StarLog("NOT RESEND");
-                    debug->Log("ack?", (int)data_seq_num);
+
+                    data_seq_num += data_size;
 
                     DataHolder *dataHolder = new DataHolder;
                     dataHolder->seq_num = data_seq_num;
@@ -1083,7 +1086,7 @@ namespace E {
                 new_header->offset_res_flags = 0x10; // ACK
                 new_header->dest_port = htons(ntohs(packet_header->src_port));
                 new_header->src_port = htons(ntohs(packet_header->dest_port));
-                new_header->ack_num = htonl(data_seq_num + (uint32_t) 1);
+                new_header->ack_num = htonl(data_seq_num);
                 new_header->seq_num = htonl(dest_socket_ptr->seq_num);
                 new_header->window = htons(dest_socket_ptr->readBuffer->rwnd);
                 new_header->urgent_ptr = (uint16_t) 0;
