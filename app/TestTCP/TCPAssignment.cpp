@@ -886,24 +886,43 @@ namespace E {
                 int copy_size = socket_ptr->readBuffer->packet_data_bucket[i]->data_size;
                 if (left_len - copy_size < 0) {
                     // 사이즈 넘었지롱
+                    memcpy(
+                            (char *)read_content + basic_offset + data_index,
+                            socket_ptr->readBuffer->packet_data_bucket[i]->data,
+                            left_len);
+
+                    debug->Log("HERE?");
+
+                    memcpy(
+                            socket_ptr->readBuffer->packet_data_bucket[i]->data,
+                            socket_ptr->readBuffer->packet_data_bucket[i]->data + left_len,
+                            copy_size - left_len);
+
+                    socket_ptr->readBuffer->packet_data_bucket[i]->data_size = copy_size - left_len;
                     copy_size = left_len;
+                    debug->StarLog("copy", copy_size);
+                } else {
+                    delete_index++;
+
+                    memcpy(
+                            (char *)read_content + basic_offset + data_index,
+                            socket_ptr->readBuffer->packet_data_bucket[i]->data,
+                            copy_size);
                 }
-                memcpy(
-                        (char *)read_content + basic_offset + data_index,
-                        socket_ptr->readBuffer->packet_data_bucket[i]->data,
-                        copy_size);
+
                 data_index += copy_size;
                 left_len -= copy_size;
-                delete_index++;
+
+//                delete_index++;
             }
 
             socket_ptr->readBuffer->rwnd += data_index; // 이거 계산하는 거 다시
             socket_ptr->readBuffer->last_read_size += data_index;
-            socket_ptr->readBuffer->buffer_data_size = 0;
+            socket_ptr->readBuffer->buffer_data_size -= data_index;
 
             // TODO: 읽은 만큼 버퍼에서 삭제 부탁하므니다.
             if (socket_ptr->readBuffer->packet_data_bucket.size() < delete_index) {
-                debug->StarLog("망함");
+                debug->StarLog("망 함");
             } else if (delete_index == 0) {
                 // 아무 짓도 하지 마세영
             } else {
