@@ -1061,7 +1061,7 @@ namespace E {
                     DataHolder *dataHolder = new DataHolder;
                     dataHolder->seq_num = data_seq_num;
                     dataHolder->data_size = data_size;
-                    dataHolder->data = (char *)malloc(sizeof(char) * data_size);
+                    dataHolder->data = (char *)malloc(data_size);
 
                     packet->readData(54, dataHolder->data, data_size);
 
