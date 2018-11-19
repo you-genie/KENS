@@ -48,6 +48,7 @@ namespace E {
         int last_rcvd_size = 0;
         int last_read_size = 0;
         int buffer_data_size = 0;
+        uint32_t last_seq_num = (uint32_t) 0;
         std::vector<DataHolder *> packet_data_bucket = std::vector<DataHolder *>();
     };
     struct Connection {

@@ -1056,10 +1056,11 @@ namespace E {
                 debug->StarLog("data seq num", (int)data_seq_num);
 
                 // TODO: check readBuffer whether it's resend.
-                if (FindDataWithSeq(data_seq_num, dest_socket_ptr->readBuffer) == -1) {
+                if (data_seq_num != dest_socket_ptr->readBuffer->last_seq_num) {
                     // TODO: insert it on readBuffer
                     debug->StarLog("NOT RESEND");
 
+                    dest_socket_ptr->readBuffer->last_seq_num = data_seq_num;
                     data_seq_num += data_size;
 
                     DataHolder *dataHolder = new DataHolder;
@@ -1077,6 +1078,8 @@ namespace E {
                             + dest_socket_ptr->readBuffer->last_read_size;
                 } else {
                     debug->StarLog("RESEND...");
+                    this->freePacket(packet);
+                    return;
                 }
 
                 // TODO: send ACK to src.
