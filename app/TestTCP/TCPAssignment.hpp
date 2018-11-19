@@ -96,7 +96,7 @@ namespace E {
         uint32_t seq_num = 0;
         uint32_t ack_num = 0;
         uint32_t last_ack = 0;
-        uint32_t fin_seq = 0;
+        uint32_t fin_seq = -10;
         Peer *peer_values = new Peer;
         WriteBuffer *writeBuffer = new WriteBuffer;
         ReadBuffer *readBuffer = new ReadBuffer;

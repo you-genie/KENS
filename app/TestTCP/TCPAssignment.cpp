@@ -1031,6 +1031,7 @@ namespace E {
         /****** SENDING DATA ACK MANAGER *******/
         /***************************************/
         uint32_t data_seq_num = ntohl(packet_header->seq_num);
+        uint32_t data_ack_num = ntohl(packet_header->ack_num);
 
         if ( dest_socket_ptr->socket_type == MachineType::SERVER ) {
             int found = FindChildSocketWithPorts(packet_header->dest_port, *src_ip, dest_socket_ptr, socket_bucket);
@@ -1040,8 +1041,7 @@ namespace E {
         if (!fin && !syn && ack
             && (dest_socket_ptr->state_label == Label::ESTABLISHED ||
                 dest_socket_ptr->state_label == Label::FIN_WAIT_1)
-            && dest_socket_ptr->fin_seq == 0) {
-//             && data_seq_num != ( dest_socket_ptr->fin_seq + (uint32_t) 1) ) {
+			&& data_ack_num != ( dest_socket_ptr->fin_seq + (uint32_t) 1) ) {
             /* if data_seq_num = ( dest_socket_ptr->fin_seq + (uint32_t) 1), it is ack for fin */
             uint16_t peer_rwnd_temp = ntohs(packet_header->window);
             uint16_t data_size = 0;
