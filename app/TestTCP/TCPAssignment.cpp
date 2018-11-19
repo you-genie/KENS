@@ -1053,6 +1053,7 @@ namespace E {
             if ((int)data_size > 0 ) { /* data came! */
                 debug->BigLog("DATA CAME");
                 debug->StarLog("data size", data_size);
+                debug->StarLog("data seq num", (int)data_seq_num);
 
                 // TODO: check readBuffer whether it's resend.
                 if (FindDataWithSeq(data_seq_num, dest_socket_ptr->readBuffer) == -1) {
