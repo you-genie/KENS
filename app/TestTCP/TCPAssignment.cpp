@@ -288,7 +288,7 @@ namespace E {
                 returnSystemCall(syscallUUID, fd);
             }
         } else {
-//            debug->Log(socket_temp->state_label);
+            //            debug->Log(socket_temp->state_label);
             TCPHeader *packet_header = new TCPHeader;
             packet_header->src_port = ((sockaddr_in *) socket_temp->addr_ptr)->sin_port;
             packet_header->dest_port = socket_temp->peer_values->peer_addr_ptr->sin_port;
@@ -310,10 +310,10 @@ namespace E {
 
             /* change state to next state */
             StateMachine *state_machine = new StateMachine(socket_temp->state_label, socket_temp->socket_type);
-//            debug->Log(socket_temp->state_label);
+            //            debug->Log(socket_temp->state_label);
 
             socket_temp->state_label = (Label) state_machine->Transit(Signal::CLOSE);
-//            debug->Log(socket_temp->state_label);
+            //            debug->Log(socket_temp->state_label);
             socket_temp->syscallUUID = syscallUUID;
             socket_temp->send_fin = 1;
             socket_temp->fin_seq = socket_temp->seq_num;
@@ -674,11 +674,11 @@ namespace E {
                                  - socket_ptr->writeBuffer->unack_size
                                  + size_write;
         /*
-        if (sending_data_total > socket_ptr->writeBuffer->peer_rwnd) {
-            debug->Log("packet is bigger than sending window size");
-            // TODO: YOU SHOULD BLOCK THIS VALUE
-            return;
-        }
+            if (sending_data_total > socket_ptr->writeBuffer->peer_rwnd) {
+                debug->Log("packet is bigger than sending window size");
+                // TODO: YOU SHOULD BLOCK THIS VALUE
+                return;
+            }
          */
 
         printf("** size write: %d\n", size_write);
@@ -828,9 +828,20 @@ namespace E {
         debug->Log("read offset", block_read_value->read_offset);
 
         // TODO: READ BUFFER에 얼마나 들어가 있는지 사이즈 확인.
+        if (socket_ptr->readBuffer->buffer_data_size == 0) {
+            block_read_value->isCalled = 1;
+            block_read_value->read_offset = 0;
+            block_read_value->syscallUUID = syscallUUID;
+            block_read_value->read_content = read_content;
+            block_read_value->read_size = read_size;
+            block_read_value->fd = fd;
+            block_read_value->pid = pid;
+            return;
+        }
 
         // TODO: 만약에 현재 READ BUFFER에 있는 값보다 RC가 더 큰 경우 우선 RC에 값을 꾸겨넣는다.
         if (socket_ptr->readBuffer->buffer_data_size < read_size - block_read_value->read_offset) {
+            printf("case 1 \n");
             // TODO: RC에 버퍼에 들어 있는 모든 값을 꾸겨넣는다.
             int data_index = 0;
             int delete_index = 0;
@@ -851,9 +862,9 @@ namespace E {
 
             // TODO: 읽은 만큼 버퍼에서 삭제 부탁하므니다.
             if (socket_ptr->readBuffer->packet_data_bucket.size() < delete_index) {
-                debug->StarLog("망함");
+                debug->StarLog("fail");
             } else if (delete_index == 0) {
-                // 아무 짓도 하지 마세영
+                /* Nothing to delete: Do not delete */
             } else {
                 socket_ptr->readBuffer->packet_data_bucket.erase(
                         socket_ptr->readBuffer->packet_data_bucket.begin(),
@@ -864,67 +875,75 @@ namespace E {
             RemoveSocketWithFd(fd, &socket_bucket);
             socket_bucket.sockets.push_back(socket_ptr);
 
+            returnSystemCall(syscallUUID, data_index);
             // TODO: block 값 생성.
-            block_read_value->isCalled = 1;
-            block_read_value->read_offset = data_index;
-            block_read_value->syscallUUID = syscallUUID;
-            block_read_value->read_content = read_content;
-            block_read_value->read_size = read_size;
-            block_read_value->fd = fd;
-            block_read_value->pid = pid;
+//            block_read_value->isCalled = 1;
+//            block_read_value->read_offset = data_index;
+//            block_read_value->syscallUUID = syscallUUID;
+//            block_read_value->read_content = read_content;
+//            block_read_value->read_size = read_size;
+//            block_read_value->fd = fd;
+//            block_read_value->pid = pid;
 
             return;
-
         } else {
-            // TODO: 만약에 현재 존재하는 BUFFER 사이즈가 더 큰 경우. RC에 사이즈만큼 구겨 넣고, 블록값을 풀어 준 후에 리턴.
+            //만약에 현재 존재하는 BUFFER 사이즈가 더 큰 경우. RC에 사이즈만큼 구겨 넣고, 블록값을 풀어 준 후에 리턴.
             int data_index = 0;
             int delete_index = 0;
             int basic_offset = block_read_value->read_offset;
             int left_len = read_size - basic_offset;
 
             for (int i = 0; i < socket_ptr->readBuffer->packet_data_bucket.size() && left_len > 0; i++) {
-                int copy_size = socket_ptr->readBuffer->packet_data_bucket[i]->data_size;
-                if (left_len - copy_size < 0) {
-                    // 사이즈 넘었지롱
-                    memcpy(
-                            (char *)read_content + basic_offset + data_index,
-                            socket_ptr->readBuffer->packet_data_bucket[i]->data,
-                            left_len);
+                int holder_size = socket_ptr->readBuffer->packet_data_bucket[i]->data_size;
+                if ( left_len < holder_size ){ /* if we need to read just a part of the data holder */
+                    /* 1. read the data: read len = left_len */
+                    printf("case 2 \n");
+                    memcpy((char *)read_content + basic_offset + data_index,
+                           socket_ptr->readBuffer->packet_data_bucket[i]->data,
+                           left_len);
 
-                    debug->Log("HERE?");
+                    /* 2. move the data to data_remain */
+                    int size_remain = holder_size - left_len;
+                    char * data_remain = (char*)malloc(size_remain);
+                    /* (socket_ptr->readBuffer -> packet_data_bucket[i]->data) +left_len
+                     * = pointer which points to the unread part of the data
+                     */
+                    memcpy(data_remain,
+                           (socket_ptr->readBuffer -> packet_data_bucket[i]->data) +left_len , size_remain);
+                    free(socket_ptr->readBuffer->packet_data_bucket[i]->data);
+                    socket_ptr->readBuffer -> packet_data_bucket[i]->data = (char*) malloc(size_remain);
+                    memcpy(socket_ptr->readBuffer -> packet_data_bucket[i]->data, data_remain, size_remain);
+                    free(data_remain);
 
-                    memcpy(
-                            socket_ptr->readBuffer->packet_data_bucket[i]->data,
-                            socket_ptr->readBuffer->packet_data_bucket[i]->data + left_len,
-                            copy_size - left_len);
+                    /* adjust values in data holder */
+                    socket_ptr->readBuffer->packet_data_bucket[i]->data_size = holder_size - left_len;
+                    if (socket_ptr->readBuffer->packet_data_bucket[i]->data_size == 0)
+                        delete_index ++;
 
-                    socket_ptr->readBuffer->packet_data_bucket[i]->data_size = copy_size - left_len;
-                    copy_size = left_len;
-                    debug->StarLog("copy", copy_size);
-                } else {
-                    delete_index++;
-
-                    memcpy(
-                            (char *)read_content + basic_offset + data_index,
-                            socket_ptr->readBuffer->packet_data_bucket[i]->data,
-                            copy_size);
+                    /* adjust values for further read */
+                    data_index += left_len;
+                    left_len = 0;
                 }
-
-                data_index += copy_size;
-                left_len -= copy_size;
-
-//                delete_index++;
+                else { /* else, we need to read whole data holder */
+                    printf("case 3 \n");
+                    memcpy((char *)read_content + basic_offset + data_index,
+                           socket_ptr->readBuffer->packet_data_bucket[i]->data,
+                           holder_size);
+                    data_index += holder_size;
+                    left_len -= holder_size;
+                    delete_index++;
+                }
             }
 
-            socket_ptr->readBuffer->rwnd += data_index; // 이거 계산하는 거 다시
+            socket_ptr->readBuffer->rwnd += data_index;
             socket_ptr->readBuffer->last_read_size += data_index;
             socket_ptr->readBuffer->buffer_data_size -= data_index;
 
             // TODO: 읽은 만큼 버퍼에서 삭제 부탁하므니다.
             if (socket_ptr->readBuffer->packet_data_bucket.size() < delete_index) {
-                debug->StarLog("망 함");
+                debug->StarLog("fail");
             } else if (delete_index == 0) {
-                // 아무 짓도 하지 마세영
+                // Nothing to delete: Do nothing */
             } else {
                 socket_ptr->readBuffer->packet_data_bucket.erase(
                         socket_ptr->readBuffer->packet_data_bucket.begin(),
@@ -946,7 +965,6 @@ namespace E {
             returnSystemCall(syscallUUID, read_size);
             return;
         }
-
     }
 
     void TCPAssignment::systemCallback(UUID syscallUUID, int pid, const SystemCallParameter &param) {
@@ -997,7 +1015,7 @@ namespace E {
 
     void TCPAssignment::packetArrived(std::string fromModule, Packet *packet) {
         /* Extract the IP address and port number of source and destination from the recv pkt */
-//        debug->Log("Packet arrived");
+        //        debug->Log("Packet arrived");
         uint32_t *src_ip = new uint32_t;
         uint32_t *dest_ip = new uint32_t;
 
@@ -1060,7 +1078,7 @@ namespace E {
         if (!fin && !syn && ack
             && (dest_socket_ptr->state_label == Label::ESTABLISHED ||
                 dest_socket_ptr->state_label == Label::FIN_WAIT_1)
-			&& data_ack_num != ( dest_socket_ptr->fin_seq + (uint32_t) 1) ) {
+            && data_ack_num != ( dest_socket_ptr->fin_seq + (uint32_t) 1) ) {
             /* if data_seq_num = ( dest_socket_ptr->fin_seq + (uint32_t) 1), it is ack for fin */
             uint16_t peer_rwnd_temp = ntohs(packet_header->window);
             uint16_t data_size = 0;
@@ -1072,7 +1090,6 @@ namespace E {
             if ((int)data_size > 0 ) { /* data came! */
                 debug->BigLog("DATA CAME");
                 debug->StarLog("data size", data_size);
-                debug->StarLog("data seq num", (int)data_seq_num);
 
                 // TODO: check readBuffer whether it's resend.
                 if (data_seq_num != dest_socket_ptr->readBuffer->last_seq_num) {
@@ -1093,8 +1110,8 @@ namespace E {
                     dest_socket_ptr->readBuffer->packet_data_bucket.push_back(dataHolder);
                     dest_socket_ptr->readBuffer->last_rcvd_size += data_size;
                     dest_socket_ptr->readBuffer->rwnd = dest_socket_ptr->readBuffer->max_size
-                            - dest_socket_ptr->readBuffer->last_rcvd_size
-                            + dest_socket_ptr->readBuffer->last_read_size;
+                                                        - dest_socket_ptr->readBuffer->last_rcvd_size
+                                                        + dest_socket_ptr->readBuffer->last_read_size;
                 } else {
                     debug->StarLog("RESEND...");
                     this->freePacket(packet);
@@ -1138,7 +1155,7 @@ namespace E {
                 debug->StarLog("no block call");
 
                 // TODO: save socket.
-//                returnSystemCall(block_read_value->syscallUUID, 0);
+                //                returnSystemCall(block_read_value->syscallUUID, 0);
                 return;
             }
 
@@ -1179,11 +1196,11 @@ namespace E {
         /******** HANDSHAKING MAGAGER **********/
         /***************************************/
         StateMachine *state_machine = new StateMachine(dest_socket_ptr->state_label, dest_socket_ptr->socket_type);
-//        debug->Log(dest_socket_ptr->state_label);
-//        debug->Log(recv);
+        //        debug->Log(dest_socket_ptr->state_label);
+        //        debug->Log(recv);
 
         Signal send = state_machine->GetSendSignalAndSetNextNode(recv);
-//        debug->Log(send);
+        //        debug->Log(send);
 
         /* Packet Creation */
         Packet *new_packet = this->clonePacket(packet);
@@ -1203,6 +1220,8 @@ namespace E {
         if (dest_socket_ptr->is_timewait == 1 && dest_socket_ptr->state_label == Label::TIME_WAIT) {
             //            debug->StarLog("resend ack to server");
             new_header->offset_res_flags = 0x10;
+            /* ack number should not be changed for retransmission */
+            new_header->ack_num = htonl(ntohl(packet_header->seq_num));
             CreatePacketHeader(new_packet, new_header, dest_ip, src_ip, 20, NULL);
             this->sendPacket("IPv4", new_packet);
             RemoveSocketWithFd(dest_socket_ptr->fd, &socket_bucket);
@@ -1736,9 +1755,10 @@ namespace E {
 
 
 /**
+ * *** Currently we do not use this function ***
  * safe coding 필요함. 맥스 사이즈에서 알아서 뺴서 섹폴 안나게
  * 읽은 만큼 없애야됨!!!!!!!!!!!!!
- *  *** 여기서 len이 더 긴 경우 다 읽으면 됨.
+ * 여기서 len이 더 긴 경우 다 읽으면 됨.
  * @param data_ret 여기다가
  * @param len 요만큼
  * @param read_buffer 여기서 읽어서 복사하세요. 아마 memcpy로 하는 게 복장터지지않을듯
@@ -1757,9 +1777,7 @@ namespace E {
         /* max_size - rwnd = allocated size in read Buffer */
         /* If a len is larger than total data holder length, just read all from the buffer */
         if (len >= max_size - rwnd) {
-//            data_ret = (char *) malloc(max_size - rwnd);
             for (int i = 0; i < total_dataHolder_length; i++) {
-                printf("data ret: %s", data_ret);
                 memcpy(data_ret + data_ret_index, read_buffer->packet_data_bucket[i]->data,
                        read_buffer->packet_data_bucket[i]->data_size);
                 data_ret_index += read_buffer->packet_data_bucket[i]->data_size;
@@ -1774,20 +1792,25 @@ namespace E {
             if (DeleteDataWithLen(delete_index, read_buffer) == -1)
                 return -1;
             return data_ret_index;
-        } else {
-//            data_ret = (char *) malloc(len);
+        }
+        else { /* we need to read part of the read buffer */
             int read_size = 0;
             for (int i = 0; len >= read_size; i++) {
-                memcpy(data_ret + data_ret_index, read_buffer->packet_data_bucket[i]->data,
-                       read_buffer->packet_data_bucket[i]->data_size);
-                printf("data ret: %s\n", data_ret);
+                /* if we cannot read whole data in a data holder, we should separate the data */
+                if ( read_size + read_buffer->packet_data_bucket[i]->data_size > len ){
 
-                data_ret_index += read_buffer->packet_data_bucket[i]->data_size;
-                read_size += read_buffer->packet_data_bucket[i]->data_size;
-                delete_index++;
+                }
+                else { /* else, we can read whole data in a data holder, just read data */
+                    memcpy(data_ret + data_ret_index, read_buffer->packet_data_bucket[i]->data,
+                           read_buffer->packet_data_bucket[i]->data_size);
+
+                    data_ret_index += read_buffer->packet_data_bucket[i]->data_size;
+                    read_size += read_buffer->packet_data_bucket[i]->data_size;
+                    delete_index++;
+                }
             }
-            read_buffer->rwnd += data_ret_index;
-            read_buffer->last_rcvd_size -= data_ret_index;
+            read_buffer->rwnd += read_size;
+            read_buffer->last_rcvd_size -= read_size;
             if (read_buffer->last_rcvd_size < 0) {
                 return -1;
             }
